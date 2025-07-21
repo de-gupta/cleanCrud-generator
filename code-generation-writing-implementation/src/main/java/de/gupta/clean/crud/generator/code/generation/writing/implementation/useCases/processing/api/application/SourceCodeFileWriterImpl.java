@@ -1,0 +1,23 @@
+package de.gupta.clean.crud.generator.code.generation.writing.implementation.useCases.processing.api.application;
+
+import de.gupta.clean.crud.generator.code.generation.writing.domain.model.SourceCodeWriteRequest;
+import de.gupta.clean.crud.generator.code.generation.writing.useCases.processing.api.application.SourceCodeFileWriter;
+import de.gupta.clean.crud.generator.code.generation.writing.useCases.processing.facade.SourceCodeFileWriterServiceFacade;
+import org.springframework.stereotype.Component;
+
+@Component
+final class SourceCodeFileWriterImpl implements SourceCodeFileWriter
+{
+	private final SourceCodeFileWriterServiceFacade service;
+
+	@Override
+	public void writeSourceCode(final SourceCodeWriteRequest request)
+	{
+		service.writeSourceCode(request);
+	}
+
+	SourceCodeFileWriterImpl(final SourceCodeFileWriterServiceFacade service)
+	{
+		this.service = service;
+	}
+}
