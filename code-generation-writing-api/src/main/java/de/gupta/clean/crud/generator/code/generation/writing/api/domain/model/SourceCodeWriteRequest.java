@@ -7,4 +7,9 @@ public record SourceCodeWriteRequest(
 		boolean overwriteExistingFile
 )
 {
+	public static SourceCodeWriteRequest from(final String contentRootPath, final String fileName,
+											  final String sourceCode, final boolean overwriteExistingFile)
+	{
+		return new SourceCodeWriteRequest(contentRootPath, fileName, sourceCode, overwriteExistingFile);
+	}
 }
