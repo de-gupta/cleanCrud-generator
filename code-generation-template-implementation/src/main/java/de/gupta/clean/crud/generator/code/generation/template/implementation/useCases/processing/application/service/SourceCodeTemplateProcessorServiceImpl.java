@@ -7,14 +7,29 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 final class SourceCodeTemplateProcessorServiceImpl implements SourceCodeTemplateProcessorService
 {
+	private final TemplateProcessor templateProcessor;
+
 	@Override
 	public Map<SourceCodeTemplate, SourceCodeFile> generateSourceCode(final Model model,
 																	  final Set<SourceCodeTemplate> sourceCodeTemplates)
 	{
-		return Map.of();
+		return sourceCodeTemplates.stream()
+								  .collect(Collectors.toMap(
+												  Function.identity(),
+												  sct -> templateProcessor.process(sct, model)
+										  )
+								  );
+
+	}
+
+	SourceCodeTemplateProcessorServiceImpl(final TemplateProcessor templateProcessor)
+	{
+		this.templateProcessor = templateProcessor;
 	}
 }
