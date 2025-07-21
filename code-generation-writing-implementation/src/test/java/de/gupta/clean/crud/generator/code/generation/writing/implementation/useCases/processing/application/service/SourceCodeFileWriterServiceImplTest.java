@@ -1,6 +1,6 @@
 package de.gupta.clean.crud.generator.code.generation.writing.implementation.useCases.processing.application.service;
 
-import de.gupta.clean.crud.generator.code.generation.writing.domain.model.SourceCodeWriteRequest;
+import de.gupta.clean.crud.generator.code.generation.writing.api.domain.model.SourceCodeWriteRequest;
 import de.gupta.commons.utility.javaLanguage.classes.ClassWritingUtility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

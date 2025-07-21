@@ -1,10 +1,10 @@
-package de.gupta.clean.crud.generator.code.generation.implementation.useCases.processing.api.application;
+package de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.api.application;
 
 import de.gupta.clean.crud.generator.code.generation.api.domain.model.Model;
 import de.gupta.clean.crud.generator.code.generation.api.domain.model.SourceCodeFile;
-import de.gupta.clean.crud.generator.code.generation.implementation.useCases.processing.facade.SourceCodeTemplateProcessorServiceFacade;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.SourceCodeTemplate;
 import de.gupta.clean.crud.generator.code.generation.template.api.useCases.processing.api.application.SourceCodeTemplateProcessor;
+import de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.facade.SourceCodeTemplateProcessorServiceFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

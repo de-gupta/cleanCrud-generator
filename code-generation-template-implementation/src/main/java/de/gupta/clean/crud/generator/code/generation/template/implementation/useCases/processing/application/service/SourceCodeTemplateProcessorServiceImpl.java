@@ -1,4 +1,4 @@
-package de.gupta.clean.crud.generator.code.generation.implementation.useCases.processing.application.service;
+package de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.application.service;
 
 import de.gupta.clean.crud.generator.code.generation.api.domain.model.Model;
 import de.gupta.clean.crud.generator.code.generation.api.domain.model.SourceCodeFile;

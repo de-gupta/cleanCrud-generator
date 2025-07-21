@@ -1,4 +1,4 @@
-package de.gupta.clean.crud.generator.code.generation.implementation;
+package de.gupta.clean.crud.generator.code.generation.template.implementation;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

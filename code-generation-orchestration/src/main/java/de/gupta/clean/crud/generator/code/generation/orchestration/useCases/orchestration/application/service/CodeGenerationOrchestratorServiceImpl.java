@@ -3,7 +3,7 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orc
 import de.gupta.clean.crud.generator.code.generation.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
 import de.gupta.clean.crud.generator.code.generation.template.api.useCases.processing.api.application.SourceCodeTemplateProcessor;
-import de.gupta.clean.crud.generator.code.generation.writing.useCases.processing.api.application.SourceCodeFileWriter;
+import de.gupta.clean.crud.generator.code.generation.writing.api.useCases.processing.api.application.SourceCodeFileWriter;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package de.gupta.clean.crud.generator.code.generation.writing.domain.model;
+package de.gupta.clean.crud.generator.code.generation.writing.api.domain.model;
 
 public record SourceCodeWriteRequest(
 		String contentRootPath,
