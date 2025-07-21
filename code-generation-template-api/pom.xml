@@ -7,26 +7,16 @@
         <version>0.0.1</version>
     </parent>
 
-    <name>cleanCrud-generator-orchestration</name>
+    <name>cleanCrud-generator-template-api</name>
     <description>A library for implementing clean architecture based crud operations</description>
     <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
-    <artifactId>code-generation-orchestration</artifactId>
+    <artifactId>code-generation-template-api</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>code-generation-model-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-template-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-writing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
