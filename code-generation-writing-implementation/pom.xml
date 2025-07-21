@@ -23,6 +23,12 @@
             <artifactId>code-generation-writing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>commons-utility</artifactId>
+            <version>${commons.utility.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

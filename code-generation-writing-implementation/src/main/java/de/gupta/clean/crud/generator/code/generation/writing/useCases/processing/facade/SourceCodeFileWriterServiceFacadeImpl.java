@@ -10,9 +10,9 @@ final class SourceCodeFileWriterServiceFacadeImpl implements SourceCodeFileWrite
 	private final SourceCodeFileWriterService service;
 
 	@Override
-	public int writeSourceCode(final SourceCodeWriteRequest request)
+	public void writeSourceCode(final SourceCodeWriteRequest request)
 	{
-		return service.writeSourceCode(request);
+		service.writeSourceCode(request);
 	}
 
 	SourceCodeFileWriterServiceFacadeImpl(final SourceCodeFileWriterService service)

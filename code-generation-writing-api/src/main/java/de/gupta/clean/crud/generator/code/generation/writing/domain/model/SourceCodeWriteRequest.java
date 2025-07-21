@@ -1,7 +1,7 @@
 package de.gupta.clean.crud.generator.code.generation.writing.domain.model;
 
 public record SourceCodeWriteRequest(
-		String contentRoot,
+		String contentRootPath,
 		String packageName,
 		String fileName,
 		String sourceCode,
