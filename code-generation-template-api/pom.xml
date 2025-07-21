@@ -7,6 +7,10 @@
         <version>0.0.2-SNAPSHOT</version>
     </parent>
 
+    <name>cleanCrud-generator-template-api</name>
+    <description>A library for implementing clean architecture based crud operations</description>
+    <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
+
     <artifactId>code-generation-template-api</artifactId>
 
     <dependencies>

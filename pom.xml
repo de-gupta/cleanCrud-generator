@@ -17,9 +17,9 @@
         <module>cleanCrud-generator-api</module>
     </modules>
 
-    <name>cleanCrud</name>
+    <name>cleanCrud-generator</name>
     <description>A library for implementing clean architecture based crud operations</description>
-    <url>https://github.com/de-gupta/cleanCrud.git</url>
+    <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
