@@ -6,6 +6,7 @@ import de.gupta.clean.crud.generator.api.api.cli.ListTemplatesCommand;
 import de.gupta.clean.crud.generator.code.generation.model.implementation.ModelImplementationModuleConfiguration;
 import de.gupta.clean.crud.generator.code.generation.orchestration.OrchestrationModuleConfiguration;
 import de.gupta.clean.crud.generator.code.generation.template.implementation.TemplateImplementationModuleConfiguration;
+import de.gupta.clean.crud.generator.code.generation.writing.implementation.WritingImplementationModuleConfiguration;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 		{
 				ModelImplementationModuleConfiguration.class,
 				TemplateImplementationModuleConfiguration.class,
+				WritingImplementationModuleConfiguration.class,
 				OrchestrationModuleConfiguration.class,
 		}
 )

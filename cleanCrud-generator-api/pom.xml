@@ -30,6 +30,12 @@
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
+            <artifactId>code-generation-writing-implementation</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
             <artifactId>code-generation-orchestration</artifactId>
             <version>${project.version}</version>
         </dependency>
