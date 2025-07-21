@@ -9,22 +9,12 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>code-generation-orchestration</artifactId>
+    <artifactId>code-generation-model-implementation</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>code-generation-model-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-template-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-writing-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

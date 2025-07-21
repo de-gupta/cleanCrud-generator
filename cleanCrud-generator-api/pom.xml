@@ -9,23 +9,35 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>code-generation-orchestration</artifactId>
+    <properties>
+        <picocli.version>4.7.7</picocli.version>
+    </properties>
 
+
+    <artifactId>cleanCrud-generator-api</artifactId>
     <dependencies>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-model-api</artifactId>
+            <artifactId>code-generation-model-implementation</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-template-api</artifactId>
+            <artifactId>code-generation-template-implementation</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-writing-api</artifactId>
+            <artifactId>code-generation-orchestration</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
         </dependency>
     </dependencies>
 
