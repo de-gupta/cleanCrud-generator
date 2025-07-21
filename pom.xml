@@ -19,7 +19,7 @@
         <module>cleanCrud-generator-api</module>
     </modules>
 
-    <name>cleaCrud</name>
+    <name>cleanCrud</name>
     <description>A library for implementing clean architecture based crud operations</description>
     <url>https://github.com/de-gupta/cleanCrud.git</url>
 
