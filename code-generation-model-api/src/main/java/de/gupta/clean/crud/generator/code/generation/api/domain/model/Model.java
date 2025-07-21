@@ -14,4 +14,8 @@ public record Model(
 		Set<Property> properties
 )
 {
+	public Map<String, Object> asMap()
+	{
+		return Map.of();
+	}
 }
