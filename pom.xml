@@ -15,6 +15,7 @@
         <module>code-generation-writing-api</module>
         <module>code-generation-writing-implementation</module>
         <module>cleanCrud-generator-api</module>
+        <module>cleanCrud-generator-master</module>
     </modules>
 
     <name>cleanCrud-generator</name>

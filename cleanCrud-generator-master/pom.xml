@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.de-gupta</groupId>
+        <artifactId>cleanCrud-generator</artifactId>
+        <version>0.0.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cleanCrud-generator-master</artifactId>
+
+    <name>${artifactId}</name>
+    <description>A library for implementing clean architecture based crud operations</description>
+    <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>code-generation-model-implementation</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>code-generation-template-implementation</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>code-generation-writing-implementation</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>code-generation-orchestration</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>cleanCrud-generator-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+</project>

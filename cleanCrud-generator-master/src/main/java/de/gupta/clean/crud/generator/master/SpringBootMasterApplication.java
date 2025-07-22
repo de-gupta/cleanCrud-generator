@@ -1,4 +1,4 @@
-package de.gupta.clean.crud.generator.api;
+package de.gupta.clean.crud.generator.master;
 
 import de.gupta.clean.crud.generator.api.api.cli.CleanCrudGeneratorCLI;
 import de.gupta.clean.crud.generator.api.api.cli.GenerateCommand;
