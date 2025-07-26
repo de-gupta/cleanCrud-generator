@@ -8,9 +8,9 @@ public record Model(
 		String modelName,
 		String packageName,
 		SequencedCollection<String> genericTypeParameters,
-		Map<String, ConcreteType> domainGenericTypes,
-		Map<String, ConcreteType> persistenceGenericTypes,
-		Map<String, ConcreteType> apiGenericTypes,
+//		Map<String, ConcreteType> domainGenericTypes,
+//		Map<String, ConcreteType> persistenceGenericTypes,
+//		Map<String, ConcreteType> apiGenericTypes,
 		Set<Property> properties
 )
 {

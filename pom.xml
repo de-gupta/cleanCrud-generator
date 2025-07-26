@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring.boot.version>3.5.3</spring.boot.version>
-        <commons.utility.version>0.0.3-SNAPSHOT</commons.utility.version>
+        <commons.utility.version>0.0.4-SNAPSHOT</commons.utility.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
@@ -52,6 +52,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>commons-utility</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
