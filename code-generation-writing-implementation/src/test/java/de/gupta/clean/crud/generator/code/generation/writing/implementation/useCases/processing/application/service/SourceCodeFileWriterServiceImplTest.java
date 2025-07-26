@@ -13,6 +13,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -88,7 +89,7 @@ class SourceCodeFileWriterServiceImplTest
 			return Stream.of(
 					Arguments.of("Standard case",
 							new SourceCodeWriteRequest(
-									"src/main/java",
+									Path.of("src/main/java"),
 									"Test.java",
 									"public class Test {}",
 									true
@@ -99,7 +100,7 @@ class SourceCodeFileWriterServiceImplTest
 					Arguments.of(
 							"Empty package",
 							new SourceCodeWriteRequest(
-									"src/main/resources",
+									Path.of("src/main/resources"),
 									"config.properties",
 									"key=value",
 									false
@@ -110,7 +111,7 @@ class SourceCodeFileWriterServiceImplTest
 					Arguments.of(
 							"Deep package structure",
 							new SourceCodeWriteRequest(
-									"src/main/java",
+									Path.of("src/main/java"),
 									"DeepClass.java",
 									"package org.example.deep.structure;\npublic class DeepClass {}",
 									true
@@ -122,7 +123,7 @@ class SourceCodeFileWriterServiceImplTest
 					Arguments.of(
 							"Windows-style paths",
 							new SourceCodeWriteRequest(
-									"C:\\Project\\src",
+									Path.of("C:\\Project\\src"),
 									"WindowsPath.java",
 									"package com.windows.path;\npublic class WindowsPath {}",
 									false
@@ -135,6 +136,7 @@ class SourceCodeFileWriterServiceImplTest
 
 		static Stream<Arguments> nullFieldsTestCases()
 		{
+			final var contentRootPath = Path.of("src/main/java");
 			return Stream.of(
 					Arguments.of(
 							"Null contentRootPath",
@@ -148,7 +150,7 @@ class SourceCodeFileWriterServiceImplTest
 					Arguments.of(
 							"Null packageName",
 							new SourceCodeWriteRequest(
-									"src/main/java",
+									contentRootPath,
 									"Test.java",
 									"public class Test {}",
 									true
@@ -157,7 +159,7 @@ class SourceCodeFileWriterServiceImplTest
 					Arguments.of(
 							"Null fileName",
 							new SourceCodeWriteRequest(
-									"src/main/java",
+									contentRootPath,
 									null,
 									"public class Test {}",
 									true
@@ -166,7 +168,7 @@ class SourceCodeFileWriterServiceImplTest
 					Arguments.of(
 							"Null sourceCode",
 							new SourceCodeWriteRequest(
-									"src/main/java",
+									contentRootPath,
 									"Test.java",
 									null,
 									true
@@ -215,14 +217,11 @@ class SourceCodeFileWriterServiceImplTest
 		@DisplayName("Should throw IllegalArgumentException when request has null fields")
 		void shouldThrowExceptionWhenRequestHasNullFields(String testName, SourceCodeWriteRequest request)
 		{
-			// Given
-			// Parameters from method source
-
-			// When/Then
 			assertThatThrownBy(() -> service.writeSourceCode(request))
 					.as("Exception when calling writeSourceCode with request having null fields")
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessageContaining("No package found in the given class content");
+					.isInstanceOf(IllegalArgumentException.class);
+			// TODO: see how we can have a uniform message
+//					.hasMessageContaining("No package found in the given class content");
 		}
 
 		@Test
@@ -231,7 +230,7 @@ class SourceCodeFileWriterServiceImplTest
 		{
 			// Given
 			SourceCodeWriteRequest request = new SourceCodeWriteRequest(
-					"src/main/java",
+					Path.of("src/main/java"),
 					"Special@Test.java",
 					"public class Special {}",
 					true

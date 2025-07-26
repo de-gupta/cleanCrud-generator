@@ -1,4 +1,4 @@
-package de.gupta.clean.crud.generator.code.generation.api.domain.model;
+package de.gupta.clean.crud.generator.code.generation.model.api.domain.model;
 
 public record SourceCode(String sourceCode)
 {
