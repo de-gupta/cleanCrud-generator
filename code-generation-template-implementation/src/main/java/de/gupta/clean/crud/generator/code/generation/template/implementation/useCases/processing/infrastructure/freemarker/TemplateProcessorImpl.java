@@ -1,5 +1,6 @@
 package de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.freemarker;
 
+import de.gupta.aletheia.functional.Unfolding;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Model;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCode;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCodeFile;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 final class TemplateProcessorImpl implements TemplateProcessor
@@ -24,14 +24,15 @@ final class TemplateProcessorImpl implements TemplateProcessor
 	private final Configuration freemarkerConfiguration;
 
 	@Override
-	public SourceCodeFile process(final SourceCodeTemplate template, final Model model)
+	public SourceCodeFile process(final SourceCodeTemplate template, final Model model,
+								  final Map<String, String> domainGenericTypes,
+								  final Map<String, String> persistenceGenericTypes,
+								  final Map<String, String> apiGenericTypes)
 	{
-		return Optional.ofNullable(template)
-					   .map(t -> Map.entry(t, templateFileName(t)))
-					   .map(e -> SourceCodeFile.with(e.getValue(),
-							   templateCode(e.getKey(), model.asMap()))
-					   )
-					   .orElseThrow(() -> InvalidTemplateException.withMessage("Template cannot be null"));
+		return Unfolding.of(template)
+				.interlace(this::templateFileName)
+				.metamorphose(p -> SourceCodeFile.with(p.second(), templateCode(p.first(), model.asMap())))
+				.decree(() -> InvalidTemplateException.withMessage("Template cannot be null"));
 	}
 
 	private String templateFileName(final SourceCodeTemplate template)

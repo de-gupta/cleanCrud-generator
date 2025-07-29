@@ -10,5 +10,9 @@ import java.util.Set;
 public interface SourceCodeTemplateProcessorService
 {
 	Map<SourceCodeTemplate, SourceCodeFile> generateSourceCode(final Model model,
-															   final Set<SourceCodeTemplate> sourceCodeTemplates);
+															   final Set<SourceCodeTemplate> sourceCodeTemplates,
+															   final Map<String, String> domainGenericTypes,
+															   final Map<String, String> persistenceGenericTypes,
+															   final Map<String, String> apiGenericTypes
+	);
 }

@@ -7,4 +7,5 @@ module code.generation.template.implementation
 
 	requires spring.beans;
 	requires spring.context;
+	requires aletheia;
 }

@@ -13,13 +13,20 @@ public record Model(
 		Set<Property> properties
 )
 {
-	public static Model of(final String modelName, final String packageName,
-						   final Path contentRootPath,
-						   final SequencedCollection<String> genericTypeParameters,
-						   final Set<Property> properties
-	)
+	public static Model of(final String modelName, final String packageName, final Path contentRootPath,
+						   final SequencedCollection<String> genericTypeParameters, final Set<Property> properties)
 	{
 		return new Model(modelName, packageName, contentRootPath, genericTypeParameters, properties);
+	}
+
+	public String basePackage()
+	{
+		return packageName.substring(0, packageName.lastIndexOf(".")).substring(0, packageName.lastIndexOf("."));
+	}
+
+	public boolean isGeneric()
+	{
+		return !genericTypeParameters.isEmpty();
 	}
 
 	public Map<String, Object> asMap()

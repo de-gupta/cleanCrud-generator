@@ -17,9 +17,12 @@ final class SourceCodeTemplateProcessorImpl implements SourceCodeTemplateProcess
 
 	@Override
 	public Map<SourceCodeTemplate, SourceCodeFile> generateSourceCode(final Model model,
-																	  final Set<SourceCodeTemplate> sourceCodeTemplates)
+																	  final Set<SourceCodeTemplate> sourceCodeTemplates,
+																	  final Map<String, String> domainGenericTypes,
+																	  final Map<String, String> persistenceGenericTypes,
+																	  final Map<String, String> apiGenericTypes)
 	{
-		return service.generateSourceCode(model, sourceCodeTemplates);
+		return service.generateSourceCode(model, sourceCodeTemplates, domainGenericTypes, persistenceGenericTypes, apiGenericTypes);
 	}
 
 	SourceCodeTemplateProcessorImpl(final SourceCodeTemplateProcessorServiceFacade service)

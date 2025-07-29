@@ -9,6 +9,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -16,7 +17,6 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import de.gupta.aletheia.collection.Pair;
 import de.gupta.aletheia.functional.Unfolding;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.exceptions.PackageNotFoundException;
@@ -39,8 +39,8 @@ final class JavaParserBasedCodeParser implements CodeParser
 	public String typeName(final String sourceCodeFilePath)
 	{
 		return Unfolding.of(extractType(sourceCodeFilePath))
-						.refold(NodeWithSimpleName::getNameAsString)
-						.reveal();
+						.metamorphose(NodeWithSimpleName::getNameAsString)
+						.summon();
 	}
 
 	@Override
@@ -140,10 +140,10 @@ final class JavaParserBasedCodeParser implements CodeParser
 		final String methodName = methodDeclaration.getNameAsString();
 
 		return Unfolding.of(methodDeclaration)
-						.refold(MethodDeclaration::getType)
-						.refold(type -> Pair.of(type, type.resolve()))
-						.refold(p -> p.transformSecond(ResolvedType::describe))
-						.refold(p -> Property.of(methodName, p.first().toString(), p.second()))
-						.reveal();
+						.metamorphose(MethodDeclaration::getType)
+						.interlace(Type::resolve)
+						.metamorphose(p -> p.transformSecond(ResolvedType::describe))
+						.metamorphose(p -> Property.of(methodName, p.first().toString(), p.second()))
+						.summon();
 	}
 }

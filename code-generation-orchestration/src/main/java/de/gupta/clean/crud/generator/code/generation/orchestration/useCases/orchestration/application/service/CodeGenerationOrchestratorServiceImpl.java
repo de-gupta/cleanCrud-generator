@@ -7,6 +7,7 @@ import de.gupta.clean.crud.generator.code.generation.writing.api.domain.model.So
 import de.gupta.clean.crud.generator.code.generation.writing.api.useCases.processing.api.application.SourceCodeFileWriter;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -22,7 +23,7 @@ final class CodeGenerationOrchestratorServiceImpl implements CodeGenerationOrche
 		var model = modelParser.parseDomainModel(configuration.domainModelSourceCodeFilePath());
 
 		// TODO: determine the templates using options
-		var files = templateProcessor.generateSourceCode(model, Set.of());
+		var files = templateProcessor.generateSourceCode(model, Set.of(), Map.of(), Map.of(), Map.of());
 
 		files.forEach((template, sourceCodeFile) ->
 				{

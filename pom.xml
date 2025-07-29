@@ -55,12 +55,12 @@
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>aletheia</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>commons-utility</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <version>0.0.4</version>
         </dependency>
 
         <dependency>
