@@ -5,4 +5,9 @@ public record SourceCodeTemplate(
 		boolean forceOverwrite
 )
 {
+	public String templateFileName()
+	{
+		// TODO
+		return templateName + ".ftl";
+	}
 }

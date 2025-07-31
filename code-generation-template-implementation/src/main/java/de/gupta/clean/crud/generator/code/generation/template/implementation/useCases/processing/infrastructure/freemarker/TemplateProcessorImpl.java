@@ -30,15 +30,9 @@ final class TemplateProcessorImpl implements TemplateProcessor
 								  final Map<String, String> apiGenericTypes)
 	{
 		return Unfolding.of(template)
-				.interlace(this::templateFileName)
+				.interlace(SourceCodeTemplate::templateFileName)
 				.metamorphose(p -> SourceCodeFile.with(p.second(), templateCode(p.first(), model.asMap())))
 				.decree(() -> InvalidTemplateException.withMessage("Template cannot be null"));
-	}
-
-	private String templateFileName(final SourceCodeTemplate template)
-	{
-		// TODO
-		return "File";
 	}
 
 	private SourceCode templateCode(final SourceCodeTemplate template, final Map<String, Object> model)

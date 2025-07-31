@@ -24,7 +24,7 @@ public final class CleanCrudGeneratorCLI implements Callable<Integer>
 	@Override
 	public Integer call()
 	{
-		System.out.println("Clean Architecture CRUD code generator CLI. Must use of the subcommands");
+		System.out.println("Clean Architecture CRUD code generator CLI. Must use of the subcommands `generate` or `list-templates`");
 		return 1;
 	}
 }

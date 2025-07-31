@@ -2,13 +2,11 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orc
 
 import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.TemplateSelector;
 import de.gupta.clean.crud.generator.code.generation.template.api.useCases.processing.api.application.SourceCodeTemplateProcessor;
 import de.gupta.clean.crud.generator.code.generation.writing.api.domain.model.SourceCodeWriteRequest;
 import de.gupta.clean.crud.generator.code.generation.writing.api.useCases.processing.api.application.SourceCodeFileWriter;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.Set;
 
 @Service
 final class CodeGenerationOrchestratorServiceImpl implements CodeGenerationOrchestratorService
@@ -22,8 +20,9 @@ final class CodeGenerationOrchestratorServiceImpl implements CodeGenerationOrche
 	{
 		var model = modelParser.parseDomainModel(configuration.domainModelSourceCodeFilePath());
 
-		// TODO: determine the templates using options
-		var files = templateProcessor.generateSourceCode(model, Set.of(), Map.of(), Map.of(), Map.of());
+		var files = templateProcessor.generateSourceCode(model, TemplateSelector.with(configuration.templateGroups()),
+				configuration.domainGenericTypes(), configuration.persistenceGenericTypes(),
+				configuration.apiGenericTypes());
 
 		files.forEach((template, sourceCodeFile) ->
 				{

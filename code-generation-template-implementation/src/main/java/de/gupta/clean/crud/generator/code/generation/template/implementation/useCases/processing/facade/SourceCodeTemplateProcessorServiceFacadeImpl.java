@@ -3,6 +3,7 @@ package de.gupta.clean.crud.generator.code.generation.template.implementation.us
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Model;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCodeFile;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.SourceCodeTemplate;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.TemplateSelector;
 import de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.application.service.SourceCodeTemplateProcessorService;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +17,12 @@ final class SourceCodeTemplateProcessorServiceFacadeImpl implements SourceCodeTe
 
 	@Override
 	public Map<SourceCodeTemplate, SourceCodeFile> generateSourceCode(final Model model,
-																	  final Set<SourceCodeTemplate> sourceCodeTemplates,
+																	  final TemplateSelector templateSelector,
 																	  final Map<String, String> domainGenericTypes,
 																	  final Map<String, String> persistenceGenericTypes,
 																	  final Map<String, String> apiGenericTypes)
 	{
-		return service.generateSourceCode(model, sourceCodeTemplates, domainGenericTypes, persistenceGenericTypes, apiGenericTypes);
+		return service.generateSourceCode(model, templateSelector, domainGenericTypes, persistenceGenericTypes, apiGenericTypes);
 	}
 
 	SourceCodeTemplateProcessorServiceFacadeImpl(final SourceCodeTemplateProcessorService service)
