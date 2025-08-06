@@ -1,6 +1,7 @@
 package de.gupta.clean.crud.generator.api.api.cli;
 
 import de.gupta.clean.crud.generator.api.facade.CodeGenerationServiceFacade;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 
@@ -17,10 +18,14 @@ public final class GenerateCommand implements Callable<Integer>
 {
 	private final CodeGenerationServiceFacade service;
 
+	@CommandLine.Parameters(index = "0", description = "Model file path", arity = "0..1")
+	private String modelFilePath;
+
 	@Override
 	public Integer call()
 	{
-		return service.generateCode();
+		var configuration = CodeGenerationConfiguration.of(modelFilePath);
+		return service.generateCode(configuration);
 	}
 
 	GenerateCommand(final CodeGenerationServiceFacade service)

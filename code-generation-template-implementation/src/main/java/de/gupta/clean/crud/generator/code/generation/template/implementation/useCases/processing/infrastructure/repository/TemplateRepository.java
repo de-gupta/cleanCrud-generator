@@ -1,6 +1,6 @@
 package de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.repository;
 
-import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.SourceCodeTemplate;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template.SourceCodeTemplate;
 
 import java.util.Set;
 

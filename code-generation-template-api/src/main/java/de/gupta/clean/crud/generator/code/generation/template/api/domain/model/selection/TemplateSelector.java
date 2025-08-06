@@ -1,4 +1,4 @@
-package de.gupta.clean.crud.generator.code.generation.template.api.domain.model;
+package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection;
 
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -1,9 +1,10 @@
 package de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.application.service;
 
-import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Model;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCodeFile;
-import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.SourceCodeTemplate;
-import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.TemplateSelector;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModel;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateSelector;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template.SourceCodeTemplate;
+import de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.repository.TemplateRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -15,32 +16,31 @@ import java.util.stream.Collectors;
 final class SourceCodeTemplateProcessorServiceImpl implements SourceCodeTemplateProcessorService
 {
 	private final TemplateProcessor templateProcessor;
+	private final TemplateRepository templateRepository;
 
 	@Override
-	public Map<SourceCodeTemplate, SourceCodeFile> generateSourceCode(final Model model,
-																	  final TemplateSelector templateSelector,
-																	  final Map<String, String> domainGenericTypes,
-																	  final Map<String, String> persistenceGenericTypes,
-																	  final Map<String, String> apiGenericTypes)
+	public Map<SourceCodeTemplate, SourceCodeFile> generateSourceCode(final TemplateModel model,
+																	  final TemplateSelector templateSelector)
 	{
 		return resolveTemplates(templateSelector)
 				.stream()
 				.collect(Collectors.toMap(
 								Function.identity(),
-								sct -> templateProcessor.process(sct, model, domainGenericTypes,
-										persistenceGenericTypes, apiGenericTypes)
+								sct -> templateProcessor.process(sct, model)
 						)
 				);
 	}
 
 	private Set<SourceCodeTemplate> resolveTemplates(TemplateSelector selector)
 	{
-		// TODO
-		return Set.of();
+		// TODO: write real logic here
+		return templateRepository.allTemplates();
 	}
 
-	SourceCodeTemplateProcessorServiceImpl(final TemplateProcessor templateProcessor)
+	SourceCodeTemplateProcessorServiceImpl(final TemplateProcessor templateProcessor,
+										   final TemplateRepository templateRepository)
 	{
 		this.templateProcessor = templateProcessor;
+		this.templateRepository = templateRepository;
 	}
 }

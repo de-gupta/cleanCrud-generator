@@ -1,5 +1,6 @@
 package de.gupta.clean.crud.generator.master;
 
+import de.gupta.clean.crud.generator.api.APIModuleConfiguration;
 import de.gupta.clean.crud.generator.api.api.cli.CleanCrudGeneratorCLI;
 import de.gupta.clean.crud.generator.api.api.cli.GenerateCommand;
 import de.gupta.clean.crud.generator.api.api.cli.ListTemplatesCommand;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 @SpringBootApplication
 @Import(
 		{
+				APIModuleConfiguration.class,
 				ModelImplementationModuleConfiguration.class,
 				TemplateImplementationModuleConfiguration.class,
 				WritingImplementationModuleConfiguration.class,

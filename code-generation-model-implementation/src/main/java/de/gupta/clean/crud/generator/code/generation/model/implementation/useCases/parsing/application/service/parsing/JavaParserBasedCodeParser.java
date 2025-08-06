@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-final class JavaParserBasedCodeParser implements CodeParser
+public final class JavaParserBasedCodeParser implements CodeParser
 {
 	@Override
 	public String typeName(final String sourceCodeFilePath)

@@ -2,11 +2,14 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orc
 
 import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
-import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.TemplateSelector;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModelFactory;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateSelector;
 import de.gupta.clean.crud.generator.code.generation.template.api.useCases.processing.api.application.SourceCodeTemplateProcessor;
 import de.gupta.clean.crud.generator.code.generation.writing.api.domain.model.SourceCodeWriteRequest;
 import de.gupta.clean.crud.generator.code.generation.writing.api.useCases.processing.api.application.SourceCodeFileWriter;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 final class CodeGenerationOrchestratorServiceImpl implements CodeGenerationOrchestratorService
@@ -20,9 +23,13 @@ final class CodeGenerationOrchestratorServiceImpl implements CodeGenerationOrche
 	{
 		var model = modelParser.parseDomainModel(configuration.domainModelSourceCodeFilePath());
 
-		var files = templateProcessor.generateSourceCode(model, TemplateSelector.with(configuration.templateGroups()),
-				configuration.domainGenericTypes(), configuration.persistenceGenericTypes(),
-				configuration.apiGenericTypes());
+		// TODO: template model creation better
+		var templateModel = TemplateModelFactory.create(model.packageName(), model.modelName(),
+				model.genericTypeParameters(), model.properties(), configuration.domainConcreteTypes(),
+				configuration.persistenceConcreteTypes(), configuration.apiConcreteTypes(), Set.of());
+
+		var files = templateProcessor.generateSourceCode(templateModel,
+				TemplateSelector.with(configuration.templateGroups()));
 
 		files.forEach((template, sourceCodeFile) ->
 				{

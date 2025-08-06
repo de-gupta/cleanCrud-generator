@@ -1,8 +1,8 @@
 package de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.repository;
 
 import de.gupta.aletheia.functional.Unfolding;
-import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.SourceCodeTemplate;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.exceptions.TemplateLoadingException;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template.SourceCodeTemplate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class TemplateRepositoryImpl implements TemplateRepository
+final class TemplateRepositoryImpl implements TemplateRepository
 {
 	private final Set<SourceCodeTemplate> cachedTemplates;
 
@@ -57,6 +57,7 @@ public class TemplateRepositoryImpl implements TemplateRepository
 
 	private static SourceCodeTemplate createTemplateFromResource(Resource resource)
 	{
+		// TODO: create real template object here
 		return Unfolding.of(resource)
 						.metamorphose(Resource::getFilename)
 						.metamorphose(f -> f.substring(0, f.length() - 4))
