@@ -29,7 +29,7 @@
 
         <spring.boot.version>3.5.3</spring.boot.version>
 
-        <aletheia.version>0.0.5</aletheia.version>
+        <aletheia.version>0.0.12</aletheia.version>
         <commons.utility.version>0.0.5-SNAPSHOT</commons.utility.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>aletheia</artifactId>
-            <version>0.0.3</version>
+            <version>${aletheia.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>

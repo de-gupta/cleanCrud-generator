@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -80,7 +82,7 @@ final class TemplateRepositoryImpl implements TemplateRepository
 
 	private static SourceCodeTemplate createTemplateFromResource(Resource resource)
 	{
-		return Unfolding.of(resource)
+		return Unfolding.beckon(resource)
 						.metamorphose(Resource::getFilename)
 						.metamorphose(f -> f.substring(0, f.length() - 4))
 						.metamorphose(name ->
@@ -98,27 +100,8 @@ final class TemplateRepositoryImpl implements TemplateRepository
 		try
 		{
 			String path = resource.getURI().toString();
-			if (path.contains("/templates/domain/"))
-			{
-				return TemplateGroup.DOMAIN;
-			}
-			else if (path.contains("/templates/api/"))
-			{
-				return TemplateGroup.API;
-			}
-			else if (path.contains("/templates/infrastructure/"))
-			{
-				return TemplateGroup.INFRASTRUCTURE;
-			}
-			else if (path.contains("/templates/use_cases/"))
-			{
-				return TemplateGroup.USE_CASES;
-			}
-			else
-			{
-				// Default fallback for templates in root templates folder
-				return TemplateGroup.DOMAIN;
-			}
+			return Unfolding.beckon(path)
+							.cleave(extractTemplateGroupMap(), TemplateGroup.DOMAIN);
 		}
 		catch (Exception e)
 		{
@@ -139,6 +122,16 @@ final class TemplateRepositoryImpl implements TemplateRepository
 		// TODO: Parse template file content for forceOverwrite flag
 		// For now, return false as default
 		return false;
+	}
+
+	private static Map<Predicate<? super String>, Function<? super String, TemplateGroup>> extractTemplateGroupMap()
+	{
+		return Map.of(
+				path -> path.contains("/templates/domain/"), _ -> TemplateGroup.DOMAIN,
+				path -> path.contains("/templates/api/"), _ -> TemplateGroup.API,
+				path -> path.contains("/templates/infrastructure/"), _ -> TemplateGroup.INFRASTRUCTURE,
+				path -> path.contains("/templates/use_cases/"), _ -> TemplateGroup.USE_CASES
+		);
 	}
 
 	TemplateRepositoryImpl()
