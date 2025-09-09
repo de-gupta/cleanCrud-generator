@@ -27,7 +27,11 @@ public interface ${modelName()}Model<#if isGeneric()><<#list genericTypeParamete
 	interface ${modelName()}ModelBuilder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M extends ${modelName()}Model<#if isGeneric()><<#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>></#if>,B extends ${modelName()}ModelBuilder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M,B${">"}${">"} extends ModelBuilder${"<"}M${">"}
 	{
 	<#list properties() as property>
-	    B with${property.capitalizedName()}(final ${property.returnType()} ${property.name()});
+        <#if property.optional>
+		B with${property.capitalizedName}(${"Optional<"}${property.type}${">"} ${property.name});
+        <#else>
+		B with${property.capitalizedName}(${property.paramType} ${property.name});
+        </#if>
     </#list>
 	}
 }
