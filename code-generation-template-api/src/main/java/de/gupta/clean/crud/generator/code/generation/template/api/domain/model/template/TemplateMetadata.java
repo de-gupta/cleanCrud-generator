@@ -12,7 +12,8 @@ public record TemplateMetadata(
 		Set<String> dependencies,
 		Set<String> tags,
 		Optional<String> author,
-		Optional<String> version
+		Optional<String> version,
+		boolean forceOverwrite
 )
 {
 	public static TemplateMetadata empty()
@@ -22,7 +23,8 @@ public record TemplateMetadata(
 				Set.of(),
 				Set.of(),
 				Optional.empty(),
-				Optional.empty()
+				Optional.empty(),
+				false
 		);
 	}
 
@@ -33,7 +35,20 @@ public record TemplateMetadata(
 				Set.of(),
 				Set.of(),
 				Optional.empty(),
-				Optional.empty()
+				Optional.empty(),
+				false
+		);
+	}
+
+	public static TemplateMetadata with(String description, boolean forceOverwrite)
+	{
+		return new TemplateMetadata(
+				Optional.ofNullable(description),
+				Set.of(),
+				Set.of(),
+				Optional.empty(),
+				Optional.empty(),
+				forceOverwrite
 		);
 	}
 }

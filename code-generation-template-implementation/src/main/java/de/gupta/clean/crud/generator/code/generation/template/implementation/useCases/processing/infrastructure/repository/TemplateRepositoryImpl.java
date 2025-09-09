@@ -4,7 +4,7 @@ import de.gupta.aletheia.functional.Unfolding;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.exceptions.TemplateLoadingException;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template.SourceCodeTemplate;
-import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template.TemplateMetadata;
+import de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.configuration.TemplateMetadataRegistry;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -87,52 +85,21 @@ final class TemplateRepositoryImpl implements TemplateRepository
 						.metamorphose(f -> f.substring(0, f.length() - 4))
 						.metamorphose(name ->
 						{
-							TemplateGroup group = extractTemplateGroupFromResource(resource);
-							TemplateMetadata metadata = extractTemplateMetadata(resource, name);
-							boolean forceOverwrite = extractForceOverwriteFlag(resource);
-							return new SourceCodeTemplate(name, forceOverwrite, group, metadata);
+							var metadataConfig = TemplateMetadataRegistry.getTemplateMetadata(name)
+																		 .orElseThrow(
+																				 () -> TemplateLoadingException.withMessage(
+																						 "Template metadata not found in registry: " + name));
+
+							return new SourceCodeTemplate(
+									name,
+									metadataConfig.metadata().forceOverwrite(),
+									metadataConfig.templateGroup(),
+									metadataConfig.metadata()
+							);
 						})
 						.decree(() -> TemplateLoadingException.withMessage("Failed to create template from resource"));
 	}
 
-	private static TemplateGroup extractTemplateGroupFromResource(Resource resource)
-	{
-		try
-		{
-			String path = resource.getURI().toString();
-			return Unfolding.beckon(path)
-							.cleave(extractTemplateGroupMap(), TemplateGroup.DOMAIN);
-		}
-		catch (Exception e)
-		{
-			throw TemplateLoadingException.withMessage(
-					"Failed to extract template group from resource: " + e.getMessage());
-		}
-	}
-
-	private static TemplateMetadata extractTemplateMetadata(Resource resource, String templateName)
-	{
-		// TODO: Parse template file content for metadata comments
-		// For now, return metadata with template name as description
-		return TemplateMetadata.with("Template: " + templateName);
-	}
-
-	private static boolean extractForceOverwriteFlag(Resource resource)
-	{
-		// TODO: Parse template file content for forceOverwrite flag
-		// For now, return false as default
-		return false;
-	}
-
-	private static Map<Predicate<? super String>, Function<? super String, TemplateGroup>> extractTemplateGroupMap()
-	{
-		return Map.of(
-				path -> path.contains("/templates/domain/"), _ -> TemplateGroup.DOMAIN,
-				path -> path.contains("/templates/api/"), _ -> TemplateGroup.API,
-				path -> path.contains("/templates/infrastructure/"), _ -> TemplateGroup.INFRASTRUCTURE,
-				path -> path.contains("/templates/use_cases/"), _ -> TemplateGroup.USE_CASES
-		);
-	}
 
 	TemplateRepositoryImpl()
 	{
