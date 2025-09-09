@@ -1,10 +1,15 @@
 package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template;
 
-public record SourceCodeTemplate(String templateName, boolean forceOverwrite)
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
+
+public record SourceCodeTemplate(
+		String templateName,
+		boolean forceOverwrite,
+		TemplateGroup templateGroup,
+		TemplateMetadata metadata)
 {
 	public String templateFileName()
 	{
-		// TODO
 		return templateName + ".ftl";
 	}
 

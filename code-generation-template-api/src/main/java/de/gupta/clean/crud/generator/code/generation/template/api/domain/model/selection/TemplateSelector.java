@@ -7,11 +7,9 @@ public record TemplateSelector(Set<TemplateGroup> templateGroups)
 {
 	public static TemplateSelector with(final Set<String> templateGroups)
 	{
-		return new TemplateSelector(
-				templateGroups
-						.stream()
-						.map(TemplateGroup::valueOf)
-						.collect(Collectors.toSet())
+		return new TemplateSelector(templateGroups.stream()
+												  .map(TemplateGroup::valueOf)
+												  .collect(Collectors.toSet())
 		);
 	}
 }

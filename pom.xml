@@ -28,6 +28,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring.boot.version>3.5.3</spring.boot.version>
+
+        <aletheia.version>0.0.5</aletheia.version>
         <commons.utility.version>0.0.5-SNAPSHOT</commons.utility.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>

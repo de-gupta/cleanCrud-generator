@@ -33,8 +33,11 @@ final class SourceCodeTemplateProcessorServiceImpl implements SourceCodeTemplate
 
 	private Set<SourceCodeTemplate> resolveTemplates(TemplateSelector selector)
 	{
-		// TODO: write real logic here
-		return templateRepository.allTemplates();
+		if (selector == null || selector.templateGroups().isEmpty())
+		{
+			return templateRepository.allTemplates();
+		}
+		return templateRepository.findTemplatesByGroups(selector.templateGroups());
 	}
 
 	SourceCodeTemplateProcessorServiceImpl(final TemplateProcessor templateProcessor,
