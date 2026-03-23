@@ -32,8 +32,8 @@ final class ${modelName}APIToDomainUpdateAdapter
 implements APIToDomainUpdateAdapter${"<"}${modelName}APIModelUpdatePatch, ${modelName}DomainModelUpdatePatch${">"}
 {
 <#if isGeneric>
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < apiConcreteTypes?size>
 	private final Function<${apiConcreteTypes[domainIndex]}, ${domainConcreteTypes[domainIndex]}> ${param?lower_case}APIToDomainConverter;
 </#if>
@@ -45,23 +45,23 @@ implements APIToDomainUpdateAdapter${"<"}${modelName}APIModelUpdatePatch, ${mode
 	{
 		return new ${modelName}DomainModelUpdatePatch(
 <#list properties as property>
-<#if isGeneric && genericTypeParams?seq_contains(property.baseType)>
-<#assign index = genericTypeParams?seq_index_of(property.baseType)>
+<#if isGeneric && genericTypeParams()?seq_contains(property.baseType())>
+<#assign index = genericTypeParams()?seq_index_of(property.baseType())>
 <#if index < domainConcreteTypes?size && index < apiConcreteTypes?size>
-			apiModel.${property.name}().map(${property.baseType?lower_case}APIToDomainConverter)<#if property_has_next>,</#if>
+			apiModel.${property.name()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next>,</#if>
 <#else>
-			apiModel.${property.name}()<#if property_has_next>,</#if>
+			apiModel.${property.name()}()<#if property_has_next>,</#if>
 </#if>
 <#else>
-			apiModel.${property.name}()<#if property_has_next>,</#if>
+			apiModel.${property.name()}()<#if property_has_next>,</#if>
 </#if>
 </#list>
 		);
 	}
 
 	${modelName}APIToDomainUpdateAdapter(<#if isGeneric>
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < apiConcreteTypes?size>
 			@Qualifier("${modelName?uncap_first}${param}APIToDomainConverter") final Function<${apiConcreteTypes[domainIndex]}, ${domainConcreteTypes[domainIndex]}> ${param?lower_case}APIToDomainConverter<#if param_has_next>,</#if>
 </#if>
@@ -69,8 +69,8 @@ implements APIToDomainUpdateAdapter${"<"}${modelName}APIModelUpdatePatch, ${mode
 </#if>)
 	{
 <#if isGeneric>
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < apiConcreteTypes?size>
 		this.${param?lower_case}APIToDomainConverter = ${param?lower_case}APIToDomainConverter;
 </#if>

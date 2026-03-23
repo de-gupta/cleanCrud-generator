@@ -17,7 +17,7 @@ public ${modelName}DomainModel toModel(final ${modelName}DomainModelCreate domai
 {
 return modelBuilderFactory.builder()
 <#list properties as property>
-    .with${property.capitalizedName}(domainModelCreate.${property.getter}())<#if property_has_next>
+    .with${property.capitalizedName()}(domainModelCreate.${property.getter()}())<#if property_has_next>
 </#if></#list>
 .build();
 }

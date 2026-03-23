@@ -16,15 +16,15 @@ import ${import};
 final class ${modelName}DomainModelImpl implements ${modelName}DomainModel
 {
 <#list properties as property>
-    <#if genericTypeParams?seq_contains(property.type)>
-        <#assign index = genericTypeParams?seq_index_of(property.type)>
+    <#if genericTypeParams()?seq_contains(property.type())>
+        <#assign index = genericTypeParams()?seq_index_of(property.type())>
         <#if index < domainConcreteTypes?size>
-    private ${domainConcreteTypes[index]} ${property.name};
+    private ${domainConcreteTypes[index]} ${property.name()};
         <#else>
-    private ${property.type} ${property.name};
+    private ${property.type()} ${property.name()};
         </#if>
     <#else>
-    private ${property.type} ${property.name};
+    private ${property.type()} ${property.name()};
     </#if>
 </#list>
 
@@ -35,12 +35,12 @@ final class ${modelName}DomainModelImpl implements ${modelName}DomainModel
 
 <#list properties as property>
     @Override
-    public <#if property.optional>Optional<<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if>><#else><#if genericTypeParams?seq_contains(property.type)><#assign index = genericTypeParams?seq_index_of(property.type)><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.type}</#if><#else>${property.type}</#if></#if> ${property.getter}()
+    public <#if property.optional()>Optional<<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if>><#else><#if genericTypeParams()?seq_contains(property.type())><#assign index = genericTypeParams()?seq_index_of(property.type())><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.type()}</#if><#else>${property.type()}</#if></#if> ${property.getter()}()
     {
-    <#if property.optional>
-        return Optional.ofNullable(${property.name});
+    <#if property.optional()>
+        return Optional.ofNullable(${property.name()});
     <#else>
-        return ${property.name};
+        return ${property.name()};
     </#if>
     }
 
@@ -51,8 +51,8 @@ public int hashCode()
 	// TODO from template: check and adapt if you change equals method
 	int result = 1;
 <#list properties as property>
-	<#if !property.optional>
-	result = 31 * result + (${property.name} != null ? ${property.name}.hashCode() : 0);
+	<#if !property.optional()>
+	result = 31 * result + (${property.name()} != null ? ${property.name()}.hashCode() : 0);
 	</#if>
 </#list>
 	return result;
@@ -65,8 +65,8 @@ public boolean equals(Object o)
 	return o == this ||
 		(o instanceof ${modelName}DomainModel that
 		<#list properties as property>
-			<#if !property.optional>
-			&& Objects.equals(${property.name}, that.${property.name}())
+			<#if !property.optional()>
+			&& Objects.equals(${property.name()}, that.${property.name()}())
 			</#if>
 		</#list>
 		);
@@ -84,13 +84,13 @@ implements
 
 <#list properties as property>
     @Override
-	public ${modelName}DomainModelBuilder with${property.capitalizedName}(
-			final <#if property.optional>Optional<<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if>><#else><#if genericTypeParams?seq_contains(property.type)><#assign index = genericTypeParams?seq_index_of(property.type)><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.type}</#if><#else>${property.type}</#if></#if> ${property.name})
+	public ${modelName}DomainModelBuilder with${property.capitalizedName()}(
+			final <#if property.optional()>Optional<<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if>><#else><#if genericTypeParams()?seq_contains(property.type())><#assign index = genericTypeParams()?seq_index_of(property.type())><#if index < domainConcreteTypes?size>${domainConcreteTypes[index]}<#else>${property.type()}</#if><#else>${property.type()}</#if></#if> ${property.name()})
     {
-    <#if property.optional>
-        ${property.name}.ifPresent(d -> model.${property.name} = d);
+    <#if property.optional()>
+        ${property.name()}.ifPresent(d -> model.${property.name()} = d);
     <#else>
-        model.${property.name} = ${property.name};
+        model.${property.name()} = ${property.name()};
     </#if>
     return this;
     }

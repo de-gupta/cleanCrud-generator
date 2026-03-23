@@ -191,17 +191,6 @@ public final class TemplateMetadataRegistry
 		));
 
 		// API Templates
-		templates.put("APIDomainModelAdapter", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Adapter between API and domain models"),
-						Set.of("ModelAdapter"),
-						Set.of("api", "adapter", "domain"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.API
-		));
 
 		templates.put("APIModelCreateDTO", new TemplateMetadataConfig(
 				new TemplateMetadata(
@@ -268,18 +257,6 @@ public final class TemplateMetadataRegistry
 						Optional.of("Adapter from domain model to API response DTO"),
 						Set.of("ResponseAdapter"),
 						Set.of("api", "adapter", "response"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.API
-		));
-
-		templates.put("SpringRestCrudController", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Spring REST controller for CRUD operations"),
-						Set.of("RestController", "Spring"),
-						Set.of("api", "rest", "crud", "controller"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false
@@ -492,18 +469,6 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.INFRASTRUCTURE
 		));
 
-		templates.put("PersistenceModelJpaCrudRepository", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("JPA CRUD repository for persistence model"),
-						Set.of("JpaRepository", "CRUD"),
-						Set.of("infrastructure", "jpa", "crud", "repository"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.INFRASTRUCTURE
-		));
-
 		templates.put("PersistenceModelJpaDeleteRepository", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("JPA delete repository for persistence model"),
@@ -540,84 +505,83 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.INFRASTRUCTURE
 		));
 
-		// USE_CASES Templates
-		templates.put("ApplicationCrudController", new TemplateMetadataConfig(
+		templates.put("DomainPersistenceAdapterHistoryModel", new TemplateMetadataConfig(
 				new TemplateMetadata(
-						Optional.of("Application controller for CRUD operations"),
-						Set.of("Controller", "CRUD"),
-						Set.of("usecase", "controller", "crud"),
+						Optional.of("History model for domain-persistence ID mappings"),
+						Set.of("PersistenceAdapter", "History", "Model"),
+						Set.of("infrastructure", "persistence", "adapter", "history", "model"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.INFRASTRUCTURE
 		));
 
-		templates.put("ChangePolicy", new TemplateMetadataConfig(
+		templates.put("DomainPersistenceAdapterHistoryJpaRepository", new TemplateMetadataConfig(
 				new TemplateMetadata(
-						Optional.of("Policy for change operations"),
-						Set.of("Policy", "Change"),
-						Set.of("usecase", "policy", "change"),
+						Optional.of("History JPA repository for domain-persistence ID mappings"),
+						Set.of("JpaRepository", "PersistenceAdapter", "History"),
+						Set.of("infrastructure", "persistence", "adapter", "history", "repository"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.INFRASTRUCTURE
 		));
+
+		templates.put("PersistenceModelHistory", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Tri-temporal history entity for persistence models"),
+						Set.of("Entity", "History", "PersistenceModel"),
+						Set.of("infrastructure", "persistence", "history", "entity"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.INFRASTRUCTURE
+		));
+
+		templates.put("PersistenceModelHistoryJpaRepository", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("History JPA repository for persistence models"),
+						Set.of("JpaRepository", "History", "PersistenceModel"),
+						Set.of("infrastructure", "persistence", "history", "repository"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.INFRASTRUCTURE
+		));
+
+		templates.put("PersistenceHistorySnapshotFactory", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Snapshot factory for persistence-model history rows"),
+						Set.of("History", "SnapshotFactory", "PersistenceModel"),
+						Set.of("infrastructure", "persistence", "history", "factory"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.INFRASTRUCTURE
+		));
+
+		templates.put("PersistenceModelJpaUpdateRepository", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("JPA update repository for persistence models"),
+						Set.of("JpaRepository", "Update", "PersistenceModel"),
+						Set.of("infrastructure", "jpa", "update", "repository"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.INFRASTRUCTURE
+		));// USE_CASES Templates
 
 		templates.put("ControllerSecurityAspect", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Security aspect for controllers"),
 						Set.of("Security", "Aspect"),
 						Set.of("usecase", "security", "aspect"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASES
-		));
-
-		templates.put("CrudDomainModelMapper", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Mapper for CRUD domain models"),
-						Set.of("Mapper", "CRUD"),
-						Set.of("usecase", "mapper", "crud"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASES
-		));
-
-		templates.put("CrudPersistenceService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Persistence service for CRUD operations"),
-						Set.of("PersistenceService", "CRUD"),
-						Set.of("usecase", "persistence", "service"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASES
-		));
-
-		templates.put("CrudService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Service for CRUD operations"),
-						Set.of("Service", "CRUD"),
-						Set.of("usecase", "service", "crud"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASES
-		));
-
-		templates.put("CrudServiceFacade", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Facade for CRUD services"),
-						Set.of("Facade", "CRUD"),
-						Set.of("usecase", "facade", "crud"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false
@@ -774,18 +738,6 @@ public final class TemplateMetadataRegistry
 						Optional.of("Policy for patch operations"),
 						Set.of("Policy", "Patch"),
 						Set.of("usecase", "policy", "patch"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASES
-		));
-
-		templates.put("ResourceExistenceDetectionService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Service for detecting resource existence"),
-						Set.of("Service", "ResourceDetection"),
-						Set.of("usecase", "service", "detection"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false

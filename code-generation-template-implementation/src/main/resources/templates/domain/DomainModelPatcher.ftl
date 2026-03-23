@@ -18,12 +18,12 @@ final ${modelName}DomainModelUpdatePatch updatePatch)
 {
 return modelBuilderFactory.builder()
 <#list properties as property>
-    <#if property.optional>
-        .with${property.capitalizedName}(updatePatch.${property.name}().isPresent() ?
-        updatePatch.${property.name}() :
-        originalModel.${property.getter}())
+    <#if property.optional()>
+        .with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ?
+        updatePatch.${property.name()}() :
+        originalModel.${property.getter()}())
     <#else>
-        .with${property.capitalizedName}(updatePatch.${property.name}().orElse(originalModel.${property.getter}()))
+        .with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()))
     </#if><#if property_has_next>
 
 </#if>

@@ -16,19 +16,18 @@
     <dependencies>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-model-api</artifactId>
+            <artifactId>code-generation-model-implementation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-template-api</artifactId>
+            <artifactId>code-generation-template-implementation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-writing-api</artifactId>
+            <artifactId>code-generation-writing-implementation</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
 </project>

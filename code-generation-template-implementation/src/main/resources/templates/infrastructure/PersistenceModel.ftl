@@ -18,7 +18,7 @@ public interface ${modelName}PersistenceModel extends
 		BasePersistenceModel${"<"}UUID${">"},  ${modelName}Model<#if isGeneric><<#list persistenceConcreteTypes as type>${type}<#if type_has_next>, </#if></#list>></#if>
 {
 <#list properties as property>
-    void set${property.capitalizedName}(<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if> ${property.name});
+    void set${property.capitalizedName()}(<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if> ${property.name()});
 </#list>
 
 	interface ${modelName}PersistenceModelBuilder

@@ -6,27 +6,26 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ${modelName}DomainPersistenceAdapterJpaRepository
-extends JpaRepository${"<"}${modelName}DomainPersistenceAdapterModel, Long${">"}
+		extends JpaRepository<${modelName}DomainPersistenceAdapterModel, UUID>
 {
-boolean existsByDomainID(final Long domainID);
+	boolean existsByDomainID(final Long domainID);
 
-@Query("""
-SELECT m.domainID
-FROM ${modelName}DomainPersistenceAdapterModel m
-WHERE m.domainID IN :domainIDs
-"""
-)
-Collection${"<"}Long${">"} findExistingDomainIDsFrom(@Param("domainIDs") final Collection${"<"}Long${">"} domainIDs);
+	Optional<${modelName}DomainPersistenceAdapterModel> findOneByDomainID(Long domainID);
 
-Collection${"<"}${modelName}DomainPersistenceAdapterModel${">"} findAllByDomainIDAndValidFromIsBeforeAndValidToIsAfter(
-final Long domainID, final Instant validFrom, final Instant validTo);
+	Optional<${modelName}DomainPersistenceAdapterModel> findOneByPersistenceID(UUID persistenceID);
 
-Collection${"<"}${modelName}DomainPersistenceAdapterModel${">"} findAllByPersistenceIDAndValidFromIsBeforeAndValidToIsAfter(
-final UUID persistenceID, final Instant validFrom, final Instant validTo);
+	Collection<${modelName}DomainPersistenceAdapterModel> findAllByDomainIDIn(Collection<Long> domainIDs);
+
+	@Query("""
+			SELECT m.domainID
+			FROM ${modelName}DomainPersistenceAdapterModel m
+			WHERE m.domainID IN :domainIDs
+			""")
+	Collection<Long> findExistingDomainIDsFrom(@Param("domainIDs") final Collection<Long> domainIDs);
 }

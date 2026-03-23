@@ -22,8 +22,8 @@ import ${import};
 </#if>
 
 <#if isGeneric>
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < persistenceConcreteTypes?size>
 @Component
 @Qualifier("${modelName?uncap_first}${param}DomainToPersistenceConverter")

@@ -21,16 +21,16 @@ import ${import};
 public interface ${modelName}JpaRepository extends JpaRepository<${modelName}PersistenceModelImpl, UUID>
 {
 <#list properties as property>
-    <#assign propertyParamName = property.name>
-    <#assign capitalizedPropertyName = property.capitalizedName>
-    <#assign propertyFieldName = property.name>
-    <#if property.name == "user">
+    <#assign propertyParamName = property.name()>
+    <#assign capitalizedPropertyName = property.capitalizedName()>
+    <#assign propertyFieldName = property.name()>
+    <#if property.name() == "user">
         <#assign propertyParamName = "userID">
         <#assign capitalizedPropertyName = "UserID">
         <#assign propertyFieldName = "userID">
     </#if>
-    <#if genericTypeParams?seq_contains(property.baseType)>
-        <#assign index = genericTypeParams?seq_index_of(property.baseType)>
+    <#if genericTypeParams()?seq_contains(property.baseType())>
+        <#assign index = genericTypeParams()?seq_index_of(property.baseType())>
         <#if index < persistenceConcreteTypes?size>
         boolean existsBy${capitalizedPropertyName}(final ${persistenceConcreteTypes[index]} ${propertyParamName});
 
@@ -38,17 +38,17 @@ public interface ${modelName}JpaRepository extends JpaRepository<${modelName}Per
         List<${persistenceConcreteTypes[index]}> find${capitalizedPropertyName}sBy${capitalizedPropertyName}In(@Param("${propertyParamName}s") final Collection<${persistenceConcreteTypes[index]}> ${propertyParamName}s);
         <#else>
 
-        boolean existsBy${capitalizedPropertyName}(final ${property.baseType} ${propertyParamName});
+        boolean existsBy${capitalizedPropertyName}(final ${property.baseType()} ${propertyParamName});
 
         @Query("SELECT t.${propertyFieldName} FROM ${modelName}PersistenceModelImpl t WHERE t.${propertyFieldName} IN :${propertyParamName}s")
-        List<${property.baseType}> find${capitalizedPropertyName}sBy${capitalizedPropertyName}In(@Param("${propertyParamName}s") final Collection<${property.type}> ${propertyParamName}s);
+        List<${property.baseType()}> find${capitalizedPropertyName}sBy${capitalizedPropertyName}In(@Param("${propertyParamName}s") final Collection<${property.type()}> ${propertyParamName}s);
 
         </#if>
     <#else>
-        boolean existsBy${capitalizedPropertyName}(final ${property.baseType} ${propertyParamName});
+        boolean existsBy${capitalizedPropertyName}(final ${property.baseType()} ${propertyParamName});
 
         @Query("SELECT t.${propertyFieldName} FROM ${modelName}PersistenceModelImpl t WHERE t.${propertyFieldName} IN :${propertyParamName}s")
-        List<${property.baseType}> find${capitalizedPropertyName}sBy${capitalizedPropertyName}In(@Param("${propertyParamName}s") final Collection<${property.type}> ${propertyParamName}s);
+        List<${property.baseType()}> find${capitalizedPropertyName}sBy${capitalizedPropertyName}In(@Param("${propertyParamName}s") final Collection<${property.type()}> ${propertyParamName}s);
     </#if>
 </#list>
 }

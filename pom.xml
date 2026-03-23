@@ -10,9 +10,6 @@
         <module>code-generation-model-implementation</module>
         <module>code-generation-template-implementation</module>
         <module>code-generation-orchestration</module>
-        <module>code-generation-model-api</module>
-        <module>code-generation-template-api</module>
-        <module>code-generation-writing-api</module>
         <module>code-generation-writing-implementation</module>
         <module>cleanCrud-generator-api</module>
         <module>cleanCrud-generator-master</module>
@@ -169,5 +166,4 @@
             <email>221553154+de-gupta@users.noreply.github.com</email>
         </developer>
     </developers>
-
 </project>

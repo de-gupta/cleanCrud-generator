@@ -9,14 +9,23 @@ public record CodeGenerationConfiguration(
 		Map<String, String> persistenceConcreteTypes,
 		Map<String, String> apiConcreteTypes,
 		Set<String> templateGroups,
-		boolean forceOverwrite
+		boolean forceOverwrite,
+		boolean historized
 )
 {
 	public static CodeGenerationConfiguration of(final String domainModelSourceCodeFilePath)
 	{
+		return of(domainModelSourceCodeFilePath, false);
+	}
+
+	public static CodeGenerationConfiguration of(
+			final String domainModelSourceCodeFilePath,
+			final boolean historized)
+	{
 		var map = Map.of("U", "String", "V", "Long");
 		return new CodeGenerationConfiguration(domainModelSourceCodeFilePath, map, map, map,
 				Set.of(),
-				false);
+				false,
+				historized);
 	}
 }

@@ -12,34 +12,34 @@ import ${import};
 
 public record ${modelName}DomainModelUpdatePatch(
 <#list properties as property>
-    <#if genericTypeParams?seq_contains(property.baseType)>
-        <#assign index = genericTypeParams?seq_index_of(property.baseType)>
+    <#if genericTypeParams()?seq_contains(property.baseType())>
+        <#assign index = genericTypeParams()?seq_index_of(property.baseType())>
         <#if index < domainConcreteTypes?size>
-    Optional<${domainConcreteTypes[index]}> ${property.name}<#if property_has_next>,</#if>
+    Optional<${domainConcreteTypes[index]}> ${property.name()}<#if property_has_next>,</#if>
         <#else>
-    Optional<${property.baseType}> ${property.name}<#if property_has_next>,</#if>
+    Optional<${property.baseType()}> ${property.name()}<#if property_has_next>,</#if>
         </#if>
     <#else>
-    Optional<${property.baseType}> ${property.name}<#if property_has_next>,</#if>
+    Optional<${property.baseType()}> ${property.name()}<#if property_has_next>,</#if>
     </#if>
 </#list>
 )
 {
 	public static ${modelName}DomainModelUpdatePatch of(
 <#list properties as property>
-    <#if genericTypeParams?seq_contains(property.baseType)>
-        <#assign index = genericTypeParams?seq_index_of(property.baseType)>
+    <#if genericTypeParams()?seq_contains(property.baseType())>
+        <#assign index = genericTypeParams()?seq_index_of(property.baseType())>
         <#if index < domainConcreteTypes?size>
-		final Optional<${domainConcreteTypes[index]}> ${property.name}<#if property_has_next>,</#if>
+		final Optional<${domainConcreteTypes[index]}> ${property.name()}<#if property_has_next>,</#if>
         <#else>
-		final Optional<${property.baseType}> ${property.name}<#if property_has_next>,</#if>
+		final Optional<${property.baseType()}> ${property.name()}<#if property_has_next>,</#if>
         </#if>
     <#else>
-		final Optional<${property.baseType}> ${property.name}<#if property_has_next>,</#if>
+		final Optional<${property.baseType()}> ${property.name()}<#if property_has_next>,</#if>
     </#if>
 </#list>
 	)
 	{
-		return new ${modelName}DomainModelUpdatePatch(<#list properties as property>${property.name}<#if property_has_next>, </#if></#list>);
+		return new ${modelName}DomainModelUpdatePatch(<#list properties as property>${property.name()}<#if property_has_next>, </#if></#list>);
 	}
 }

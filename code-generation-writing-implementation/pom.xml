@@ -14,11 +14,5 @@
     <artifactId>code-generation-writing-implementation</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-writing-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
-
 </project>

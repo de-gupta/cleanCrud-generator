@@ -6,47 +6,51 @@ import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persisten
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
 @Qualifier("${modelName?uncap_first}DomainPersistenceAdapterRepository")
 final class ${modelName}DomainPersistenceAdapterRepository
-extends AbstractDomainPersistenceAdapterJpaRepository${"<"}Long, UUID, ${modelName}DomainPersistenceAdapterModel${">"}
-implements DomainPersistenceAdapterRepository${"<"}Long, UUID, ${modelName}DomainPersistenceAdapterModel${">"}
+		extends AbstractDomainPersistenceAdapterJpaRepository<Long, UUID, ${modelName}DomainPersistenceAdapterModel>
+		implements DomainPersistenceAdapterRepository<Long, UUID, ${modelName}DomainPersistenceAdapterModel>
 {
-private final ${modelName}DomainPersistenceAdapterJpaRepository jpaRepository;
+	private final ${modelName}DomainPersistenceAdapterJpaRepository jpaRepository;
 
-@Override
-public boolean existsByDomainID(final Long domainID)
-{
-return jpaRepository.existsByDomainID(domainID);
-}
+	@Override
+	public boolean existsByDomainID(final Long domainID)
+	{
+		return jpaRepository.existsByDomainID(domainID);
+	}
 
-@Override
-public Collection${"<"}Long${">"} existingDomainIDsFrom(final Collection${"<"}Long${">"} domainIDs)
-{
-return jpaRepository.findExistingDomainIDsFrom(domainIDs);
-}
+	@Override
+	public Collection<Long> existingDomainIDsFrom(final Collection<Long> domainIDs)
+	{
+		return jpaRepository.findExistingDomainIDsFrom(domainIDs);
+	}
 
-@Override
-protected Collection${"<"}${modelName}DomainPersistenceAdapterModel${">"} findAllByPersistenceIDAndValidFromIsBeforeAndValidToIsAfter(
-final UUID uuid, final Instant validFrom, final Instant validTo)
-{
-return jpaRepository.findAllByPersistenceIDAndValidFromIsBeforeAndValidToIsAfter(uuid, validFrom, validTo);
-}
+	@Override
+	protected Optional<${modelName}DomainPersistenceAdapterModel> findOneByPersistenceID(final UUID uuid)
+	{
+		return jpaRepository.findOneByPersistenceID(uuid);
+	}
 
-@Override
-protected Collection${"<"}${modelName}DomainPersistenceAdapterModel${">"} findAllByDomainIDAndValidFromIsBeforeAndValidToIsAfter(
-final Long domainID, final Instant validFrom, final Instant validTo)
-{
-return jpaRepository.findAllByDomainIDAndValidFromIsBeforeAndValidToIsAfter(domainID, validFrom, validTo);
-}
+	@Override
+	protected Optional<${modelName}DomainPersistenceAdapterModel> findOneByDomainID(final Long domainID)
+	{
+		return jpaRepository.findOneByDomainID(domainID);
+	}
 
-${modelName}DomainPersistenceAdapterRepository(final ${modelName}DomainPersistenceAdapterJpaRepository jpaRepository)
-{
-super(jpaRepository);
-this.jpaRepository = jpaRepository;
-}
+	@Override
+	protected Collection<${modelName}DomainPersistenceAdapterModel> findAllByDomainIDIn(final Collection<Long> domainIDs)
+	{
+		return jpaRepository.findAllByDomainIDIn(domainIDs);
+	}
+
+	${modelName}DomainPersistenceAdapterRepository(final ${modelName}DomainPersistenceAdapterJpaRepository jpaRepository)
+	{
+		super(jpaRepository);
+		this.jpaRepository = jpaRepository;
+	}
 }

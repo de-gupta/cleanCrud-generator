@@ -12,7 +12,7 @@ import ${import};
 
 public record ${modelName}APIModelUpdatePatch(
 <#list properties as property>
-    Optional<<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < apiConcreteTypes?size>${apiConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if>> ${property.name}<#if property_has_next>,</#if>
+    Optional<<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < apiConcreteTypes?size>${apiConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if>> ${property.name()}<#if property_has_next>,</#if>
 </#list>
 )
 {

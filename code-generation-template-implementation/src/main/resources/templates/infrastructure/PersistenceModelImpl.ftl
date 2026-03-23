@@ -26,21 +26,21 @@ class ${modelName}PersistenceModelImpl implements ${modelName}PersistenceModel
 	private UUID id;
 
 <#list properties as property>
-    <#if !property.optional>
+    <#if !property.optional()>
         @NotNull
         @Column(nullable = false)
     <#else>
-        @Column<#if property.type == "String">(columnDefinition = "TEXT")</#if>
+        @Column<#if property.type() == "String">(columnDefinition = "TEXT")</#if>
     </#if>
-    <#if genericTypeParams?seq_contains(property.type)>
-        <#assign index = genericTypeParams?seq_index_of(property.type)>
+    <#if genericTypeParams()?seq_contains(property.type())>
+        <#assign index = genericTypeParams()?seq_index_of(property.type())>
         <#if index < persistenceConcreteTypes?size>
-    private ${persistenceConcreteTypes[index]} <#if property.name == "user">userID<#else> ${property.name}</#if>;
+    private ${persistenceConcreteTypes[index]} <#if property.name() == "user">userID<#else> ${property.name()}</#if>;
         <#else>
-    private ${property.type} <#if property.name == "user">userID<#else>${property.name}</#if>;
+    private ${property.type()} <#if property.name() == "user">userID<#else>${property.name()}</#if>;
         </#if>
     <#else>
-    private ${property.type} ${property.name};
+    private ${property.type()} ${property.name()};
     </#if>
 </#list>
 
@@ -51,19 +51,19 @@ class ${modelName}PersistenceModelImpl implements ${modelName}PersistenceModel
 
 <#list properties as property>
     @Override
-	public <#if property.optional>Optional<<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if>><#else><#if genericTypeParams?seq_contains(property.type)><#assign index = genericTypeParams?seq_index_of(property.type)><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.type}</#if><#else>${property.type}</#if></#if> ${property.getter}()
+	public <#if property.optional()>Optional<<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if>><#else><#if genericTypeParams()?seq_contains(property.type())><#assign index = genericTypeParams()?seq_index_of(property.type())><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.type()}</#if><#else>${property.type()}</#if></#if> ${property.getter()}()
     {
-    <#if property.optional>
-        return Optional.ofNullable(<#if property.name == "user">userID<#else>${property.name}</#if>);
+    <#if property.optional()>
+        return Optional.ofNullable(<#if property.name() == "user">userID<#else>${property.name()}</#if>);
     <#else>
-    return <#if property.name == "user">userID<#else>${property.name}</#if>;
+    return <#if property.name() == "user">userID<#else>${property.name()}</#if>;
     </#if>
 	}
 
     @Override
-	public void set${property.capitalizedName}(final <#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if> ${property.name})
+	public void set${property.capitalizedName()}(final <#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if> ${property.name()})
 	{
-		this.<#if property.name == "user">userID<#else>${property.name}</#if> = ${property.name};
+		this.<#if property.name() == "user">userID<#else>${property.name()}</#if> = ${property.name()};
 		this.validate();
 	}
 
@@ -98,13 +98,13 @@ class ${modelName}PersistenceModelImpl implements ${modelName}PersistenceModel
 
 <#list properties as property>
     @Override
-	public ${modelName}PersistenceModelBuilder with${property.capitalizedName}(
-			final <#if property.optional>Optional<<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if>><#else><#if genericTypeParams?seq_contains(property.type)><#assign index = genericTypeParams?seq_index_of(property.type)><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.type}</#if><#else>${property.type}</#if></#if> ${property.name})
+	public ${modelName}PersistenceModelBuilder with${property.capitalizedName()}(
+			final <#if property.optional()>Optional<<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if>><#else><#if genericTypeParams()?seq_contains(property.type())><#assign index = genericTypeParams()?seq_index_of(property.type())><#if index < persistenceConcreteTypes?size>${persistenceConcreteTypes[index]}<#else>${property.type()}</#if><#else>${property.type()}</#if></#if> ${property.name()})
 	{
-		<#if property.optional>
-                ${property.name}.ifPresent(d -> model.<#if property.name == "user">userID<#else>${property.name}</#if> = d);
+		<#if property.optional()>
+                ${property.name()}.ifPresent(d -> model.<#if property.name() == "user">userID<#else>${property.name()}</#if> = d);
             <#else>
-                model.<#if property.name == "user">userID<#else>${property.name}</#if> = ${property.name};
+                model.<#if property.name() == "user">userID<#else>${property.name()}</#if> = ${property.name()};
             </#if>
 		return this;
 	}

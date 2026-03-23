@@ -36,8 +36,8 @@ final class ${modelName}DomainToAPIResponseAdapter
 {
 	private final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter;
 <#if isGeneric>
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < apiConcreteTypes?size>
 	private final Function<${domainConcreteTypes[domainIndex]}, ${apiConcreteTypes[domainIndex]}> ${param?lower_case}DomainToAPIConverter;
 </#if>
@@ -52,19 +52,19 @@ final class ${modelName}DomainToAPIResponseAdapter
 		return ${modelName}APIModelResponse.of(
 			idAdapter.mapToAPIModelID(domainModel.id()),
 <#list properties as property>
-<#if isGeneric && genericTypeParams?seq_contains(property.baseType)>
-<#assign index = genericTypeParams?seq_index_of(property.baseType)>
+<#if isGeneric && genericTypeParams()?seq_contains(property.baseType())>
+<#assign index = genericTypeParams()?seq_index_of(property.baseType())>
 <#if index < domainConcreteTypes?size && index < apiConcreteTypes?size>
-			<#if property.optional>
-			domainModel.model().${property.getter}().map(${property.baseType?lower_case}DomainToAPIConverter)<#if property_has_next>,</#if>
+			<#if property.optional()>
+			domainModel.model().${property.getter()}().map(${property.baseType()?lower_case}DomainToAPIConverter)<#if property_has_next>,</#if>
 			<#else>
-			${property.baseType?lower_case}DomainToAPIConverter.apply(domainModel.model().${property.getter}())<#if property_has_next>,</#if>
+			${property.baseType()?lower_case}DomainToAPIConverter.apply(domainModel.model().${property.getter()}())<#if property_has_next>,</#if>
 			</#if>
 <#else>
-			domainModel.model().${property.getter}()<#if property_has_next>,</#if>
+			domainModel.model().${property.getter()}()<#if property_has_next>,</#if>
 </#if>
 <#else>
-			domainModel.model().${property.getter}()<#if property_has_next>,</#if>
+			domainModel.model().${property.getter()}()<#if property_has_next>,</#if>
 </#if>
 </#list>
 		);
@@ -72,8 +72,8 @@ final class ${modelName}DomainToAPIResponseAdapter
 
 	${modelName}DomainToAPIResponseAdapter(
 			final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter<#if isGeneric>,
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < apiConcreteTypes?size>
 			@Qualifier("${modelName?uncap_first}${param}DomainToAPIConverter") final Function<${domainConcreteTypes[domainIndex]}, ${apiConcreteTypes[domainIndex]}> ${param?lower_case}DomainToAPIConverter<#if param_has_next>,</#if>
 </#if>
@@ -82,8 +82,8 @@ final class ${modelName}DomainToAPIResponseAdapter
 	{
 		this.idAdapter = idAdapter;
 <#if isGeneric>
-<#list genericTypeParams as param>
-<#assign domainIndex = genericTypeParams?seq_index_of(param)>
+<#list genericTypeParams() as param>
+<#assign domainIndex = genericTypeParams()?seq_index_of(param)>
 <#if domainIndex < domainConcreteTypes?size && domainIndex < apiConcreteTypes?size>
 		this.${param?lower_case}DomainToAPIConverter = ${param?lower_case}DomainToAPIConverter;
 </#if>

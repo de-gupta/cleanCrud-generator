@@ -15,14 +15,14 @@ import ${import};
 
 public record ${modelName}APIModelCreate(
 <#list properties as property>
-    <#if !property.optional>
-        <#if property.baseType == "String">
-            @NotBlank(message = "${property.capitalizedName} is required")
+    <#if !property.optional()>
+        <#if property.baseType() == "String">
+            @NotBlank(message = "${property.capitalizedName()} is required")
         <#else>
-        @NotNull(message = "${property.capitalizedName} is required")
+        @NotNull(message = "${property.capitalizedName()} is required")
         </#if>
     </#if>
-    <#if property.optional>Optional<<#if genericTypeParams?seq_contains(property.baseType)><#assign index = genericTypeParams?seq_index_of(property.baseType)><#if index < apiConcreteTypes?size>${apiConcreteTypes[index]}<#else>${property.baseType}</#if><#else>${property.baseType}</#if>><#else><#if genericTypeParams?seq_contains(property.type)><#assign index = genericTypeParams?seq_index_of(property.type)><#if index < apiConcreteTypes?size>${apiConcreteTypes[index]}<#else>${property.type}</#if><#else>${property.type}</#if></#if> ${property.name}<#if property_has_next>,</#if>
+    <#if property.optional()>Optional<<#if genericTypeParams()?seq_contains(property.baseType())><#assign index = genericTypeParams()?seq_index_of(property.baseType())><#if index < apiConcreteTypes?size>${apiConcreteTypes[index]}<#else>${property.baseType()}</#if><#else>${property.baseType()}</#if>><#else><#if genericTypeParams()?seq_contains(property.type())><#assign index = genericTypeParams()?seq_index_of(property.type())><#if index < apiConcreteTypes?size>${apiConcreteTypes[index]}<#else>${property.type()}</#if><#else>${property.type()}</#if></#if> ${property.name()}<#if property_has_next>,</#if>
 </#list>
 )
 {
