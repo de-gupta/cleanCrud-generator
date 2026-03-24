@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-<#if isGeneric() && persistenceGenericImports()?has_content>
-<#list persistenceGenericImports() as import>
-<#if import != "java.util.Optional">
+<#if persistenceModelImports()?has_content>
+<#list persistenceModelImports() as import>
+<#if import != "java.util.Optional" && import != "java.util.UUID">
 import ${import};
 </#if>
 </#list>

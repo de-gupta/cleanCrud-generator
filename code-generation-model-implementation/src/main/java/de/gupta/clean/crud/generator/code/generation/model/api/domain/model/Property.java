@@ -2,11 +2,20 @@ package de.gupta.clean.crud.generator.code.generation.model.api.domain.model;
 
 import de.gupta.commons.utility.string.StringCaseUtility;
 
-public record Property(String name, String returnType, String fullyQualifiedTypeName)
+public record Property(String name, String returnType, String fullyQualifiedTypeName, boolean enumType)
 {
 	public static Property of(final String name, final String returnType, final String fullyQualifiedTypeName)
 	{
-		return new Property(name, returnType, fullyQualifiedTypeName);
+		return new Property(name, returnType, fullyQualifiedTypeName, false);
+	}
+
+	public static Property of(
+			final String name,
+			final String returnType,
+			final String fullyQualifiedTypeName,
+			final boolean enumType)
+	{
+		return new Property(name, returnType, fullyQualifiedTypeName, enumType);
 	}
 
 	public String capitalizedName()
@@ -42,6 +51,11 @@ public record Property(String name, String returnType, String fullyQualifiedType
 	public String baseTypeImport()
 	{
 		return extractImport(optional() ? stripOuterGeneric(fullyQualifiedTypeName) : fullyQualifiedTypeName);
+	}
+
+	public boolean isEnum()
+	{
+		return enumType;
 	}
 
 	private String extractImport(final String typeName)

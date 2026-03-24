@@ -5,8 +5,8 @@ import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 
 import java.util.Objects;
 import java.util.Optional;
-<#if isGeneric() && domainGenericImports()?has_content>
-<#list domainGenericImports() as import>
+<#if domainModelImports()?has_content>
+<#list domainModelImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>

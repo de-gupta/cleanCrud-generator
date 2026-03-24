@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Optional;
-<#if isGeneric() && apiGenericImports()?has_content>
-<#list apiGenericImports() as import>
+<#if apiModelImports()?has_content>
+<#list apiModelImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>

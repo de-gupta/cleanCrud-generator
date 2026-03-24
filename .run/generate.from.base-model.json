@@ -19,7 +19,7 @@
     "USE_CASES",
     "COMMON"
   ],
-  "generateCommonFiles": null,
+  "generateCommonFiles": true,
   "forceOverwrite": true,
   "historized": true
 }

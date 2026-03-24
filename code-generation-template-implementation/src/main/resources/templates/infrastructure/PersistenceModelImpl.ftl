@@ -9,8 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-<#if isGeneric() && persistenceGenericImports()?has_content>
-<#list persistenceGenericImports() as import>
+<#if persistenceModelImports()?has_content>
+<#list persistenceModelImports() as import>
 <#if import != "java.util.Optional" && import != "java.util.UUID">
 import ${import};
 </#if>
@@ -28,8 +28,14 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 <#list properties() as property>
 	<#if !property.optional()>
 	@NotNull
+	<#if property.isEnum()>
+	@Enumerated(EnumType.STRING)
+	</#if>
 	@Column(name = "${sqlColumnName(property)}", nullable = false)
 	<#else>
+	<#if property.isEnum()>
+	@Enumerated(EnumType.STRING)
+	</#if>
 	@Column(name = "${sqlColumnName(property)}"<#if property.type() == "String">, columnDefinition = "TEXT"</#if>)
 	</#if>
 	private ${persistenceResolvedType(property.baseType())} ${property.name()};

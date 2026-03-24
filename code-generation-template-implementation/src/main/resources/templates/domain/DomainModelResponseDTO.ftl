@@ -3,8 +3,8 @@ package ${basePackage()}.domain.model.dto;
 import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
 
 import java.util.Optional;
-<#if isGeneric() && domainGenericImports()?has_content>
-<#list domainGenericImports() as import>
+<#if domainModelImports()?has_content>
+<#list domainModelImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>

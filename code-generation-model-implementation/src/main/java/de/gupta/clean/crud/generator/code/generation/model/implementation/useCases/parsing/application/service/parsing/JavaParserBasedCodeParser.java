@@ -3,6 +3,7 @@ package de.gupta.clean.crud.generator.code.generation.model.implementation.useCa
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.SequencedCollection;
@@ -74,13 +76,16 @@ public final class JavaParserBasedCodeParser implements CodeParser
 	@Override
 	public Set<Property> properties(final String sourceCodeFilePath)
 	{
+		final var sourcePackageName = packageName(sourceCodeFilePath);
+		final var compilationUnit = parseSourceCodeFile(sourceCodeFilePath, createConfiguredParser(sourceCodeFilePath));
 		return extractType(sourceCodeFilePath)
 				.getMembers()
 				.stream()
 				.filter(BodyDeclaration::isMethodDeclaration)
 				.map(BodyDeclaration::asMethodDeclaration)
 				.filter(this::isPropertyAccessor)
-				.map(this::extractProperty)
+				.map(methodDeclaration -> extractProperty(methodDeclaration, sourceCodeFilePath, sourcePackageName,
+						compilationUnit))
 				.collect(Collectors.toSet());
 	}
 
@@ -143,15 +148,90 @@ public final class JavaParserBasedCodeParser implements CodeParser
 		return levels == 0 ? path : ascend(path.getParent(), levels - 1);
 	}
 
-	private Property extractProperty(final MethodDeclaration methodDeclaration)
+	private Property extractProperty(
+			final MethodDeclaration methodDeclaration,
+			final String sourceCodeFilePath,
+			final String sourcePackageName,
+			final CompilationUnit compilationUnit)
 	{
 		final String methodName = methodDeclaration.getNameAsString();
+		final Type propertyType = methodDeclaration.getType();
 
-		return Unfolding.of(methodDeclaration)
-						.metamorphose(MethodDeclaration::getType)
+		return Unfolding.of(propertyType)
 						.interlace(Type::resolve)
-						.metamorphose(p -> p.transformSecond(ResolvedType::describe))
-						.metamorphose(p -> Property.of(methodName, p.first().toString(), p.second()))
+						.metamorphose(p -> Property.of(
+								methodName,
+								p.first().toString(),
+								p.second().describe(),
+								isEnumType(p.second()) || isEnumType(p.first().toString(), sourceCodeFilePath,
+										sourcePackageName, compilationUnit)))
 						.summon();
+	}
+
+	private boolean isEnumType(final ResolvedType resolvedType)
+	{
+		if (!resolvedType.isReferenceType())
+		{
+			return false;
+		}
+		var referenceType = resolvedType.asReferenceType();
+		if (referenceType.getTypeDeclaration().map(typeDeclaration -> typeDeclaration.isEnum()).orElse(false))
+		{
+			return true;
+		}
+		return referenceType.getQualifiedName().equals("java.util.Optional")
+				&& !referenceType.typeParametersValues().isEmpty()
+				&& isEnumType(referenceType.typeParametersValues().getFirst());
+	}
+
+	private boolean isEnumType(
+			final String declaredType,
+			final String sourceCodeFilePath,
+			final String sourcePackageName,
+			final CompilationUnit compilationUnit)
+	{
+		final String baseTypeName = baseTypeName(declaredType);
+		if (baseTypeName.isBlank() || baseTypeName.contains(".") || Character.isLowerCase(baseTypeName.charAt(0)))
+		{
+			return false;
+		}
+		final Path candidate = contentRootPath(sourceCodeFilePath)
+				.resolve(resolveQualifiedTypeName(baseTypeName, sourcePackageName, compilationUnit).replace('.',
+						File.separatorChar) + ".java");
+		if (!Files.exists(candidate))
+		{
+			return false;
+		}
+		return parseSourceCodeFile(candidate.toString(), new JavaParser())
+				.getTypes()
+				.stream()
+				.filter(TypeDeclaration::isTopLevelType)
+				.filter(typeDeclaration -> typeDeclaration.getNameAsString().equals(baseTypeName))
+				.anyMatch(TypeDeclaration::isEnumDeclaration);
+	}
+
+	private String resolveQualifiedTypeName(
+			final String baseTypeName,
+			final String sourcePackageName,
+			final CompilationUnit compilationUnit)
+	{
+		return compilationUnit.getImports()
+							  .stream()
+							  .map(ImportDeclaration::getNameAsString)
+							  .filter(importName -> importName.endsWith("." + baseTypeName))
+							  .findFirst()
+							  .orElse(sourcePackageName + "." + baseTypeName);
+	}
+
+	private String baseTypeName(final String declaredType)
+	{
+		final String trimmed = declaredType.trim();
+		final int genericStart = trimmed.indexOf('<');
+		final int genericEnd = trimmed.lastIndexOf('>');
+		if (genericStart >= 0 && genericEnd > genericStart)
+		{
+			return baseTypeName(trimmed.substring(genericStart + 1, genericEnd));
+		}
+		return trimmed;
 	}
 }

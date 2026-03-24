@@ -14,7 +14,15 @@ public interface TemplateModel
 			Map.entry("value", "value_value")
 	);
 	Map<String, String> SIMPLE_TYPE_IMPORTS = Map.ofEntries(
-			Map.entry("UUID", "java.util.UUID")
+			Map.entry("UUID", "java.util.UUID"),
+			Map.entry("LocalDate", "java.time.LocalDate"),
+			Map.entry("LocalDateTime", "java.time.LocalDateTime"),
+			Map.entry("LocalTime", "java.time.LocalTime"),
+			Map.entry("Instant", "java.time.Instant"),
+			Map.entry("OffsetDateTime", "java.time.OffsetDateTime"),
+			Map.entry("ZonedDateTime", "java.time.ZonedDateTime"),
+			Map.entry("BigDecimal", "java.math.BigDecimal"),
+			Map.entry("BigInteger", "java.math.BigInteger")
 	);
 
 	String packageName();
@@ -75,14 +83,49 @@ public interface TemplateModel
 
 	Set<String> domainGenericImports();
 
+	default Set<String> propertyImports()
+	{
+		var imports = new LinkedHashSet<String>();
+		properties().forEach(property ->
+		{
+			var explicitImport = property.baseTypeImport();
+			if (!explicitImport.isBlank())
+			{
+				imports.add(explicitImport);
+				return;
+			}
+			var inferredImport = importForType(property.baseType());
+			if (!inferredImport.isBlank())
+			{
+				imports.add(inferredImport);
+			}
+		});
+		return imports;
+	}
+
+	default Set<String> domainModelImports()
+	{
+		return combineImports(domainGenericImports(), propertyImports());
+	}
+
 	default Set<String> persistenceGenericImports()
 	{
 		return combineImports(domainGenericImports(), inferredConcreteTypeImports(persistenceConcreteTypes()));
 	}
 
+	default Set<String> persistenceModelImports()
+	{
+		return combineImports(persistenceGenericImports(), propertyImports());
+	}
+
 	default Set<String> apiGenericImports()
 	{
 		return combineImports(domainGenericImports(), inferredConcreteTypeImports(apiConcreteTypes()));
+	}
+
+	default Set<String> apiModelImports()
+	{
+		return combineImports(apiGenericImports(), propertyImports());
 	}
 
 	SequencedCollection<String> genericTypeParameters();

@@ -6,8 +6,8 @@ import de.gupta.clean.crud.template.domain.model.builder.ModelBuilder;
 import de.gupta.clean.crud.template.infrastructure.persistence.model.BasePersistenceModel;
 
 import java.util.UUID;
-<#if isGeneric() && persistenceGenericImports()?has_content>
-<#list persistenceGenericImports() as import>
+<#if persistenceModelImports()?has_content>
+<#list persistenceModelImports() as import>
 <#if import != "java.util.UUID">
 import ${import};
 </#if>
