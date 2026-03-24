@@ -29,7 +29,8 @@ final class ${modelName()}${param}DomainToAPIConverter implements Function<${dom
 	@Override
 	public ${apiConcreteType(param)} apply(final ${domainConcreteType(param)} domainValue)
 	{
-		return null;
+		// TODO from Template: implement conversion from ${domainConcreteType(param)} to ${apiConcreteType(param)}.
+		throw new UnsupportedOperationException("TODO from Template: implement ${param} domain-to-API conversion");
 	}
 }
 
@@ -40,7 +41,8 @@ final class ${modelName()}${param}APIToDomainConverter implements Function<${api
 	@Override
 	public ${domainConcreteType(param)} apply(final ${apiConcreteType(param)} apiValue)
 	{
-		return null;
+		// TODO from Template: implement conversion from ${apiConcreteType(param)} to ${domainConcreteType(param)}.
+		throw new UnsupportedOperationException("TODO from Template: implement ${param} API-to-domain conversion");
 	}
 }
 

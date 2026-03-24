@@ -29,7 +29,8 @@ final class ${modelName()}${param}DomainToPersistenceConverter implements Functi
 	@Override
 	public ${persistenceConcreteType(param)} apply(final ${domainConcreteType(param)} domainValue)
 	{
-		return null;
+		// TODO from Template: implement conversion from ${domainConcreteType(param)} to ${persistenceConcreteType(param)}.
+		throw new UnsupportedOperationException("TODO from Template: implement ${param} domain-to-persistence conversion");
 	}
 }
 
@@ -40,7 +41,8 @@ final class ${modelName()}${param}PersistenceToDomainConverter implements Functi
 	@Override
 	public ${domainConcreteType(param)} apply(final ${persistenceConcreteType(param)} persistenceValue)
 	{
-		return null;
+		// TODO from Template: implement conversion from ${persistenceConcreteType(param)} to ${domainConcreteType(param)}.
+		throw new UnsupportedOperationException("TODO from Template: implement ${param} persistence-to-domain conversion");
 	}
 }
 

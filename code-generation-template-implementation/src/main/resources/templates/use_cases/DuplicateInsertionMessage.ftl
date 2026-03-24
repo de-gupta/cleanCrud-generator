@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 final class ${modelBaseName()}DuplicateInsertionMessage implements DuplicateInsertionMessage${"<"}${modelBaseName()}DomainModel${">"}
 {
-@Override
-public String messageIfModelAlreadyExists(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
-{
-// TODO from Template: write custom logic here
-return "The ${modelName()?lower_case} with ${properties()[0].name()} `" + ${beanNamePrefix()}DomainModel.${properties()[0].getter()}() + "` already exists";
-}
+	@Override
+	public String messageIfModelAlreadyExists(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
+	{
+		// TODO from Template: customize this duplicate message for the business key your API should expose.
+		return "The ${modelName()?lower_case} with ${properties()[0].name()} `" + ${beanNamePrefix()}DomainModel.${properties()[0].getter()}() + "` already exists";
+	}
 }

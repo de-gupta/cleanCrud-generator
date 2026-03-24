@@ -8,9 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 final class ${modelBaseName()}DomainSecurityPolicy implements DomainSecurityPolicy${"<"}${modelBaseName()}DomainModel${">"}
 {
-@Override
-public boolean isAccessAllowed(final ${modelBaseName()}DomainModel domainModel)
-{
-return true;
-}
+	@Override
+	public boolean isAccessAllowed(final ${modelBaseName()}DomainModel domainModel)
+	{
+		// TODO from Template: replace this permissive default with real domain visibility rules.
+		// Example: return currentUserCanSee(domainModel);
+		return true;
+	}
 }

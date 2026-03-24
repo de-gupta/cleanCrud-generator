@@ -10,5 +10,7 @@ final class ${modelBaseName()}ChangePolicy implements ChangePolicy<${modelBaseNa
 	@Override
 	public void validateChangeAttempt(final ${modelBaseName()}DomainModel originalModel, final ${modelBaseName()}DomainModel updatedModel)
 	{
+		// TODO from Template: validate whether the change from originalModel to updatedModel is allowed.
+		// Example: prevent changes to immutable business fields or state transitions.
 	}
 }

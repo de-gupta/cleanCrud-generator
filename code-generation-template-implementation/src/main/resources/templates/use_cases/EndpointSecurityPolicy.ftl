@@ -13,6 +13,8 @@ public final class ${modelBaseName()}EndpointSecurityPolicy implements EndpointS
 	@Override
 	public boolean isAccessAllowed(final Method method, final Object[] args, final HttpServletRequest request)
 	{
+		// TODO from Template: replace this permissive default with real endpoint authorization logic.
+		// Example: return request.isUserInRole("ADMIN") || method.getName().startsWith("find");
 		return true;
 	}
 }

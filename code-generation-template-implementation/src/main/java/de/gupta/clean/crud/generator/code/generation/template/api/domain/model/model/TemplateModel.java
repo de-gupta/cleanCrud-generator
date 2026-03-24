@@ -2,10 +2,7 @@ package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.
 
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.SequencedCollection;
-import java.util.Set;
+import java.util.*;
 
 public interface TemplateModel
 {
@@ -15,6 +12,9 @@ public interface TemplateModel
 			Map.entry("group", "group_value"),
 			Map.entry("key", "key_value"),
 			Map.entry("value", "value_value")
+	);
+	Map<String, String> SIMPLE_TYPE_IMPORTS = Map.ofEntries(
+			Map.entry("UUID", "java.util.UUID")
 	);
 
 	String packageName();
@@ -77,12 +77,12 @@ public interface TemplateModel
 
 	default Set<String> persistenceGenericImports()
 	{
-		return domainGenericImports();
+		return combineImports(domainGenericImports(), inferredConcreteTypeImports(persistenceConcreteTypes()));
 	}
 
 	default Set<String> apiGenericImports()
 	{
-		return domainGenericImports();
+		return combineImports(domainGenericImports(), inferredConcreteTypeImports(apiConcreteTypes()));
 	}
 
 	SequencedCollection<String> genericTypeParameters();
@@ -191,6 +191,40 @@ public interface TemplateModel
 	private String resolveConcreteType(final Map<String, String> concreteTypes, final String declaredType)
 	{
 		return concreteTypes.getOrDefault(declaredType, declaredType);
+	}
+
+	private Set<String> inferredConcreteTypeImports(final Map<String, String> concreteTypes)
+	{
+		var imports = new LinkedHashSet<String>();
+		concreteTypes.values().stream()
+					 .map(this::importForType)
+					 .filter(importName -> !importName.isBlank())
+					 .forEach(imports::add);
+		return imports;
+	}
+
+	private Set<String> combineImports(final Set<String> first, final Set<String> second)
+	{
+		var combined = new LinkedHashSet<String>();
+		combined.addAll(first);
+		combined.addAll(second);
+		return combined;
+	}
+
+	private String importForType(final String typeName)
+	{
+		var rawType = stripGenericArguments(typeName);
+		if (rawType.contains("."))
+		{
+			return rawType;
+		}
+		return SIMPLE_TYPE_IMPORTS.getOrDefault(rawType, "");
+	}
+
+	private String stripGenericArguments(final String typeName)
+	{
+		int genericStart = typeName.indexOf('<');
+		return genericStart >= 0 ? typeName.substring(0, genericStart) : typeName;
 	}
 
 	private String uncapitalize(final String value)
