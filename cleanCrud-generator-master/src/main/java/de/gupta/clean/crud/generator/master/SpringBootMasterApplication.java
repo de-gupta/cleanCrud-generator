@@ -30,19 +30,11 @@ import java.util.Arrays;
 )
 class SpringBootMasterApplication
 {
-	public static void main(String[] args)
+	static void main(String[] args)
 	{
 		setSpringProfileFromArgs(args);
 
 		System.exit(SpringApplication.exit(SpringApplication.run(SpringBootMasterApplication.class, args)));
-	}
-
-	private static void setSpringProfileFromArgs(String[] args)
-	{
-		Arrays.stream(args)
-			  .filter(argument -> argument.startsWith("-s") || argument.startsWith("--spring-profile"))
-			  .map(argument -> argument.split("=")[1])
-			  .forEach(p -> System.setProperty("spring.profiles.active", p));
 	}
 
 	@Bean
@@ -58,5 +50,13 @@ class SpringBootMasterApplication
 
 			commandLine.execute(arguments.getSourceArgs());
 		};
+	}
+
+	private static void setSpringProfileFromArgs(String[] args)
+	{
+		Arrays.stream(args)
+			  .filter(argument -> argument.startsWith("-s") || argument.startsWith("--spring-profile"))
+			  .map(argument -> argument.split("=")[1])
+			  .forEach(p -> System.setProperty("spring.profiles.active", p));
 	}
 }

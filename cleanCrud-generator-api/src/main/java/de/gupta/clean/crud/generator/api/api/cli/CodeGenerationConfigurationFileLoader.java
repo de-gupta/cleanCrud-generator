@@ -7,10 +7,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 final class CodeGenerationConfigurationFileLoader
 {
+	private static final Pattern ENVIRONMENT_VARIABLE_PATTERN = Pattern.compile("\\$\\{([A-Za-z_][A-Za-z0-9_]*)}");
+
 	CodeGenerationConfiguration load(final Path configurationFilePath)
 	{
 		try
@@ -39,7 +43,7 @@ final class CodeGenerationConfigurationFileLoader
 			final Path configurationFilePath)
 	{
 		Path configDirectory = configurationFilePath.toAbsolutePath().getParent();
-		Path modelPath = Path.of(configuration.domainModelSourceCodeFilePath());
+		Path modelPath = Path.of(expandEnvironmentVariables(configuration.domainModelSourceCodeFilePath()));
 		if (!modelPath.isAbsolute())
 		{
 			modelPath = configDirectory.resolve(modelPath).normalize();
@@ -53,5 +57,24 @@ final class CodeGenerationConfigurationFileLoader
 				configuration.generateCommonFiles(),
 				configuration.forceOverwrite(),
 				configuration.historized());
+	}
+
+	private String expandEnvironmentVariables(final String value)
+	{
+		Matcher matcher = ENVIRONMENT_VARIABLE_PATTERN.matcher(value);
+		StringBuilder expanded = new StringBuilder();
+		while (matcher.find())
+		{
+			String variableName = matcher.group(1);
+			String environmentValue = System.getenv(variableName);
+			if (environmentValue == null || environmentValue.isBlank())
+			{
+				throw new IllegalArgumentException(
+						"Required environment variable `" + variableName + "` is not set for generator configuration value `" + value + "`");
+			}
+			matcher.appendReplacement(expanded, Matcher.quoteReplacement(environmentValue));
+		}
+		matcher.appendTail(expanded);
+		return expanded.toString();
 	}
 }
