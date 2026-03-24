@@ -1,12 +1,12 @@
 <#-- Template for generating PersistenceModelJpaUpdateRepository class -->
-package ${basePackage}.useCases.crud.update.infrastructure.persistence.repository;
+package ${basePackage()}.useCases.crud.update.infrastructure.persistence.repository;
 
-import ${basePackage}.infrastructure.persistence.model.${modelName}PersistenceModel;
-import ${basePackage}.infrastructure.persistence.repository.${modelName}JpaRepository;
-import ${basePackage}.infrastructure.persistence.repository.${modelName}PersistenceHistorySnapshotFactory;
-import ${basePackage}.infrastructure.persistence.repository.${modelName}PersistenceModelHistory;
-import ${basePackage}.infrastructure.persistence.repository.${modelName}PersistenceModelHistoryJpaRepository;
-import ${basePackage}.infrastructure.persistence.repository.${modelName}PersistenceModelImpl;
+import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
+import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}JpaRepository;
+import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceHistorySnapshotFactory;
+import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistory;
+import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistoryJpaRepository;
+import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
 import de.gupta.clean.crud.template.useCases.crud.update.infrastructure.persistence.repository.AbstractPersistenceModelJpaUpdateRepository;
 import de.gupta.clean.crud.template.useCases.crud.update.infrastructure.persistence.service.UpdatePersistenceModelRepository;
 import org.springframework.stereotype.Component;
@@ -14,15 +14,15 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class ${modelName}PersistenceModelJpaUpdateRepository
-		extends AbstractPersistenceModelJpaUpdateRepository<${modelName}PersistenceModel, UUID, ${modelName}PersistenceModelImpl,
-		${modelName}PersistenceModelHistory>
-		implements UpdatePersistenceModelRepository<${modelName}PersistenceModel>
+public class ${modelBaseName()}PersistenceModelJpaUpdateRepository
+		extends AbstractPersistenceModelJpaUpdateRepository<${modelBaseName()}PersistenceModel, UUID, ${modelBaseName()}PersistenceModelImpl,
+		${modelBaseName()}PersistenceModelHistory>
+		implements UpdatePersistenceModelRepository<${modelBaseName()}PersistenceModel>
 {
-	public ${modelName}PersistenceModelJpaUpdateRepository(
-			final ${modelName}JpaRepository jpaRepository,
-			final ${modelName}PersistenceModelHistoryJpaRepository historyRepository,
-			final ${modelName}PersistenceHistorySnapshotFactory snapshotFactory)
+	public ${modelBaseName()}PersistenceModelJpaUpdateRepository(
+			final ${modelBaseName()}JpaRepository jpaRepository,
+			final ${modelBaseName()}PersistenceModelHistoryJpaRepository historyRepository,
+			final ${modelBaseName()}PersistenceHistorySnapshotFactory snapshotFactory)
 	{
 		super(jpaRepository, historyRepository, snapshotFactory);
 	}

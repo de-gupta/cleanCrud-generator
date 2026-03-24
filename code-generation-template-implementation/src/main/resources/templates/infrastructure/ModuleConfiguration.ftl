@@ -1,5 +1,5 @@
 <#-- Template for generating ModuleConfiguration class -->
-package ${basePackage};
+package ${basePackage()};
 
 import de.gupta.clean.crud.template.infrastructure.persistence.transaction.PersistenceTransactionRunner;
 import de.gupta.clean.crud.template.infrastructure.persistence.transaction.SpringPersistenceTransactionRunner;
@@ -14,7 +14,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ComponentScan
 @EntityScan
 @EnableJpaRepositories
-public class ${modelName}ModuleConfiguration
+public class ${modelBaseName()}ModuleConfiguration
 {
 	@Bean
 	public PersistenceTransactionRunner persistenceTransactionRunner(

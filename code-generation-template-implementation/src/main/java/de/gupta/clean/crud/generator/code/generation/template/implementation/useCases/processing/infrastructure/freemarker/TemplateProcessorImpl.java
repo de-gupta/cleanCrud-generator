@@ -16,19 +16,26 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Component
 final class TemplateProcessorImpl implements TemplateProcessor
 {
+	private static final Pattern TOP_LEVEL_TYPE_PATTERN = Pattern.compile(
+			"public\\s+(?:(?:final|abstract|sealed|non-sealed|static)\\s+)*(?:class|interface|record|enum)\\s+([A-Za-z_][A-Za-z0-9_]*)");
 	private final Configuration freemarkerConfiguration;
 
 	@Override
 	public SourceCodeFile process(final SourceCodeTemplate template, final TemplateModel model)
 	{
-		return Unfolding.of(template)
-						.interlace(SourceCodeTemplate::templateSourceCodeFilename)
-						.metamorphose(p -> SourceCodeFile.with(p.second(), templateCode(p.first(), model)))
-						.decree(() -> InvalidTemplateException.withMessage("Template cannot be null"));
+		SourceCodeTemplate validTemplate = Unfolding.of(template)
+													.decree(() -> InvalidTemplateException.withMessage(
+															"Template cannot be null"));
+		SourceCode sourceCode = templateCode(validTemplate, model);
+		return SourceCodeFile.with(
+				detectFileName(sourceCode).orElse(validTemplate.templateSourceCodeFilename()),
+				sourceCode);
 	}
 
 	private SourceCode templateCode(final SourceCodeTemplate template, final TemplateModel model)
@@ -43,6 +50,12 @@ final class TemplateProcessorImpl implements TemplateProcessor
 			throw TemplateProcessingException.withMessage(e.getMessage());
 		}
 		return SourceCode.with(writer.toString());
+	}
+
+	private Optional<String> detectFileName(final SourceCode sourceCode)
+	{
+		var matcher = TOP_LEVEL_TYPE_PATTERN.matcher(sourceCode.sourceCode());
+		return matcher.find() ? Optional.of(matcher.group(1) + ".java") : Optional.empty();
 	}
 
 	private Template loadTemplate(final String templateName)

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Component
 final class TemplateRepositoryImpl implements TemplateRepository
 {
+	private static final String TEMPLATE_ROOT = "templates/";
 	private final Set<SourceCodeTemplate> cachedTemplates;
 
 	@Override
@@ -81,17 +82,19 @@ final class TemplateRepositoryImpl implements TemplateRepository
 	private static SourceCodeTemplate createTemplateFromResource(Resource resource)
 	{
 		return Unfolding.beckon(resource)
-						.metamorphose(Resource::getFilename)
-						.metamorphose(f -> f.substring(0, f.length() - 4))
-						.metamorphose(name ->
+						.metamorphose(TemplateRepositoryImpl::relativeTemplatePath)
+						.metamorphose(path -> path.substring(path.lastIndexOf('/') + 1, path.length() - 4))
+						.interlace(ignored -> relativeTemplatePath(resource))
+						.metamorphose(pair ->
 						{
-							var metadataConfig = TemplateMetadataRegistry.getTemplateMetadata(name)
+							var metadataConfig = TemplateMetadataRegistry.getTemplateMetadata(pair.first())
 																		 .orElseThrow(
 																				 () -> TemplateLoadingException.withMessage(
-																						 "Template metadata not found in registry: " + name));
+																						 "Template metadata not found in registry: " + pair.first()));
 
 							return new SourceCodeTemplate(
-									name,
+									pair.first(),
+									pair.second(),
 									metadataConfig.metadata().forceOverwrite(),
 									metadataConfig.templateGroup(),
 									metadataConfig.metadata()
@@ -100,6 +103,24 @@ final class TemplateRepositoryImpl implements TemplateRepository
 						.decree(() -> TemplateLoadingException.withMessage("Failed to create template from resource"));
 	}
 
+	private static String relativeTemplatePath(final Resource resource)
+	{
+		try
+		{
+			String normalized = resource.getURL().toString().replace('\\', '/');
+			int rootIndex = normalized.indexOf(TEMPLATE_ROOT);
+			if (rootIndex < 0)
+			{
+				throw TemplateLoadingException.withMessage(
+						"Could not determine template path for resource: " + resource);
+			}
+			return normalized.substring(rootIndex + TEMPLATE_ROOT.length());
+		}
+		catch (IOException e)
+		{
+			throw TemplateLoadingException.withMessage("Failed to inspect template resource: " + e.getMessage());
+		}
+	}
 
 	TemplateRepositoryImpl()
 	{

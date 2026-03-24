@@ -79,8 +79,16 @@ public final class JavaParserBasedCodeParser implements CodeParser
 				.stream()
 				.filter(BodyDeclaration::isMethodDeclaration)
 				.map(BodyDeclaration::asMethodDeclaration)
+				.filter(this::isPropertyAccessor)
 				.map(this::extractProperty)
 				.collect(Collectors.toSet());
+	}
+
+	private boolean isPropertyAccessor(final MethodDeclaration methodDeclaration)
+	{
+		return methodDeclaration.getParameters().isEmpty()
+				&& methodDeclaration.getBody().isEmpty()
+				&& !methodDeclaration.isStatic();
 	}
 
 	private TypeDeclaration<?> extractType(final String sourceCodeFilePath)

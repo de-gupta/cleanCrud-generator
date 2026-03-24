@@ -1,23 +1,23 @@
 <#-- Template for generating DomainModelPatcher class -->
-package ${basePackage}.domain.mapping.update;
+package ${basePackage()}.domain.mapping.update;
 
-import ${basePackage}.domain.model.${modelName}DomainModel;
-import ${basePackage}.domain.model.dto.${modelName}DomainModelUpdatePatch;
+import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelUpdatePatch;
 import de.gupta.clean.crud.template.domain.mapping.update.DomainModelPatcher;
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilderFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelName}DomainModelPatcher implements DomainModelPatcher${"<"}${modelName}DomainModel, ${modelName}DomainModelUpdatePatch${">"}
+final class ${modelBaseName()}DomainModelPatcher implements DomainModelPatcher${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelUpdatePatch${">"}
 {
-private final ModelBuilderFactory${"<"}${modelName}DomainModel, ${modelName}DomainModel.${modelName}DomainModelBuilder${">"} modelBuilderFactory;
+private final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder${">"} modelBuilderFactory;
 
 @Override
-public ${modelName}DomainModel patchModel(final ${modelName}DomainModel originalModel,
-final ${modelName}DomainModelUpdatePatch updatePatch)
+public ${modelBaseName()}DomainModel patchModel(final ${modelBaseName()}DomainModel originalModel,
+final ${modelBaseName()}DomainModelUpdatePatch updatePatch)
 {
 return modelBuilderFactory.builder()
-<#list properties as property>
+<#list properties() as property>
     <#if property.optional()>
         .with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ?
         updatePatch.${property.name()}() :
@@ -31,8 +31,8 @@ return modelBuilderFactory.builder()
 .build();
 }
 
-${modelName}DomainModelPatcher(
-final ModelBuilderFactory${"<"}${modelName}DomainModel, ${modelName}DomainModel.${modelName}DomainModelBuilder${">"} modelBuilderFactory)
+${modelBaseName()}DomainModelPatcher(
+final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder${">"} modelBuilderFactory)
 {
 this.modelBuilderFactory = modelBuilderFactory;
 }

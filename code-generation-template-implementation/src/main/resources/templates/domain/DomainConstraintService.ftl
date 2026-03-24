@@ -1,25 +1,25 @@
-<#-- Template for generating ResourceExistenceDetectionService class -->
-package ${basePackage}.infrastructure.persistence.service;
+<#-- Template for generating DomainConstraintService class -->
+package ${basePackage()}.infrastructure.persistence.service;
 
-import ${basePackage}.domain.model.${modelName}DomainModel;
-import ${basePackage}.infrastructure.persistence.repository.${modelName}JpaRepository;
-import de.gupta.clean.crud.template.domain.service.constraints.DomainConstraintService;
+import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
 import de.gupta.clean.crud.template.domain.service.constraints.ConstraintResult;
+import de.gupta.clean.crud.template.domain.service.constraints.DomainConstraintService;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelName}DomainConstraintService implements DomainConstraintService${"<"}${modelName}DomainModel${">"}
+final class ${modelBaseName()}DomainConstraintService implements DomainConstraintService${"<"}${modelBaseName()}DomainModel${">"}
 {
-private final ${modelName}JpaRepository repository;
+	@Override
+	public ConstraintResult validateForInsertion(final ${modelBaseName()}DomainModel model)
+	{
+		return ConstraintResult.satisfied();
+	}
 
-@Override
-public ConstraintResult mayThisResourceBeAdded(final ${modelName}DomainModel domainModel)
-{
-// TODO from Template: write custom logic here
-return ConstraintResult.satisfied();
-}
-${modelName}DomainConstraintService(final ${modelName}JpaRepository repository)
-{
-this.repository = repository;
-}
+	@Override
+	public ConstraintResult validateForUpdate(
+			final ${modelBaseName()}DomainModel originalModel,
+			final ${modelBaseName()}DomainModel updatedModel)
+	{
+		return ConstraintResult.satisfied();
+	}
 }

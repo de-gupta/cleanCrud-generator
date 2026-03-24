@@ -1,8 +1,8 @@
 <#-- Template for generating SpringRestFetchController class -->
-package ${basePackage}.useCases.crud.fetch.api.web;
+package ${basePackage()}.useCases.crud.fetch.api.web;
 
-import ${basePackage}.useCases.crud.common.dto.${modelName}APIModelResponse;
-import ${basePackage}.useCases.crud.common.security.${modelName}EndpointSecurityPolicy;
+import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
+import ${basePackage()}.useCases.crud.common.security.${modelBaseName()}EndpointSecurityPolicy;
 import de.gupta.clean.crud.template.useCases.crud.fetch.api.web.AbstractSpringRestFetchController;
 import de.gupta.clean.crud.template.useCases.crud.fetch.api.web.SpringRestFetchController;
 import de.gupta.clean.crud.template.useCases.crud.common.security.EndpointSecurityConfiguration;
@@ -11,15 +11,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "${modelName} Fetch" , description = "Fetch Operations pertaining to ${modelName}")
+@Tag(name = "${modelName()} Fetch" , description = "Fetch Operations pertaining to ${modelName()}")
 @RestController
-@RequestMapping("/${modelName?lower_case}/fetch")
-@EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelName}EndpointSecurityPolicy.class)
-class ${modelName}SpringRestFetchController extends
-AbstractSpringRestFetchController${"<"}${modelName}APIModelResponse, Long${">"}
-		implements SpringRestFetchController${"<"}${modelName}APIModelResponse, Long${">"}
+@RequestMapping("/${modelName()?lower_case}/fetch")
+@EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
+class ${modelBaseName()}SpringRestFetchController extends
+AbstractSpringRestFetchController${"<"}${modelBaseName()}APIModelResponse, Long${">"}
+		implements SpringRestFetchController${"<"}${modelBaseName()}APIModelResponse, Long${">"}
 {
-	${modelName}SpringRestFetchController(final FetchServiceFacade${"<"}${modelName}APIModelResponse, Long${">"} service)
+	${modelBaseName()}SpringRestFetchController(final FetchServiceFacade${"<"}${modelBaseName()}APIModelResponse, Long${">"} service)
 	{
 		super(service);
 	}

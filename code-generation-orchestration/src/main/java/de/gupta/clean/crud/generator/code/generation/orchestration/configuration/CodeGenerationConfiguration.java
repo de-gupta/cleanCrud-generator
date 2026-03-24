@@ -13,19 +13,37 @@ public record CodeGenerationConfiguration(
 		boolean historized
 )
 {
+	public static CodeGenerationConfiguration of(
+			final String domainModelSourceCodeFilePath,
+			final boolean historized)
+	{
+		var map = defaultConcreteTypes();
+		return new CodeGenerationConfiguration(domainModelSourceCodeFilePath, map, map, map,
+				Set.of(),
+				false,
+				historized);
+	}
+
 	public static CodeGenerationConfiguration of(final String domainModelSourceCodeFilePath)
 	{
 		return of(domainModelSourceCodeFilePath, false);
 	}
 
-	public static CodeGenerationConfiguration of(
-			final String domainModelSourceCodeFilePath,
-			final boolean historized)
+	public static Map<String, String> defaultConcreteTypes()
 	{
-		var map = Map.of("U", "String", "V", "Long");
-		return new CodeGenerationConfiguration(domainModelSourceCodeFilePath, map, map, map,
-				Set.of(),
-				false,
-				historized);
+		return Map.of("U", "String", "V", "Long");
+	}
+
+	public CodeGenerationConfiguration
+	{
+		domainConcreteTypes = normalizeConcreteTypes(domainConcreteTypes);
+		persistenceConcreteTypes = normalizeConcreteTypes(persistenceConcreteTypes);
+		apiConcreteTypes = normalizeConcreteTypes(apiConcreteTypes);
+		templateGroups = templateGroups == null ? Set.of() : Set.copyOf(templateGroups);
+	}
+
+	private static Map<String, String> normalizeConcreteTypes(final Map<String, String> concreteTypes)
+	{
+		return concreteTypes == null || concreteTypes.isEmpty() ? defaultConcreteTypes() : Map.copyOf(concreteTypes);
 	}
 }

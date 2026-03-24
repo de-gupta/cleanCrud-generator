@@ -1,8 +1,8 @@
 <#-- Template for generating SavePersistenceService class -->
-package ${basePackage}.useCases.crud.save.infrastructure.persistence.service;
+package ${basePackage()}.useCases.crud.save.infrastructure.persistence.service;
 
-import ${basePackage}.domain.model.${modelName}DomainModel;
-import ${basePackage}.infrastructure.persistence.model.${modelName}PersistenceModel;
+import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.model.DomainPersistenceModelAdapter;
 import de.gupta.clean.crud.template.infrastructure.persistence.transaction.PersistenceTransactionRunner;
@@ -15,14 +15,14 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-final class ${modelName}SavePersistenceService extends
-		AbstractSavePersistenceService<Long, ${modelName}DomainModel, UUID, ${modelName}PersistenceModel>
-		implements SavePersistenceService<Long, ${modelName}DomainModel>
+final class ${modelBaseName()}SavePersistenceService extends
+		AbstractSavePersistenceService<Long, ${modelBaseName()}DomainModel, UUID, ${modelBaseName()}PersistenceModel>
+		implements SavePersistenceService<Long, ${modelBaseName()}DomainModel>
 {
-	${modelName}SavePersistenceService(
-			final SavePersistenceModelRepository<${modelName}PersistenceModel> repository,
-			final DomainPersistenceModelAdapter<${modelName}DomainModel, ${modelName}PersistenceModel> modelAdapter,
-			@Qualifier("${modelName?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
+	${modelBaseName()}SavePersistenceService(
+			final SavePersistenceModelRepository<${modelBaseName()}PersistenceModel> repository,
+			final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter,
+			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
 			final PersistenceTransactionRunner transactionRunner)
 	{
 		super(repository, modelAdapter, idManagement, transactionRunner);

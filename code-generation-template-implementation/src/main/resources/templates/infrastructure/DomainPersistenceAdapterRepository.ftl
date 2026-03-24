@@ -1,5 +1,5 @@
 <#-- Template for generating DomainPersistenceAdapterRepository class -->
-package ${basePackage}.infrastructure.persistence.adapter.persistence.domain.id.model;
+package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
 
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.repository.AbstractDomainPersistenceAdapterJpaRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.repository.DomainPersistenceAdapterRepository;
@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@Qualifier("${modelName?uncap_first}DomainPersistenceAdapterRepository")
-final class ${modelName}DomainPersistenceAdapterRepository
-		extends AbstractDomainPersistenceAdapterJpaRepository<Long, UUID, ${modelName}DomainPersistenceAdapterModel>
-		implements DomainPersistenceAdapterRepository<Long, UUID, ${modelName}DomainPersistenceAdapterModel>
+@Qualifier("${modelName()?uncap_first}DomainPersistenceAdapterRepository")
+final class ${modelBaseName()}DomainPersistenceAdapterRepository
+		extends AbstractDomainPersistenceAdapterJpaRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>
+		implements DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>
 {
-	private final ${modelName}DomainPersistenceAdapterJpaRepository jpaRepository;
+	private final ${modelBaseName()}DomainPersistenceAdapterJpaRepository jpaRepository;
 
 	@Override
 	public boolean existsByDomainID(final Long domainID)
@@ -31,24 +31,24 @@ final class ${modelName}DomainPersistenceAdapterRepository
 	}
 
 	@Override
-	protected Optional<${modelName}DomainPersistenceAdapterModel> findOneByPersistenceID(final UUID uuid)
+	protected Optional<${modelBaseName()}DomainPersistenceAdapterModel> findOneByPersistenceID(final UUID uuid)
 	{
 		return jpaRepository.findOneByPersistenceID(uuid);
 	}
 
 	@Override
-	protected Optional<${modelName}DomainPersistenceAdapterModel> findOneByDomainID(final Long domainID)
+	protected Optional<${modelBaseName()}DomainPersistenceAdapterModel> findOneByDomainID(final Long domainID)
 	{
 		return jpaRepository.findOneByDomainID(domainID);
 	}
 
 	@Override
-	protected Collection<${modelName}DomainPersistenceAdapterModel> findAllByDomainIDIn(final Collection<Long> domainIDs)
+	protected Collection<${modelBaseName()}DomainPersistenceAdapterModel> findAllByDomainIDIn(final Collection<Long> domainIDs)
 	{
 		return jpaRepository.findAllByDomainIDIn(domainIDs);
 	}
 
-	${modelName}DomainPersistenceAdapterRepository(final ${modelName}DomainPersistenceAdapterJpaRepository jpaRepository)
+	${modelBaseName()}DomainPersistenceAdapterRepository(final ${modelBaseName()}DomainPersistenceAdapterJpaRepository jpaRepository)
 	{
 		super(jpaRepository);
 		this.jpaRepository = jpaRepository;

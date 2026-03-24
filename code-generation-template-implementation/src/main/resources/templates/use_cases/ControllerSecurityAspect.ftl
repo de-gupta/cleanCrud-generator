@@ -1,5 +1,5 @@
 <#-- Template for generating FetchControllerSecurityAspect class -->
-<#assign parentPackage = basePackage?keep_before_last(".")>
+<#assign parentPackage = basePackage()?keep_before_last(".")>
 package ${parentPackage}.common.security;
 
 import de.gupta.clean.crud.template.useCases.crud.common.security.AbstractControllerSecurityAspect;

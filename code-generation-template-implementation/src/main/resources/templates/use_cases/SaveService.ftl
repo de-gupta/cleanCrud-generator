@@ -1,9 +1,9 @@
 <#-- Template for generating SaveService class -->
-package ${basePackage}.useCases.crud.save.application.service;
+package ${basePackage()}.useCases.crud.save.application.service;
 
-import ${basePackage}.domain.model.${modelName}DomainModel;
-import ${basePackage}.domain.model.dto.${modelName}DomainModelCreate;
-import ${basePackage}.domain.model.dto.${modelName}DomainModelResponse;
+import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelCreate;
+import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelResponse;
 import de.gupta.clean.crud.template.domain.mapping.fetch.DomainResponseBuilder;
 import de.gupta.clean.crud.template.domain.mapping.save.DomainModelBuilder;
 import de.gupta.clean.crud.template.domain.service.security.DomainSecurityPolicy;
@@ -14,18 +14,18 @@ import de.gupta.clean.crud.template.useCases.crud.save.application.service.SaveS
 import org.springframework.stereotype.Service;
 
 @Service
-final class ${modelName}SaveService
+final class ${modelBaseName()}SaveService
 		extends
-		AbstractSaveService${"<"}${modelName}DomainModel, ${modelName}DomainModelCreate, ${modelName}DomainModelResponse, Long${">"}
-		implements SaveService${"<"}${modelName}DomainModelCreate, ${modelName}DomainModelResponse, Long${">"}
+		AbstractSaveService${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelResponse, Long${">"}
+		implements SaveService${"<"}${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelResponse, Long${">"}
 {
-    ${modelName}SaveService(final SavePersistenceService${"<"}Long, ${modelName}DomainModel${">"} persistenceService,
-							final DomainModelBuilder${"<"}${modelName}DomainModelCreate,
-                            ${modelName}DomainModel${">"} modelBuilder,
-							final DomainResponseBuilder${"<"}${modelName}DomainModel,
-                            ${modelName}DomainModelResponse${">"} responseModelMapper,
-							final InsertionPolicy${"<"}${modelName}DomainModel${">"} insertionPolicy,
-							final DomainSecurityPolicy${"<"}${modelName}DomainModel${">"} domainSecurityPolicy)
+    ${modelBaseName()}SaveService(final SavePersistenceService${"<"}Long, ${modelBaseName()}DomainModel${">"} persistenceService,
+							final DomainModelBuilder${"<"}${modelBaseName()}DomainModelCreate,
+                            ${modelBaseName()}DomainModel${">"} modelBuilder,
+							final DomainResponseBuilder${"<"}${modelBaseName()}DomainModel,
+                            ${modelBaseName()}DomainModelResponse${">"} responseModelMapper,
+							final InsertionPolicy${"<"}${modelBaseName()}DomainModel${">"} insertionPolicy,
+							final DomainSecurityPolicy${"<"}${modelBaseName()}DomainModel${">"} domainSecurityPolicy)
 	{
 		super(persistenceService, modelBuilder, responseModelMapper, insertionPolicy, domainSecurityPolicy);
 	}

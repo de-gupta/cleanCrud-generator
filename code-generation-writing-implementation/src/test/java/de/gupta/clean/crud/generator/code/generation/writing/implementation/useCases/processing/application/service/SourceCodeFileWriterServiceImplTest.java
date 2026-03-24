@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,9 +24,17 @@ import static org.mockito.Mockito.times;
 @ExtendWith(MockitoExtension.class)
 class SourceCodeFileWriterServiceImplTest
 {
+	private static final Pattern TOP_LEVEL_TYPE_PATTERN = Pattern.compile(
+			"(?m)^ *(?:public +)?(?:(?:final|abstract|sealed|non-sealed|static) +)*(?:class|interface|record|enum) +([A-Za-z_][A-Za-z0-9_]*)");
 
 	private static final String SEPARATOR = File.separator;
 	private final SourceCodeFileWriterServiceImpl service = new SourceCodeFileWriterServiceImpl();
+
+	private static String resolvedFileName(final SourceCodeWriteRequest request)
+	{
+		var matcher = TOP_LEVEL_TYPE_PATTERN.matcher(request.sourceCode());
+		return matcher.find() ? matcher.group(1) + ".java" : request.fileName();
+	}
 
 	@Nested
 	@DisplayName("Tests for createPath method")
@@ -189,7 +198,7 @@ class SourceCodeFileWriterServiceImplTest
 				// Then
 				mockedUtility.verify(
 						() -> ClassWritingUtility.writeClass(
-								request.fileName(),
+								resolvedFileName(request),
 								request.sourceCode(),
 								request.contentRootPath(),
 								request.overwriteExistingFile()
@@ -244,7 +253,7 @@ class SourceCodeFileWriterServiceImplTest
 				// Then
 				mockedUtility.verify(
 						() -> ClassWritingUtility.writeClass(
-								request.fileName(),
+								resolvedFileName(request),
 								request.sourceCode(),
 								request.contentRootPath(),
 								request.overwriteExistingFile()

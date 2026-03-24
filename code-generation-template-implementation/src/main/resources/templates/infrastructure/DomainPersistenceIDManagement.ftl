@@ -1,9 +1,9 @@
 <#-- Template for generating DomainPersistenceIDManagement class -->
-package ${basePackage}.infrastructure.persistence.adapter.persistence.domain.id.adapter;
+package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.adapter;
 
-import ${basePackage}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelName}DomainPersistenceAdapterHistoryJpaRepository;
-import ${basePackage}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelName}DomainPersistenceAdapterHistoryModel;
-import ${basePackage}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelName}DomainPersistenceAdapterModel;
+import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryJpaRepository;
+import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryModel;
+import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterModel;
 import de.gupta.clean.crud.template.domain.model.builder.BuilderFactories;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.AbstractDomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
@@ -15,20 +15,20 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-final class ${modelName}DomainPersistenceIDManagement
-		extends AbstractDomainPersistenceIDManagement<Long, UUID, ${modelName}DomainPersistenceAdapterModel,
-		${modelName}DomainPersistenceAdapterHistoryModel>
+final class ${modelBaseName()}DomainPersistenceIDManagement
+		extends AbstractDomainPersistenceIDManagement<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel,
+		${modelBaseName()}DomainPersistenceAdapterHistoryModel>
 		implements DomainPersistenceIDManagement<Long, UUID>
 {
-	${modelName}DomainPersistenceIDManagement(
-			final DomainPersistenceAdapterRepository<Long, UUID, ${modelName}DomainPersistenceAdapterModel> repository,
-			final ${modelName}DomainPersistenceAdapterHistoryJpaRepository historyRepository,
-			@Qualifier("${modelName?uncap_first}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator)
+	${modelBaseName()}DomainPersistenceIDManagement(
+			final DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel> repository,
+			final ${modelBaseName()}DomainPersistenceAdapterHistoryJpaRepository historyRepository,
+			@Qualifier("${modelName()?uncap_first}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator)
 	{
 		super(repository,
-				BuilderFactories.of(${modelName}DomainPersistenceAdapterModel::builder),
+				BuilderFactories.of(${modelBaseName()}DomainPersistenceAdapterModel::builder),
 				historyRepository,
-				BuilderFactories.of(${modelName}DomainPersistenceAdapterHistoryModel::builder),
+				BuilderFactories.of(${modelBaseName()}DomainPersistenceAdapterHistoryModel::builder),
 				domainIDGenerator);
 	}
 }

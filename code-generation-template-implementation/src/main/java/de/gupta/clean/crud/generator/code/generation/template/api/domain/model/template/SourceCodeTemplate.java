@@ -4,13 +4,14 @@ import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.s
 
 public record SourceCodeTemplate(
 		String templateName,
+		String templatePath,
 		boolean forceOverwrite,
 		TemplateGroup templateGroup,
 		TemplateMetadata metadata)
 {
 	public String templateFileName()
 	{
-		return templateName + ".ftl";
+		return templatePath;
 	}
 
 	public String templateSourceCodeFilename()

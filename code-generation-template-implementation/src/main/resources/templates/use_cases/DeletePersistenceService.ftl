@@ -1,7 +1,7 @@
 <#-- Template for generating DeletePersistenceService class -->
-package ${basePackage}.useCases.crud.delete.infrastructure.persistence.service;
+package ${basePackage()}.useCases.crud.delete.infrastructure.persistence.service;
 
-import ${basePackage}.infrastructure.persistence.model.${modelName}PersistenceModel;
+import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDAdapter;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.transaction.PersistenceTransactionRunner;
@@ -15,15 +15,15 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Qualifier("${modelName?uncap_first}DeletePersistenceService")
-final class ${modelName}DeletePersistenceService extends AbstractDeletePersistenceService<Long, UUID, ${modelName}PersistenceModel>
+@Qualifier("${modelName()?uncap_first}DeletePersistenceService")
+final class ${modelBaseName()}DeletePersistenceService extends AbstractDeletePersistenceService<Long, UUID, ${modelBaseName()}PersistenceModel>
 		implements DeletePersistenceService<Long>
 {
-	${modelName}DeletePersistenceService(
-			final FetchPersistenceModelRepository<${modelName}PersistenceModel, UUID> fetchRepository,
-			@Qualifier("${modelName?uncap_first}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
-			@Qualifier("${modelName?uncap_first}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
-			@Qualifier("${modelName?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
+	${modelBaseName()}DeletePersistenceService(
+			final FetchPersistenceModelRepository<${modelBaseName()}PersistenceModel, UUID> fetchRepository,
+			@Qualifier("${modelName()?uncap_first}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
+			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
+			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
 			final PersistenceTransactionRunner transactionRunner)
 	{
 		super(fetchRepository, deleteRepository, idAdapter, idManagement, transactionRunner);
