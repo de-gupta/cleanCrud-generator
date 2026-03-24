@@ -421,6 +421,18 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.INFRASTRUCTURE
 		));
 
+		templates.put("CommonPersistenceConfiguration", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Shared persistence configuration for common infrastructure beans"),
+						Set.of("Configuration", "Spring", "PersistenceTransactionRunner"),
+						Set.of("common", "configuration", "persistence"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.COMMON
+		));
+
 		templates.put("ModuleConfiguration", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Spring module configuration"),
@@ -586,7 +598,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.COMMON
 		));
 
 		templates.put("DeleteApplicationController", new TemplateMetadataConfig(
@@ -726,6 +738,18 @@ public final class TemplateMetadataRegistry
 						Optional.of("Policy for insertion operations"),
 						Set.of("Policy", "Insertion"),
 						Set.of("usecase", "policy", "insertion"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.USE_CASES
+		));
+
+		templates.put("ChangePolicy", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Policy for validating allowed changes during patch/update operations"),
+						Set.of("Policy", "Change"),
+						Set.of("usecase", "policy", "change"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false

@@ -25,7 +25,7 @@ final class ${modelBaseName()}FetchPersistenceService
 			final FetchPersistenceModelRepository${"<"}${modelBaseName()}PersistenceModel, UUID${">"} repository,
 			final DomainPersistenceModelAdapter${"<"}${modelBaseName()}DomainModel,
 			${modelBaseName()}PersistenceModel${">"} modelAdapter,
-			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDAdapter") final
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDAdapter") final
 			DomainPersistenceIDAdapter${"<"}Long, UUID${">"} idAdapter)
 	{
 		super(repository, modelAdapter, idAdapter);

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Qualifier("${modelName()?uncap_first}DeletePersistenceModelRepository")
+@Qualifier("${beanNamePrefix()}DeletePersistenceModelRepository")
 class ${modelBaseName()}PersistenceModelJpaDeleteRepository
 		extends AbstractPersistenceModelJpaDeleteRepository<${modelBaseName()}PersistenceModel, UUID, ${modelBaseName()}PersistenceModelImpl,
 		${modelBaseName()}PersistenceModelHistory>

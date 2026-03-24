@@ -22,7 +22,7 @@ final class ${modelBaseName()}SavePersistenceService extends
 	${modelBaseName()}SavePersistenceService(
 			final SavePersistenceModelRepository<${modelBaseName()}PersistenceModel> repository,
 			final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter,
-			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
 			final PersistenceTransactionRunner transactionRunner)
 	{
 		super(repository, modelAdapter, idManagement, transactionRunner);

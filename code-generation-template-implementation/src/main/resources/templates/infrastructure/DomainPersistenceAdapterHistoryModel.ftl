@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "${modelName()?lower_case}_domain_persistence_adapter_model_history",
+@Table(name = "${domainPersistenceAdapterHistoryTableName()}",
 		indexes = {
 				@Index(name = "${modelName()?lower_case}_domain_persistence_history_idx_entity_id", columnList = "entity_id"),
 				@Index(name = "${modelName()?lower_case}_domain_persistence_history_idx_persistence_id", columnList = "persistence_id"),

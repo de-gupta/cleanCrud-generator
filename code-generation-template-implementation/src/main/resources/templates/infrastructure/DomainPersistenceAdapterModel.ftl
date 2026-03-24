@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 
 @Entity
-@Table(name = "${modelName()?lower_case}_domain_persistence_adapter_model",
+@Table(name = "${domainPersistenceAdapterTableName()}",
 		uniqueConstraints = {
 				@UniqueConstraint(columnNames = "domain_id"),
 				@UniqueConstraint(columnNames = "persistence_id")

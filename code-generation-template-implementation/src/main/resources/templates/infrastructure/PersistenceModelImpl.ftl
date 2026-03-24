@@ -18,7 +18,7 @@ import ${import};
 </#if>
 
 @Entity
-@Table(name = "${modelName()?lower_case}_persistence_model")
+@Table(name = "${persistenceModelTableName()}")
 public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()}PersistenceModel
 {
 	@Id
@@ -28,11 +28,11 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 <#list properties() as property>
 	<#if !property.optional()>
 	@NotNull
-	@Column(nullable = false)
+	@Column(name = "${sqlColumnName(property)}", nullable = false)
 	<#else>
-	@Column<#if property.type() == "String">(columnDefinition = "TEXT")</#if>
+	@Column(name = "${sqlColumnName(property)}"<#if property.type() == "String">, columnDefinition = "TEXT"</#if>)
 	</#if>
-	private ${persistenceResolvedType(property.baseType())} <#if property.name() == "user">userID<#else>${property.name()}</#if>;
+	private ${persistenceResolvedType(property.baseType())} ${property.name()};
 </#list>
 
 	static ${modelBaseName()}PersistenceModelBuilder builder()
@@ -45,16 +45,16 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	public ${persistencePropertyType(property)} ${property.getter()}()
 	{
 	<#if property.optional()>
-		return Optional.ofNullable(<#if property.name() == "user">userID<#else>${property.name()}</#if>);
+		return Optional.ofNullable(${property.name()});
 	<#else>
-		return <#if property.name() == "user">userID<#else>${property.name()}</#if>;
+		return ${property.name()};
 	</#if>
 	}
 
 	@Override
 	public void set${property.capitalizedName()}(final ${persistenceResolvedType(property.baseType())} ${property.name()})
 	{
-		this.<#if property.name() == "user">userID<#else>${property.name()}</#if> = ${property.name()};
+		this.${property.name()} = ${property.name()};
 		this.validate();
 	}
 
@@ -92,9 +92,9 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 		public ${modelBaseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistencePropertyType(property)} ${property.name()})
 		{
 			<#if property.optional()>
-			${property.name()}.ifPresent(value -> model.<#if property.name() == "user">userID<#else>${property.name()}</#if> = value);
+			${property.name()}.ifPresent(value -> model.${property.name()} = value);
 			<#else>
-			model.<#if property.name() == "user">userID<#else>${property.name()}</#if> = ${property.name()};
+			model.${property.name()} = ${property.name()};
 			</#if>
 			return this;
 		}

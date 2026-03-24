@@ -9,6 +9,7 @@ public record CodeGenerationConfiguration(
 		Map<String, String> persistenceConcreteTypes,
 		Map<String, String> apiConcreteTypes,
 		Set<String> templateGroups,
+		Boolean generateCommonFiles,
 		boolean forceOverwrite,
 		boolean historized
 )
@@ -20,6 +21,7 @@ public record CodeGenerationConfiguration(
 		var map = defaultConcreteTypes();
 		return new CodeGenerationConfiguration(domainModelSourceCodeFilePath, map, map, map,
 				Set.of(),
+				null,
 				false,
 				historized);
 	}

@@ -21,18 +21,10 @@ import ${import};
 public interface ${modelBaseName()}JpaRepository extends JpaRepository<${modelBaseName()}PersistenceModelImpl, UUID>
 {
 <#list properties() as property>
-	<#assign propertyParamName = property.name()>
-	<#assign capitalizedPropertyName = property.capitalizedName()>
-	<#assign propertyFieldName = property.name()>
-	<#if property.name() == "user">
-		<#assign propertyParamName = "userID">
-		<#assign capitalizedPropertyName = "UserID">
-		<#assign propertyFieldName = "userID">
-	</#if>
-	boolean existsBy${capitalizedPropertyName}(final ${persistenceResolvedType(property.baseType())} ${propertyParamName});
+	boolean existsBy${property.capitalizedName()}(final ${persistenceResolvedType(property.baseType())} ${property.name()});
 
-	@Query("SELECT t.${propertyFieldName} FROM ${modelBaseName()}PersistenceModelImpl t WHERE t.${propertyFieldName} IN :${propertyParamName}s")
-	List<${persistenceResolvedType(property.baseType())}> find${capitalizedPropertyName}sBy${capitalizedPropertyName}In(@Param("${propertyParamName}s") final Collection<${persistenceResolvedType(property.baseType())}> ${propertyParamName}s);
+	@Query("SELECT t.${property.name()} FROM ${modelBaseName()}PersistenceModelImpl t WHERE t.${property.name()} IN :${property.name()}s")
+	List<${persistenceResolvedType(property.baseType())}> find${property.capitalizedName()}sBy${property.capitalizedName()}In(@Param("${property.name()}s") final Collection<${persistenceResolvedType(property.baseType())}> ${property.name()}s);
 
 </#list>
 }

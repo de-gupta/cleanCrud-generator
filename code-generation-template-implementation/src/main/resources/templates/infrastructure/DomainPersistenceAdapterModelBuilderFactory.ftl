@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Qualifier("${modelName()?uncap_first}DomainPersistenceAdapterModelBuilderFactory")
+@Qualifier("${beanNamePrefix()}DomainPersistenceAdapterModelBuilderFactory")
 final class ${modelBaseName()}DomainPersistenceAdapterModelBuilderFactory
 implements
 ModelBuilderFactory${"<"}DomainPersistenceAdapterModel${"<"}Long, UUID${">"}, DomainPersistenceAdapterModel.Builder${"<"}Long,

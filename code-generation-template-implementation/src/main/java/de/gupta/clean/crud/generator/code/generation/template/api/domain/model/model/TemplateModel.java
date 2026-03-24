@@ -2,12 +2,21 @@ package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.
 
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
 public interface TemplateModel
 {
+	Map<String, String> RESERVED_SQL_IDENTIFIERS = Map.ofEntries(
+			Map.entry("user", "user_id"),
+			Map.entry("order", "order_value"),
+			Map.entry("group", "group_value"),
+			Map.entry("key", "key_value"),
+			Map.entry("value", "value_value")
+	);
+
 	String packageName();
 
 	String basePackage();
@@ -18,6 +27,46 @@ public interface TemplateModel
 	{
 		return modelName().endsWith("Model") ? modelName().substring(0, modelName().length() - "Model".length()) :
 				modelName();
+	}
+
+	default String beanNamePrefix()
+	{
+		return uncapitalize(modelBaseName());
+	}
+
+	default String qualifier(final String suffix)
+	{
+		return beanNamePrefix() + suffix;
+	}
+
+	default String sqlIdentifier(final String identifier)
+	{
+		return RESERVED_SQL_IDENTIFIERS.getOrDefault(identifier.toLowerCase(Locale.ROOT), identifier);
+	}
+
+	default String sqlColumnName(final Property property)
+	{
+		return sqlIdentifier(property.name());
+	}
+
+	default String persistenceModelTableName()
+	{
+		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_persistence_model");
+	}
+
+	default String persistenceModelHistoryTableName()
+	{
+		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_persistence_model_history");
+	}
+
+	default String domainPersistenceAdapterTableName()
+	{
+		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_domain_persistence_adapter_model");
+	}
+
+	default String domainPersistenceAdapterHistoryTableName()
+	{
+		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_domain_persistence_adapter_model_history");
 	}
 
 	boolean isGeneric();
@@ -142,5 +191,10 @@ public interface TemplateModel
 	private String resolveConcreteType(final Map<String, String> concreteTypes, final String declaredType)
 	{
 		return concreteTypes.getOrDefault(declaredType, declaredType);
+	}
+
+	private String uncapitalize(final String value)
+	{
+		return value.isEmpty() ? value : Character.toLowerCase(value.charAt(0)) + value.substring(1);
 	}
 }

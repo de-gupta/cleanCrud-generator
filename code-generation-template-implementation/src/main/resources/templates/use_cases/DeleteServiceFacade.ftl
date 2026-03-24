@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-@Qualifier("${modelName()?uncap_first}DeleteServiceFacade")
+@Qualifier("${beanNamePrefix()}DeleteServiceFacade")
 final class ${modelBaseName()}DeleteServiceFacade extends
 AbstractDeleteServiceFacade${"<"}Long, Long${">"}
 implements DeleteServiceFacade${"<"}Long${">"}
 {
 ${modelBaseName()}DeleteServiceFacade(
-@Qualifier("${modelName()?uncap_first}DeleteService") final DeleteService${"<"}Long${">"} service,
+@Qualifier("${beanNamePrefix()}DeleteService") final DeleteService${"<"}Long${">"} service,
 final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter)
 {
 super(service, idAdapter);

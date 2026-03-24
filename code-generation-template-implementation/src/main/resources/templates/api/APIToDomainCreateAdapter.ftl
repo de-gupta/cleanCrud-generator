@@ -53,7 +53,7 @@ final class ${modelBaseName()}APIToDomainCreateAdapter implements APIToDomainCre
 	}
 
 	${modelBaseName()}APIToDomainCreateAdapter(<#list apiDomainDifferingGenericTypeParameters() as param>
-			@Qualifier("${modelName()?uncap_first}${param}APIToDomainConverter") final Function<${apiConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}APIToDomainConverter<#if param_has_next>,</#if>
+			@Qualifier("${beanNamePrefix()}${param}APIToDomainConverter") final Function<${apiConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}APIToDomainConverter<#if param_has_next>,</#if>
 </#list>)
 	{
 <#list apiDomainDifferingGenericTypeParameters() as param>

@@ -12,7 +12,7 @@ final class ${modelBaseName()}DeleteApplicationController extends AbstractDelete
 		implements DeleteApplicationController${"<"}Long${">"}
 {
 	${modelBaseName()}DeleteApplicationController(
-			@Qualifier("${modelName()?uncap_first}DeleteServiceFacade") final DeleteServiceFacade${"<"}Long${">"} service)
+			@Qualifier("${beanNamePrefix()}DeleteServiceFacade") final DeleteServiceFacade${"<"}Long${">"} service)
 	{
 		super(service);
 	}

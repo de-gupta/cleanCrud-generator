@@ -23,7 +23,7 @@ final class ${modelBaseName()}DomainPersistenceIDManagement
 	${modelBaseName()}DomainPersistenceIDManagement(
 			final DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel> repository,
 			final ${modelBaseName()}DomainPersistenceAdapterHistoryJpaRepository historyRepository,
-			@Qualifier("${modelName()?uncap_first}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator)
+			@Qualifier("${beanNamePrefix()}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator)
 	{
 		super(repository,
 				BuilderFactories.of(${modelBaseName()}DomainPersistenceAdapterModel::builder),

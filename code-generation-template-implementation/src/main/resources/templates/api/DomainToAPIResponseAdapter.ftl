@@ -63,7 +63,7 @@ final class ${modelBaseName()}DomainToAPIResponseAdapter
 	${modelBaseName()}DomainToAPIResponseAdapter(
 			final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter<#if apiDomainDifferingGenericTypeParameters()?has_content>,
 <#list apiDomainDifferingGenericTypeParameters() as param>
-			@Qualifier("${modelName()?uncap_first}${param}DomainToAPIConverter") final Function<${domainConcreteType(param)}, ${apiConcreteType(param)}> ${param?lower_case}DomainToAPIConverter<#if param_has_next>,</#if>
+			@Qualifier("${beanNamePrefix()}${param}DomainToAPIConverter") final Function<${domainConcreteType(param)}, ${apiConcreteType(param)}> ${param?lower_case}DomainToAPIConverter<#if param_has_next>,</#if>
 </#list>
 </#if>)
 	{

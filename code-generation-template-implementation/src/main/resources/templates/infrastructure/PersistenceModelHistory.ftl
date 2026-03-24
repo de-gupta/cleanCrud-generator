@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "${modelName()?lower_case}_persistence_model_history",
+@Table(name = "${persistenceModelHistoryTableName()}",
 		indexes = {
 				@Index(name = "${modelName()?lower_case}_persistence_history_idx_entity_id", columnList = "entity_id"),
 				@Index(name = "${modelName()?lower_case}_persistence_history_idx_validity", columnList = "valid_from, valid_to")
@@ -28,7 +28,7 @@ public class ${modelBaseName()}PersistenceModelHistory extends AbstractTriTempor
 		implements TriTemporalHistoryModel<UUID>
 {
 <#list properties() as property>
-	@Column
+	@Column(name = "${sqlColumnName(property)}")
 	private ${persistenceResolvedType(property.baseType())} ${property.name()};
 
 </#list>

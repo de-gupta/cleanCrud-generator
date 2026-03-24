@@ -11,8 +11,8 @@ final class ${modelBaseName()}DomainResponseBuilder implements
 DomainResponseBuilder${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelResponse${">"}
 {
 @Override
-public ${modelBaseName()}DomainModelResponse toResponse(final ${modelBaseName()}DomainModel ${modelName()?uncap_first}DomainModel)
+public ${modelBaseName()}DomainModelResponse toResponse(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
 {
-return ${modelBaseName()}DomainModelResponse.fromDomainModel(${modelName()?uncap_first}DomainModel);
+return ${modelBaseName()}DomainModelResponse.fromDomainModel(${beanNamePrefix()}DomainModel);
 }
 }

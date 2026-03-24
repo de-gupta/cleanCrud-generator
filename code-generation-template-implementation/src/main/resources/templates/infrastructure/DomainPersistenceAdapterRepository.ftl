@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@Qualifier("${modelName()?uncap_first}DomainPersistenceAdapterRepository")
+@Qualifier("${beanNamePrefix()}DomainPersistenceAdapterRepository")
 final class ${modelBaseName()}DomainPersistenceAdapterRepository
 		extends AbstractDomainPersistenceAdapterJpaRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>
 		implements DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>

@@ -17,9 +17,9 @@ public record ${modelBaseName()}DomainModelResponse(
 </#list>
 )
 {
-	public static ${modelBaseName()}DomainModelResponse fromDomainModel(final ${modelBaseName()}DomainModel ${modelName()?uncap_first}DomainModel)
+	public static ${modelBaseName()}DomainModelResponse fromDomainModel(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
 	{
 		return new ${modelBaseName()}DomainModelResponse(
-<#list properties() as property>                ${modelName()?uncap_first}DomainModel.${property.getter()}()<#if property_has_next>, </#if></#list>);
+<#list properties() as property>                ${beanNamePrefix()}DomainModel.${property.getter()}()<#if property_has_next>, </#if></#list>);
 	}
 }

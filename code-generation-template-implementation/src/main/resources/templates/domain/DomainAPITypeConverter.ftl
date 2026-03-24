@@ -23,7 +23,7 @@ import ${import};
 
 <#list apiDomainDifferingGenericTypeParameters() as param>
 @Component
-@Qualifier("${modelName()?uncap_first}${param}DomainToAPIConverter")
+@Qualifier("${beanNamePrefix()}${param}DomainToAPIConverter")
 final class ${modelName()}${param}DomainToAPIConverter implements Function<${domainConcreteType(param)}, ${apiConcreteType(param)}>
 {
 	@Override
@@ -34,7 +34,7 @@ final class ${modelName()}${param}DomainToAPIConverter implements Function<${dom
 }
 
 @Component
-@Qualifier("${modelName()?uncap_first}${param}APIToDomainConverter")
+@Qualifier("${beanNamePrefix()}${param}APIToDomainConverter")
 final class ${modelName()}${param}APIToDomainConverter implements Function<${apiConcreteType(param)}, ${domainConcreteType(param)}>
 {
 	@Override

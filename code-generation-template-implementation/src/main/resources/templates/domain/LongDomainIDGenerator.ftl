@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-@Qualifier("${modelName()?uncap_first}LongDomainIDGenerator")
+@Qualifier("${beanNamePrefix()}LongDomainIDGenerator")
 final class ${modelBaseName()}LongDomainIDGenerator extends AbstractLongDomainIDGenerator implements DomainIDGenerator${"<"}Long${">"}
 {
 }

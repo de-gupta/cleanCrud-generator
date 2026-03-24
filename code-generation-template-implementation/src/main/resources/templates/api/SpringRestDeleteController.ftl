@@ -19,7 +19,7 @@ class ${modelBaseName()}SpringRestDeleteController extends AbstractSpringRestDel
 		implements SpringRestDeleteController${"<"}Long${">"}
 {
 	${modelBaseName()}SpringRestDeleteController(
-			@Qualifier("${modelName()?uncap_first}DeleteServiceFacade") final DeleteServiceFacade${"<"}Long${">"} service)
+			@Qualifier("${beanNamePrefix()}DeleteServiceFacade") final DeleteServiceFacade${"<"}Long${">"} service)
 	{
 		super(service);
 	}

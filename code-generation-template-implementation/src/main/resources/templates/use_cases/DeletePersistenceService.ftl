@@ -15,15 +15,15 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Qualifier("${modelName()?uncap_first}DeletePersistenceService")
+@Qualifier("${beanNamePrefix()}DeletePersistenceService")
 final class ${modelBaseName()}DeletePersistenceService extends AbstractDeletePersistenceService<Long, UUID, ${modelBaseName()}PersistenceModel>
 		implements DeletePersistenceService<Long>
 {
 	${modelBaseName()}DeletePersistenceService(
 			final FetchPersistenceModelRepository<${modelBaseName()}PersistenceModel, UUID> fetchRepository,
-			@Qualifier("${modelName()?uncap_first}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
-			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
-			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
+			@Qualifier("${beanNamePrefix()}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
 			final PersistenceTransactionRunner transactionRunner)
 	{
 		super(fetchRepository, deleteRepository, idAdapter, idManagement, transactionRunner);

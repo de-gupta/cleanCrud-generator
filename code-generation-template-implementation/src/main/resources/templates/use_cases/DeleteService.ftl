@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-@Qualifier("${modelName()?uncap_first}DeleteService")
+@Qualifier("${beanNamePrefix()}DeleteService")
 final class ${modelBaseName()}DeleteService extends AbstractDeleteService${"<"}Long, ${modelBaseName()}DomainModel${">"} implements DeleteService${"<"}Long${">"}
 {
 ${modelBaseName()}DeleteService(
 final FetchPersistenceService${"<"}Long, ${modelBaseName()}DomainModel${">"} fetchService,
-@Qualifier("${modelName()?uncap_first}DeletePersistenceService") final DeletePersistenceService${"<"}Long${">"} persistenceService,
+@Qualifier("${beanNamePrefix()}DeletePersistenceService") final DeletePersistenceService${"<"}Long${">"} persistenceService,
 final DeletionPolicy${"<"}${modelBaseName()}DomainModel${">"} deletionPolicy,
 final DomainSecurityPolicy${"<"}${modelBaseName()}DomainModel${">"} domainSecurityPolicy)
 {

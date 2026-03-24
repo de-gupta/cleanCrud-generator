@@ -50,6 +50,7 @@ final class CodeGenerationConfigurationFileLoader
 				configuration.persistenceConcreteTypes(),
 				configuration.apiConcreteTypes(),
 				configuration.templateGroups(),
+				configuration.generateCommonFiles(),
 				configuration.forceOverwrite(),
 				configuration.historized());
 	}

@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 final class ${modelBaseName()}DeletionPolicy implements DeletionPolicy${"<"}${modelBaseName()}DomainModel${">"}
 {
 @Override
-public void validateDeletion(final ${modelBaseName()}DomainModel ${modelName()?uncap_first})
+public void validateDeletion(final ${modelBaseName()}DomainModel ${beanNamePrefix()})
 {
 // TODO from Template: Add your custom validation logic here
 // Example:
-// if (${modelName()?uncap_first}.someProperty().contains("important"))
+// if (${beanNamePrefix()}.someProperty().contains("important"))
 // {
 //     throw ResourceCannotBeDeletedException.withMessage("An important item cannot be deleted");
 // }

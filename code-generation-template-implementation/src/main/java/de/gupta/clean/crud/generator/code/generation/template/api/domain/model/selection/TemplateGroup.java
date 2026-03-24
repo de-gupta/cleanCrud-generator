@@ -5,5 +5,6 @@ public enum TemplateGroup
 	API,
 	DOMAIN,
 	INFRASTRUCTURE,
-	USE_CASES
+	USE_CASES,
+	COMMON
 }

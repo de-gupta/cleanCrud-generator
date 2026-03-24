@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 final class ${modelBaseName()}DuplicateInsertionMessage implements DuplicateInsertionMessage${"<"}${modelBaseName()}DomainModel${">"}
 {
 @Override
-public String messageIfModelAlreadyExists(final ${modelBaseName()}DomainModel ${modelName()?uncap_first}DomainModel)
+public String messageIfModelAlreadyExists(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
 {
 // TODO from Template: write custom logic here
-return "The ${modelName()?lower_case} with ${properties()[0].name()} `" + ${modelName()?uncap_first}DomainModel.${properties()[0].getter()}() + "` already exists";
+return "The ${modelName()?lower_case} with ${properties()[0].name()} `" + ${beanNamePrefix()}DomainModel.${properties()[0].getter()}() + "` already exists";
 }
 }

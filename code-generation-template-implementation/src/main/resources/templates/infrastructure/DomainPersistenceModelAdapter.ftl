@@ -106,8 +106,8 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 			final ModelBuilderFactory${"<"}${modelBaseName()}PersistenceModel,
 			${modelBaseName()}PersistenceModel.${modelBaseName()}PersistenceModelBuilder${">"} persistenceModelBuilderFactory<#if persistenceDomainDifferingGenericTypeParameters()?has_content>,
 <#list persistenceDomainDifferingGenericTypeParameters() as param>
-			@Qualifier("${modelName()?uncap_first}${param}DomainToPersistenceConverter") final Function<${domainConcreteType(param)}, ${persistenceConcreteType(param)}> ${param?lower_case}DomainToPersistenceConverter,
-			@Qualifier("${modelName()?uncap_first}${param}PersistenceToDomainConverter") final Function<${persistenceConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}PersistenceToDomainConverter<#if param_has_next>,</#if>
+			@Qualifier("${beanNamePrefix()}${param}DomainToPersistenceConverter") final Function<${domainConcreteType(param)}, ${persistenceConcreteType(param)}> ${param?lower_case}DomainToPersistenceConverter,
+			@Qualifier("${beanNamePrefix()}${param}PersistenceToDomainConverter") final Function<${persistenceConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}PersistenceToDomainConverter<#if param_has_next>,</#if>
 </#list>
 </#if>)
 	{

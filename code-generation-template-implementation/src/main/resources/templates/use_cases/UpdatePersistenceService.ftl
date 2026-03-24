@@ -27,8 +27,8 @@ final class ${modelBaseName()}UpdatePersistenceService
 			final SavePersistenceModelRepository<${modelBaseName()}PersistenceModel> saveRepository,
 			final UpdatePersistenceModelRepository<${modelBaseName()}PersistenceModel> updateRepository,
 			final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter,
-			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
-			@Qualifier("${modelName()?uncap_first}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
 			final PersistenceTransactionRunner transactionRunner)
 	{
 		super(fetchRepository, saveRepository, updateRepository, modelAdapter, idAdapter, idManagement,
