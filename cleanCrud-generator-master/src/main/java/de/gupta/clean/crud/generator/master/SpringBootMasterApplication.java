@@ -28,7 +28,7 @@ import java.util.Arrays;
 				OrchestrationModuleConfiguration.class,
 		}
 )
-class SpringBootMasterApplication
+public class SpringBootMasterApplication
 {
 	static void main(String[] args)
 	{

@@ -25,8 +25,8 @@
 
         <spring.boot.version>3.5.3</spring.boot.version>
 
-        <aletheia.version>0.0.12</aletheia.version>
-        <athena.version>0.3.0</athena.version>
+        <aletheia.version>0.2.1</aletheia.version>
+        <athena.version>0.3.1</athena.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
