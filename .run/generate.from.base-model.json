@@ -1,0 +1,25 @@
+{
+  "domainModelSourceCodeFilePath": "${CLEANCRUD_BASE_MODEL_FILE}",
+  "domainConcreteTypes": {
+    "U": "String",
+    "V": "Integer"
+  },
+  "persistenceConcreteTypes": {
+    "U": "String",
+    "V": "Integer"
+  },
+  "apiConcreteTypes": {
+    "U": "String",
+    "V": "Integer"
+  },
+  "templateGroups": [
+    "API",
+    "DOMAIN",
+    "INFRASTRUCTURE",
+    "USE_CASES",
+    "COMMON"
+  ],
+  "generateCommonFiles": null,
+  "forceOverwrite": true,
+  "historized": true
+}

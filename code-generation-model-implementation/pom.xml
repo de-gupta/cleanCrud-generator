@@ -7,7 +7,7 @@
         <version>0.0.2-SNAPSHOT</version>
     </parent>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>A library for implementing clean architecture based crud operations</description>
     <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
@@ -15,16 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.de-gupta</groupId>
-            <artifactId>code-generation-model-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-symbol-solver-core</artifactId>
             <version>3.27.0</version>
         </dependency>
     </dependencies>
-
 </project>

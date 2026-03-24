@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-final class JavaParserBasedCodeParser implements CodeParser
+public final class JavaParserBasedCodeParser implements CodeParser
 {
 	@Override
 	public String typeName(final String sourceCodeFilePath)
@@ -79,8 +79,16 @@ final class JavaParserBasedCodeParser implements CodeParser
 				.stream()
 				.filter(BodyDeclaration::isMethodDeclaration)
 				.map(BodyDeclaration::asMethodDeclaration)
+				.filter(this::isPropertyAccessor)
 				.map(this::extractProperty)
 				.collect(Collectors.toSet());
+	}
+
+	private boolean isPropertyAccessor(final MethodDeclaration methodDeclaration)
+	{
+		return methodDeclaration.getParameters().isEmpty()
+				&& methodDeclaration.getBody().isEmpty()
+				&& !methodDeclaration.isStatic();
 	}
 
 	private TypeDeclaration<?> extractType(final String sourceCodeFilePath)

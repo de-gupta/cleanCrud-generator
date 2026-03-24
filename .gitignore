@@ -36,3 +36,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/cleanCrud-generator-master/src/test/java/de/gupta/clean/crud/generator/master/PersonModelGenerationSmokeTest.java

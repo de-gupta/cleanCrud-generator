@@ -11,7 +11,7 @@
 
     <artifactId>cleanCrud-generator-master</artifactId>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>A library for implementing clean architecture based crud operations</description>
     <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
@@ -47,4 +47,23 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>de.gupta.clean.crud.generator.master.SpringBootMasterApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

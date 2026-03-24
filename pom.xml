@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.de-gupta</groupId>
@@ -10,9 +10,6 @@
         <module>code-generation-model-implementation</module>
         <module>code-generation-template-implementation</module>
         <module>code-generation-orchestration</module>
-        <module>code-generation-model-api</module>
-        <module>code-generation-template-api</module>
-        <module>code-generation-writing-api</module>
         <module>code-generation-writing-implementation</module>
         <module>cleanCrud-generator-api</module>
         <module>cleanCrud-generator-master</module>
@@ -23,12 +20,13 @@
     <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
     <properties>
-        <maven.compiler.source>24</maven.compiler.source>
-        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring.boot.version>3.5.3</spring.boot.version>
-        <commons.utility.version>0.0.4-SNAPSHOT</commons.utility.version>
+
+        <aletheia.version>0.2.1</aletheia.version>
+        <athena.version>0.3.1</athena.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
@@ -55,12 +53,12 @@
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>aletheia</artifactId>
-            <version>0.0.3</version>
+            <version>${aletheia.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
-            <artifactId>commons-utility</artifactId>
-            <version>0.0.4</version>
+            <artifactId>athena</artifactId>
+            <version>${athena.version}</version>
         </dependency>
 
         <dependency>
@@ -89,7 +87,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${maven.release.plugin.version}</version>
                 <configuration>
-                    <goals>install</goals>
+                    <goals>deploy</goals>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
@@ -167,5 +165,4 @@
             <email>221553154+de-gupta@users.noreply.github.com</email>
         </developer>
     </developers>
-
 </project>

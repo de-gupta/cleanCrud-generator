@@ -1,5 +1,6 @@
 package de.gupta.clean.crud.generator.master;
 
+import de.gupta.clean.crud.generator.api.APIModuleConfiguration;
 import de.gupta.clean.crud.generator.api.api.cli.CleanCrudGeneratorCLI;
 import de.gupta.clean.crud.generator.api.api.cli.GenerateCommand;
 import de.gupta.clean.crud.generator.api.api.cli.ListTemplatesCommand;
@@ -20,27 +21,20 @@ import java.util.Arrays;
 @SpringBootApplication
 @Import(
 		{
+				APIModuleConfiguration.class,
 				ModelImplementationModuleConfiguration.class,
 				TemplateImplementationModuleConfiguration.class,
 				WritingImplementationModuleConfiguration.class,
 				OrchestrationModuleConfiguration.class,
 		}
 )
-class SpringBootMasterApplication
+public class SpringBootMasterApplication
 {
-	public static void main(String[] args)
+	static void main(String[] args)
 	{
 		setSpringProfileFromArgs(args);
 
 		System.exit(SpringApplication.exit(SpringApplication.run(SpringBootMasterApplication.class, args)));
-	}
-
-	private static void setSpringProfileFromArgs(String[] args)
-	{
-		Arrays.stream(args)
-			  .filter(argument -> argument.startsWith("-s") || argument.startsWith("--spring-profile"))
-			  .map(argument -> argument.split("=")[1])
-			  .forEach(p -> System.setProperty("spring.profiles.active", p));
 	}
 
 	@Bean
@@ -56,5 +50,13 @@ class SpringBootMasterApplication
 
 			commandLine.execute(arguments.getSourceArgs());
 		};
+	}
+
+	private static void setSpringProfileFromArgs(String[] args)
+	{
+		Arrays.stream(args)
+			  .filter(argument -> argument.startsWith("-s") || argument.startsWith("--spring-profile"))
+			  .map(argument -> argument.split("=")[1])
+			  .forEach(p -> System.setProperty("spring.profiles.active", p));
 	}
 }
