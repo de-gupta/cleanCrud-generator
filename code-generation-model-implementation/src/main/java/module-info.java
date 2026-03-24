@@ -7,6 +7,6 @@ module code.generation.model.implementation
 	requires de.gupta.athena;
 	requires spring.context;
 	requires com.github.javaparser.core;
-	requires aletheia;
+	requires de.gupta.aletheia;
 	requires com.github.javaparser.symbolsolver.core;
 }

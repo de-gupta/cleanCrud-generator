@@ -10,6 +10,6 @@ module code.generation.template.implementation
 	requires freemarker;
 	requires spring.beans;
 	requires spring.context;
-	requires aletheia;
+	requires de.gupta.aletheia;
 	requires spring.core;
 }

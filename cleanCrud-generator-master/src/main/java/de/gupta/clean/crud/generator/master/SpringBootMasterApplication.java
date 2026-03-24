@@ -11,6 +11,8 @@ import de.gupta.clean.crud.generator.code.generation.writing.implementation.Writ
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -18,7 +20,7 @@ import picocli.CommandLine;
 
 import java.util.Arrays;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 @Import(
 		{
 				APIModuleConfiguration.class,
@@ -30,7 +32,7 @@ import java.util.Arrays;
 )
 public class SpringBootMasterApplication
 {
-	static void main(String[] args)
+	public static void main(String[] args)
 	{
 		setSpringProfileFromArgs(args);
 
