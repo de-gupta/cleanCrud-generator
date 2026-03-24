@@ -27,6 +27,7 @@
 
         <aletheia.version>0.2.1</aletheia.version>
         <athena.version>0.3.1</athena.version>
+        <clean.crud.version>0.3.0</clean.crud.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
@@ -50,6 +51,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>cleanCrud</artifactId>
+            <version>${clean.crud.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.github.de-gupta</groupId>
             <artifactId>aletheia</artifactId>
