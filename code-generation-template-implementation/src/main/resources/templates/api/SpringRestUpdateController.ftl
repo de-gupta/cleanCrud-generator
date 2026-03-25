@@ -13,9 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "${modelName()} Update" , description = "Update Operations pertaining to ${modelName()}")
+@Tag(name = "${modelBaseName()} Update" , description = "Update Operations pertaining to ${modelBaseName()}")
 @RestController
-@RequestMapping("/${modelName()?lower_case}/update")
+@RequestMapping("/${modelBaseName()?lower_case}/update")
 @EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
 class ${modelBaseName()}SpringRestUpdateController extends
 AbstractSpringRestUpdateController${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}APIModelResponse, Long${">"}

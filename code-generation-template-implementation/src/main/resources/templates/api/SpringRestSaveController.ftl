@@ -12,9 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "${modelName()} Save" , description = "Save Operations pertaining to ${modelName()}")
+@Tag(name = "${modelBaseName()} Save" , description = "Save Operations pertaining to ${modelBaseName()}")
 @RestController
-@RequestMapping("/${modelName()?lower_case}/save")
+@RequestMapping("/${modelBaseName()?lower_case}/save")
 @EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
 class ${modelBaseName()}SpringRestSaveController extends
 		AbstractSpringRestSaveController${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse${">"}

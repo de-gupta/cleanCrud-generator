@@ -59,22 +59,22 @@ public interface TemplateModel
 
 	default String persistenceModelTableName()
 	{
-		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_persistence_model");
+		return sqlIdentifier(modelBaseName().toLowerCase(Locale.ROOT) + "_persistence_model");
 	}
 
 	default String persistenceModelHistoryTableName()
 	{
-		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_persistence_model_history");
+		return sqlIdentifier(modelBaseName().toLowerCase(Locale.ROOT) + "_persistence_model_history");
 	}
 
 	default String domainPersistenceAdapterTableName()
 	{
-		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_domain_persistence_adapter_model");
+		return sqlIdentifier(modelBaseName().toLowerCase(Locale.ROOT) + "_domain_persistence_adapter_model");
 	}
 
 	default String domainPersistenceAdapterHistoryTableName()
 	{
-		return sqlIdentifier(modelName().toLowerCase(Locale.ROOT) + "_domain_persistence_adapter_model_history");
+		return sqlIdentifier(modelBaseName().toLowerCase(Locale.ROOT) + "_domain_persistence_adapter_model_history");
 	}
 
 	boolean isGeneric();

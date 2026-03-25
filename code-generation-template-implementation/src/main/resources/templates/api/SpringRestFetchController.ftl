@@ -11,9 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "${modelName()} Fetch" , description = "Fetch Operations pertaining to ${modelName()}")
+@Tag(name = "${modelBaseName()} Fetch" , description = "Fetch Operations pertaining to ${modelBaseName()}")
 @RestController
-@RequestMapping("/${modelName()?lower_case}/fetch")
+@RequestMapping("/${modelBaseName()?lower_case}/fetch")
 @EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
 class ${modelBaseName()}SpringRestFetchController extends
 AbstractSpringRestFetchController${"<"}${modelBaseName()}APIModelResponse, Long${">"}

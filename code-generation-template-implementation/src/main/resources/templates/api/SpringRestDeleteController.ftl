@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-@Tag(name = "${modelName()} Delete" , description = "Delete Operations pertaining to ${modelName()}")
+@Tag(name = "${modelBaseName()} Delete" , description = "Delete Operations pertaining to ${modelBaseName()}")
 @RestController
-@RequestMapping("/${modelName()?lower_case}/delete")
+@RequestMapping("/${modelBaseName()?lower_case}/delete")
 @EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
 class ${modelBaseName()}SpringRestDeleteController extends AbstractSpringRestDeleteController${"<"}Long${">"}
 		implements SpringRestDeleteController${"<"}Long${">"}

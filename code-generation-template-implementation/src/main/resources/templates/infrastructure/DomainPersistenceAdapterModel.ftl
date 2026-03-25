@@ -17,8 +17,8 @@ import java.util.UUID;
 				@UniqueConstraint(columnNames = "persistence_id")
 		},
 		indexes = {
-				@Index(name = "${modelName()?lower_case}_idx_domain_id", columnList = "domain_id"),
-				@Index(name = "${modelName()?lower_case}_idx_persistence_id", columnList = "persistence_id")
+				@Index(name = "${modelBaseName()?lower_case}_idx_domain_id", columnList = "domain_id"),
+				@Index(name = "${modelBaseName()?lower_case}_idx_persistence_id", columnList = "persistence_id")
 		})
 public class ${modelBaseName()}DomainPersistenceAdapterModel extends AbstractDomainPersistenceAdapterModel<Long, UUID>
 		implements DomainPersistenceAdapterModel<Long, UUID>

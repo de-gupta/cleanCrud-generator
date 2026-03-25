@@ -24,7 +24,7 @@ import ${import};
 <#list persistenceDomainDifferingGenericTypeParameters() as param>
 @Component
 @Qualifier("${beanNamePrefix()}${param}DomainToPersistenceConverter")
-final class ${modelName()}${param}DomainToPersistenceConverter implements Function<${domainConcreteType(param)}, ${persistenceConcreteType(param)}>
+final class ${modelBaseName()}${param}DomainToPersistenceConverter implements Function<${domainConcreteType(param)}, ${persistenceConcreteType(param)}>
 {
 	@Override
 	public ${persistenceConcreteType(param)} apply(final ${domainConcreteType(param)} domainValue)
@@ -36,7 +36,7 @@ final class ${modelName()}${param}DomainToPersistenceConverter implements Functi
 
 @Component
 @Qualifier("${beanNamePrefix()}${param}PersistenceToDomainConverter")
-final class ${modelName()}${param}PersistenceToDomainConverter implements Function<${persistenceConcreteType(param)}, ${domainConcreteType(param)}>
+final class ${modelBaseName()}${param}PersistenceToDomainConverter implements Function<${persistenceConcreteType(param)}, ${domainConcreteType(param)}>
 {
 	@Override
 	public ${domainConcreteType(param)} apply(final ${persistenceConcreteType(param)} persistenceValue)

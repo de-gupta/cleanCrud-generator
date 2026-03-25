@@ -24,7 +24,7 @@ import ${import};
 <#list apiDomainDifferingGenericTypeParameters() as param>
 @Component
 @Qualifier("${beanNamePrefix()}${param}DomainToAPIConverter")
-final class ${modelName()}${param}DomainToAPIConverter implements Function<${domainConcreteType(param)}, ${apiConcreteType(param)}>
+final class ${modelBaseName()}${param}DomainToAPIConverter implements Function<${domainConcreteType(param)}, ${apiConcreteType(param)}>
 {
 	@Override
 	public ${apiConcreteType(param)} apply(final ${domainConcreteType(param)} domainValue)
@@ -36,7 +36,7 @@ final class ${modelName()}${param}DomainToAPIConverter implements Function<${dom
 
 @Component
 @Qualifier("${beanNamePrefix()}${param}APIToDomainConverter")
-final class ${modelName()}${param}APIToDomainConverter implements Function<${apiConcreteType(param)}, ${domainConcreteType(param)}>
+final class ${modelBaseName()}${param}APIToDomainConverter implements Function<${apiConcreteType(param)}, ${domainConcreteType(param)}>
 {
 	@Override
 	public ${domainConcreteType(param)} apply(final ${apiConcreteType(param)} apiValue)

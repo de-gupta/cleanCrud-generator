@@ -21,8 +21,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "${persistenceModelHistoryTableName()}",
 		indexes = {
-				@Index(name = "${modelName()?lower_case}_persistence_history_idx_entity_id", columnList = "entity_id"),
-				@Index(name = "${modelName()?lower_case}_persistence_history_idx_validity", columnList = "valid_from, valid_to")
+				@Index(name = "${modelBaseName()?lower_case}_persistence_history_idx_entity_id", columnList = "entity_id"),
+				@Index(name = "${modelBaseName()?lower_case}_persistence_history_idx_validity", columnList = "valid_from, valid_to")
 		})
 public class ${modelBaseName()}PersistenceModelHistory extends AbstractTriTemporalHistoryModel<UUID>
 		implements TriTemporalHistoryModel<UUID>

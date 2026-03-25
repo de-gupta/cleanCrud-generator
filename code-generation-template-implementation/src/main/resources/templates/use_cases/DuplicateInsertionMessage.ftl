@@ -12,6 +12,6 @@ final class ${modelBaseName()}DuplicateInsertionMessage implements DuplicateInse
 	public String messageIfModelAlreadyExists(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
 	{
 		// TODO from Template: customize this duplicate message for the business key your API should expose.
-		return "The ${modelName()?lower_case} with ${properties()[0].name()} `" + ${beanNamePrefix()}DomainModel.${properties()[0].getter()}() + "` already exists";
+		return "The ${modelBaseName()?lower_case} with ${properties()[0].name()} `" + ${beanNamePrefix()}DomainModel.${properties()[0].getter()}() + "` already exists";
 	}
 }
