@@ -2,24 +2,28 @@
 package ${basePackage()}.infrastructure.persistence.service;
 
 import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import de.gupta.clean.crud.template.domain.service.constraints.AbstractDomainConstraintService;
 import de.gupta.clean.crud.template.domain.service.constraints.ConstraintResult;
 import de.gupta.clean.crud.template.domain.service.constraints.DomainConstraintService;
+import de.gupta.clean.crud.template.domain.service.constraints.ExistingModelsConstraintService;
+import de.gupta.clean.crud.template.domain.service.equality.DuplicateDefinition;
+import de.gupta.clean.crud.template.domain.service.equality.DuplicateInsertionMessage;
 import org.springframework.stereotype.Component;
 
-@Component
-final class ${modelBaseName()}DomainConstraintService implements DomainConstraintService${"<"}${modelBaseName()}DomainModel${">"}
-{
-	@Override
-	public ConstraintResult validateForInsertion(final ${modelBaseName()}DomainModel model)
-	{
-		return ConstraintResult.satisfied();
-	}
+import java.util.Collection;
+import java.util.function.Supplier;
 
-	@Override
-	public ConstraintResult validateForUpdate(
-			final ${modelBaseName()}DomainModel originalModel,
-			final ${modelBaseName()}DomainModel updatedModel)
+@Component
+final class ${modelBaseName()}DomainConstraintService
+		extends AbstractDomainConstraintService<${modelBaseName()}DomainModel>
+		implements DomainConstraintService${"<"}${modelBaseName()}DomainModel${">"}
+{
+	${modelBaseName()}DomainConstraintService(
+			final DuplicateDefinition<${modelBaseName()}DomainModel> duplicateDefinition,
+			final DuplicateInsertionMessage<${modelBaseName()}DomainModel> duplicateInsertionMessage,
+			final ExistingModelsConstraintService<${modelBaseName()}DomainModel> existingModelsConstraintService,
+			final Supplier<Collection<${modelBaseName()}DomainModel>> existingModelsSupplier)
 	{
-		return ConstraintResult.satisfied();
+		super(duplicateDefinition, duplicateInsertionMessage, existingModelsConstraintService, existingModelsSupplier);
 	}
 }

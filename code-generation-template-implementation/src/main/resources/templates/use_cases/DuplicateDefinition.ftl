@@ -2,12 +2,12 @@
 package ${basePackage()}.domain.service.equality;
 
 import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import de.gupta.clean.crud.template.domain.service.equality.AbstractKeyBasedDuplicateDefinition;
+import de.gupta.clean.crud.template.domain.service.equality.KeyBasedDuplicateDefinition;
 import org.springframework.stereotype.Component;
 
 @Component
 final class ${modelBaseName()}DuplicateDefinition
-		extends AbstractKeyBasedDuplicateDefinition<${modelBaseName()}DomainModel, ${duplicateKeyTypeName()}>
+		implements KeyBasedDuplicateDefinition<${modelBaseName()}DomainModel, ${duplicateKeyTypeName()}>
 {
 	@Override
 	public ${duplicateKeyTypeName()} duplicateKeyOf(final ${modelBaseName()}DomainModel model)
