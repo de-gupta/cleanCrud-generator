@@ -8,7 +8,7 @@ import de.gupta.clean.crud.template.domain.mapping.fetch.DomainResponseBuilder;
 import de.gupta.clean.crud.template.domain.mapping.save.DomainModelBuilder;
 import de.gupta.clean.crud.template.domain.service.security.DomainSecurityPolicy;
 import de.gupta.clean.crud.template.domain.service.crud.policy.InsertionPolicy;
-import de.gupta.clean.crud.template.domain.service.equality.DomainEqualityPolicy;
+import de.gupta.clean.crud.template.domain.service.equality.DuplicateDefinition;
 import de.gupta.clean.crud.template.useCases.crud.save.application.service.AbstractSaveService;
 import de.gupta.clean.crud.template.useCases.crud.save.application.service.SavePersistenceService;
 import de.gupta.clean.crud.template.useCases.crud.save.application.service.SaveService;
@@ -27,9 +27,9 @@ final class ${modelBaseName()}SaveService
                             ${modelBaseName()}DomainModelResponse${">"} responseModelMapper,
 							final InsertionPolicy${"<"}${modelBaseName()}DomainModel${">"} insertionPolicy,
 							final DomainSecurityPolicy${"<"}${modelBaseName()}DomainModel${">"} domainSecurityPolicy,
-							final DomainEqualityPolicy${"<"}${modelBaseName()}DomainModel${">"} domainEqualityPolicy)
+							final DuplicateDefinition${"<"}${modelBaseName()}DomainModel${">"} duplicateDefinition)
 	{
 		super(persistenceService, modelBuilder, responseModelMapper, insertionPolicy, domainSecurityPolicy,
-				domainEqualityPolicy);
+				duplicateDefinition);
 	}
 }

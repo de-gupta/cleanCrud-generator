@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 final class TemplateProcessorImpl implements TemplateProcessor
 {
 	private static final Pattern TOP_LEVEL_TYPE_PATTERN = Pattern.compile(
-			"public\\s+(?:(?:final|abstract|sealed|non-sealed|static)\\s+)*(?:class|interface|record|enum)\\s+([A-Za-z_][A-Za-z0-9_]*)");
+			"(?:(?:public|protected|private)\\s+)?(?:(?:final|abstract|sealed|non-sealed|static)\\s+)*(?:class|interface|record|enum)\\s+([A-Za-z_][A-Za-z0-9_]*)");
 	private final Configuration freemarkerConfiguration;
 
 	@Override

@@ -673,11 +673,23 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.USE_CASES
 		));
 
-		templates.put("EqualityPolicy", new TemplateMetadataConfig(
+		templates.put("DuplicateDefinition", new TemplateMetadataConfig(
 				new TemplateMetadata(
-						Optional.of("Explicit domain equality policy for duplicate detection"),
-						Set.of("Policy", "Equality", "Domain"),
-						Set.of("usecase", "policy", "equality"),
+						Optional.of("Explicit duplicate-definition contract for duplicate detection"),
+						Set.of("Duplicate", "Definition", "Domain"),
+						Set.of("usecase", "duplicate", "definition"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.USE_CASES
+		));
+
+		templates.put("DuplicateKey", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Typed duplicate key record for generated duplicate-definition scaffolding"),
+						Set.of("Duplicate", "Key", "Record"),
+						Set.of("usecase", "duplicate", "key"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false

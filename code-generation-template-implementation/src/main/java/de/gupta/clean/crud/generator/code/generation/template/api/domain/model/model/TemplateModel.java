@@ -137,6 +137,16 @@ public interface TemplateModel
 
 	Set<Property> properties();
 
+	default SequencedCollection<Property> requiredProperties()
+	{
+		return properties().stream().filter(property -> !property.optional()).toList();
+	}
+
+	default String duplicateKeyTypeName()
+	{
+		return modelBaseName() + "DuplicateKey";
+	}
+
 	Map<String, String> domainConcreteTypes();
 
 	Map<String, String> persistenceConcreteTypes();
