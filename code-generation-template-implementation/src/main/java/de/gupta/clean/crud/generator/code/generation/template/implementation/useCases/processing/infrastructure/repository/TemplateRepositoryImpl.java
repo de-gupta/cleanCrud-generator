@@ -10,9 +10,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -67,15 +65,47 @@ final class TemplateRepositoryImpl implements TemplateRepository
 		try
 		{
 			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-			Resource[] resources = resolver.getResources("classpath:templates/**/*.ftl");
+			Resource[] resources = resolver.getResources("classpath*:templates/**/*.ftl");
 
 			return Arrays.stream(resources)
+						 .sorted(Comparator.comparingInt(TemplateRepositoryImpl::resourcePriority))
 						 .map(TemplateRepositoryImpl::createTemplateFromResource)
-						 .collect(Collectors.toSet());
+						 .collect(Collectors.collectingAndThen(
+								 Collectors.toMap(
+										 SourceCodeTemplate::templateName,
+										 template -> template,
+										 (preferred, ignored) -> preferred,
+										 LinkedHashMap::new),
+								 templates -> Set.copyOf(templates.values())));
 		}
 		catch (IOException e)
 		{
 			throw TemplateLoadingException.withMessage("Failed to load templates: " + e.getMessage());
+		}
+	}
+
+	private static int resourcePriority(final Resource resource)
+	{
+		try
+		{
+			var normalized = resource.getURL().toString().replace('\\', '/');
+			if (normalized.contains("/target/classes/templates/"))
+			{
+				return 0;
+			}
+			if (normalized.startsWith("file:"))
+			{
+				return 1;
+			}
+			if (normalized.startsWith("jar:file:"))
+			{
+				return 2;
+			}
+			return 3;
+		}
+		catch (IOException e)
+		{
+			return Integer.MAX_VALUE;
 		}
 	}
 

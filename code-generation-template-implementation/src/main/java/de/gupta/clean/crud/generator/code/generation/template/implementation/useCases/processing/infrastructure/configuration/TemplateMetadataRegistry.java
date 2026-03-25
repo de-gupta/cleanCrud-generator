@@ -70,6 +70,18 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.DOMAIN
 		));
 
+		templates.put("ExistingModelsConstraintService", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Constraint service for additional checks against the existing model set"),
+						Set.of("ConstraintValidator", "ExistingModels"),
+						Set.of("domain", "validation", "constraint", "existing"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.DOMAIN
+		));
+
 		templates.put("DomainModelBuilder", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Builder implementation for domain models"),
@@ -438,6 +450,18 @@ public final class TemplateMetadataRegistry
 						Optional.of("Spring module configuration"),
 						Set.of("Configuration", "Spring"),
 						Set.of("infrastructure", "configuration", "module"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.INFRASTRUCTURE
+		));
+
+		templates.put("ExistingDomainModelsSupplier", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Supplier for loading existing domain models from persistence"),
+						Set.of("Supplier", "Persistence", "ExistingModels"),
+						Set.of("infrastructure", "persistence", "service", "existing-models"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false
