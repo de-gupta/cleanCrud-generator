@@ -2,12 +2,12 @@
     <configuration default="false" name="generate.from.base-model" type="Application" factoryName="Application">
         <option name="ALTERNATIVE_JRE_PATH" value="D:/Work/Programming/Languages/Java/jdk/jdk-25/oracle"/>
         <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true"/>
+        <option name="envFilePaths">
+            <option value="$PROJECT_DIR$/.env"/>
+        </option>
         <option name="MAIN_CLASS_NAME" value="de.gupta.clean.crud.generator.master.SpringBootMasterApplication"/>
         <module name="cleanCrud-generator-master"/>
         <option name="PROGRAM_PARAMETERS" value="generate --config $PROJECT_DIR$/.run/generate.from.base-model.json"/>
-        <envs>
-            <env name="CLEANCRUD_BASE_MODEL_FILE" value=""/>
-        </envs>
         <method v="2">
             <option name="Make" enabled="true"/>
         </method>
