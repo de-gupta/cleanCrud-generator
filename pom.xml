@@ -4,7 +4,7 @@
 
     <groupId>io.github.de-gupta</groupId>
     <artifactId>cleanCrud-generator</artifactId>
-    <version>0.1.3-SNAPSHOT</version>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>code-generation-model-implementation</module>
@@ -83,7 +83,7 @@
         <connection>scm:git:git@github.com:de-gupta/cleanCrud-generator.git</connection>
         <developerConnection>scm:git:git@github.com:de-gupta/cleanCrud-generator.git</developerConnection>
         <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
-        <tag>HEAD</tag>
+        <tag>v0.2.0</tag>
     </scm>
 
     <build>
