@@ -673,6 +673,18 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.USE_CASES
 		));
 
+		templates.put("EqualityPolicy", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Explicit domain equality policy for duplicate detection"),
+						Set.of("Policy", "Equality", "Domain"),
+						Set.of("usecase", "policy", "equality"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.USE_CASES
+		));
+
 		templates.put("EndpointSecurityPolicy", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Security policy for endpoints"),
