@@ -445,6 +445,30 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.COMMON
 		));
 
+		templates.put("IdentityAPIDomainIDAdapter", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Shared identity adapter between API and domain IDs"),
+						Set.of("Identity", "API", "Domain", "ID", "Adapter"),
+						Set.of("common", "adapter", "id"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.COMMON
+		));
+
+		templates.put("GlobalSpringRestControllerAdvice", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Shared global Spring REST controller advice"),
+						Set.of("ControllerAdvice", "Spring", "Web"),
+						Set.of("common", "configuration", "web", "advice"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.COMMON
+		));
+
 		templates.put("ModuleConfiguration", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Spring module configuration"),
