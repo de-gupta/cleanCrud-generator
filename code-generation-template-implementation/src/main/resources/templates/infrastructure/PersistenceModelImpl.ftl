@@ -95,13 +95,9 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 
 <#list properties() as property>
 		@Override
-		public ${modelBaseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistencePropertyType(property)} ${property.name()})
+		public ${modelBaseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistenceBuilderPropertyType(property)} ${property.name()})
 		{
-			<#if property.optional()>
-			${property.name()}.ifPresent(value -> model.${property.name()} = value);
-			<#else>
 			model.${property.name()} = ${property.name()};
-			</#if>
 			return this;
 		}
 

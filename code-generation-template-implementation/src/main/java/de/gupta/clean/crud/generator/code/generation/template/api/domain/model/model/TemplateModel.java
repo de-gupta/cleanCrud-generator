@@ -189,9 +189,25 @@ public interface TemplateModel
 				domainResolvedType(property.type());
 	}
 
+	default String baseBuilderPropertyType(final Property property)
+	{
+		return property.optional() ? property.baseType() : property.paramType();
+	}
+
+	default String domainBuilderPropertyType(final Property property)
+	{
+		return property.optional() ? domainResolvedType(property.baseType()) : domainResolvedType(property.type());
+	}
+
 	default String persistencePropertyType(final Property property)
 	{
 		return property.optional() ? "Optional<" + persistenceResolvedType(property.baseType()) + ">" :
+				persistenceResolvedType(property.type());
+	}
+
+	default String persistenceBuilderPropertyType(final Property property)
+	{
+		return property.optional() ? persistenceResolvedType(property.baseType()) :
 				persistenceResolvedType(property.type());
 	}
 

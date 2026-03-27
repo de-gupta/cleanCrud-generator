@@ -72,13 +72,9 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 
 <#list properties() as property>
 		@Override
-		public ${modelBaseName()}DomainModelBuilder with${property.capitalizedName()}(final ${domainPropertyType(property)} ${property.name()})
+		public ${modelBaseName()}DomainModelBuilder with${property.capitalizedName()}(final ${domainBuilderPropertyType(property)} ${property.name()})
 		{
-		<#if property.optional()>
-			${property.name()}.ifPresent(value -> model.${property.name()} = value);
-		<#else>
 			model.${property.name()} = ${property.name()};
-		</#if>
 			return this;
 		}
 

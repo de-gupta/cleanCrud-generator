@@ -16,19 +16,23 @@ private final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBas
 public ${modelBaseName()}DomainModel patchModel(final ${modelBaseName()}DomainModel originalModel,
 final ${modelBaseName()}DomainModelUpdatePatch updatePatch)
 {
-return modelBuilderFactory.builder()
+final var builder = modelBuilderFactory.builder();
 <#list properties() as property>
-    <#if property.optional()>
-        .with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ?
-        updatePatch.${property.name()}() :
-        originalModel.${property.getter()}())
-    <#else>
-        .with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()))
-    </#if><#if property_has_next>
+	<#if property.optional()>
+if (updatePatch.${property.name()}().isPresent())
+{
+	builder.with${property.capitalizedName()}(updatePatch.${property.name()}().get());
+}
+else
+{
+	originalModel.${property.getter()}().ifPresent(builder::with${property.capitalizedName()});
+}
+	<#else>
+builder.with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()));
+	</#if>
 
-</#if>
 </#list>
-.build();
+return builder.build();
 }
 
 ${modelBaseName()}DomainModelPatcher(
