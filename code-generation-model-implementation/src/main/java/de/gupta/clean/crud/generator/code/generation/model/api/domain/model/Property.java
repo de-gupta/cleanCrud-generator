@@ -2,8 +2,16 @@ package de.gupta.clean.crud.generator.code.generation.model.api.domain.model;
 
 import de.gupta.commons.utility.string.StringCaseUtility;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public record Property(String name, String returnType, String fullyQualifiedTypeName, boolean enumType)
 {
+	private static final Pattern QUALIFIED_TYPE_PATTERN = Pattern.compile(
+			"\\b[a-zA-Z_]\\w*(?:\\.[a-zA-Z_]\\w*)+\\b");
+
 	public static Property of(final String name, final String returnType, final String fullyQualifiedTypeName)
 	{
 		return new Property(name, returnType, fullyQualifiedTypeName, false);
@@ -51,6 +59,21 @@ public record Property(String name, String returnType, String fullyQualifiedType
 	public String baseTypeImport()
 	{
 		return extractImport(optional() ? stripOuterGeneric(fullyQualifiedTypeName) : fullyQualifiedTypeName);
+	}
+
+	public Set<String> imports()
+	{
+		final Set<String> imports = new LinkedHashSet<>();
+		final Matcher matcher = QUALIFIED_TYPE_PATTERN.matcher(fullyQualifiedTypeName);
+		while (matcher.find())
+		{
+			final String candidate = matcher.group();
+			if (!candidate.startsWith("java.lang."))
+			{
+				imports.add(candidate);
+			}
+		}
+		return imports;
 	}
 
 	public boolean isEnum()

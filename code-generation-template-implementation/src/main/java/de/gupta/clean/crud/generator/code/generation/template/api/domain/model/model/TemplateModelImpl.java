@@ -22,8 +22,9 @@ record TemplateModelImpl(
 	@Override
 	public String basePackage()
 	{
-		final String firstParent = packageName.substring(0, packageName.lastIndexOf("."));
-		return firstParent.substring(0, firstParent.lastIndexOf("."));
+		return packageName.endsWith(".domain.model") ?
+				packageName.substring(0, packageName.length() - ".domain.model".length()) :
+				packageName;
 	}
 
 	@Override

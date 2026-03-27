@@ -24,6 +24,34 @@ public interface TemplateModel
 			Map.entry("BigDecimal", "java.math.BigDecimal"),
 			Map.entry("BigInteger", "java.math.BigInteger")
 	);
+	Set<String> SIMPLE_PERSISTENCE_TYPES = Set.of(
+			"String",
+			"Boolean",
+			"boolean",
+			"Byte",
+			"byte",
+			"Short",
+			"short",
+			"Integer",
+			"int",
+			"Long",
+			"long",
+			"Float",
+			"float",
+			"Double",
+			"double",
+			"Character",
+			"char",
+			"UUID",
+			"LocalDate",
+			"LocalDateTime",
+			"LocalTime",
+			"Instant",
+			"OffsetDateTime",
+			"ZonedDateTime",
+			"BigDecimal",
+			"BigInteger"
+	);
 
 	String packageName();
 
@@ -62,6 +90,11 @@ public interface TemplateModel
 		return sqlIdentifier(modelBaseName().toLowerCase(Locale.ROOT) + "_persistence_model");
 	}
 
+	default String persistenceJpaConvertersTypeName()
+	{
+		return modelBaseName() + "PersistenceJpaConverters";
+	}
+
 	default String persistenceModelHistoryTableName()
 	{
 		return sqlIdentifier(modelBaseName().toLowerCase(Locale.ROOT) + "_persistence_model_history");
@@ -86,20 +119,12 @@ public interface TemplateModel
 	default Set<String> propertyImports()
 	{
 		var imports = new LinkedHashSet<String>();
-		properties().forEach(property ->
-		{
-			var explicitImport = property.baseTypeImport();
-			if (!explicitImport.isBlank())
-			{
-				imports.add(explicitImport);
-				return;
-			}
-			var inferredImport = importForType(property.baseType());
-			if (!inferredImport.isBlank())
-			{
-				imports.add(inferredImport);
-			}
-		});
+		properties().forEach(property -> imports.addAll(property.imports()));
+		properties().stream()
+		            .map(Property::baseType)
+		            .map(this::importForType)
+		            .filter(importName -> !importName.isBlank())
+		            .forEach(imports::add);
 		return imports;
 	}
 
@@ -140,6 +165,11 @@ public interface TemplateModel
 	default SequencedCollection<Property> requiredProperties()
 	{
 		return properties().stream().filter(property -> !property.optional()).toList();
+	}
+
+	default SequencedCollection<Property> jpaConverterProperties()
+	{
+		return properties().stream().filter(this::requiresJpaConverter).toList();
 	}
 
 	default String duplicateKeyTypeName()
@@ -211,6 +241,20 @@ public interface TemplateModel
 				persistenceResolvedType(property.type());
 	}
 
+	default boolean requiresJpaConverter(final Property property)
+	{
+		if (property.isEnum())
+		{
+			return false;
+		}
+		return !SIMPLE_PERSISTENCE_TYPES.contains(rawTypeName(persistenceResolvedType(property.baseType())));
+	}
+
+	default String jpaConverterNestedClassName(final Property property)
+	{
+		return property.capitalizedName() + "JpaConverter";
+	}
+
 	default String apiPropertyType(final Property property)
 	{
 		return property.optional() ? "Optional<" + apiResolvedType(property.baseType()) + ">" :
@@ -266,9 +310,9 @@ public interface TemplateModel
 	{
 		var imports = new LinkedHashSet<String>();
 		concreteTypes.values().stream()
-					 .map(this::importForType)
-					 .filter(importName -> !importName.isBlank())
-					 .forEach(imports::add);
+		             .map(this::importForType)
+		             .filter(importName -> !importName.isBlank())
+		             .forEach(imports::add);
 		return imports;
 	}
 
@@ -294,6 +338,13 @@ public interface TemplateModel
 	{
 		int genericStart = typeName.indexOf('<');
 		return genericStart >= 0 ? typeName.substring(0, genericStart) : typeName;
+	}
+
+	private String rawTypeName(final String typeName)
+	{
+		var rawType = stripGenericArguments(typeName);
+		int packageSeparator = rawType.lastIndexOf('.');
+		return packageSeparator >= 0 ? rawType.substring(packageSeparator + 1) : rawType;
 	}
 
 	private String uncapitalize(final String value)

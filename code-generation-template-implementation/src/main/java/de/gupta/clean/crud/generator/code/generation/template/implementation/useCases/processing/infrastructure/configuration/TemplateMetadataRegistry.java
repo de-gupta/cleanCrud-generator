@@ -601,6 +601,18 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.INFRASTRUCTURE
 		));
 
+		templates.put("PersistenceJpaConverters", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("JPA converter stubs for complex persistence fields"),
+						Set.of("JPA", "AttributeConverter", "Persistence", "Converter"),
+						Set.of("infrastructure", "persistence", "converter", "jpa"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.INFRASTRUCTURE
+		));
+
 		templates.put("PersistenceModelHistoryJpaRepository", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("History JPA repository for persistence models"),

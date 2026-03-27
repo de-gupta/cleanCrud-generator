@@ -1,19 +1,25 @@
 <#-- Template for generating PersistenceModelHistory class -->
 package ${basePackage()}.infrastructure.persistence.repository;
 
+<#if jpaConverterProperties()?has_content>
+import ${basePackage()}.infrastructure.persistence.converter.${persistenceJpaConvertersTypeName()};
+</#if>
 import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.model.AbstractTriTemporalHistoryModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.model.TemporalChangeType;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.model.TriTemporalHistoryModel;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-<#list properties() as property>
-<#if property.baseTypeImport()?has_content>
-import ${property.baseTypeImport()};
+<#if persistenceModelImports()?has_content>
+<#list persistenceModelImports() as import>
+<#if import != "java.util.Optional" && import != "java.util.UUID">
+import ${import};
 </#if>
 </#list>
+</#if>
 
 import java.time.Instant;
 import java.util.UUID;
@@ -28,6 +34,9 @@ public class ${modelBaseName()}PersistenceModelHistory extends AbstractTriTempor
 		implements TriTemporalHistoryModel<UUID>
 {
 <#list properties() as property>
+	<#if requiresJpaConverter(property)>
+	@Convert(converter = ${persistenceJpaConvertersTypeName()}.${jpaConverterNestedClassName(property)}.class)
+	</#if>
 	@Column(name = "${sqlColumnName(property)}")
 	private ${persistenceResolvedType(property.baseType())} ${property.name()};
 

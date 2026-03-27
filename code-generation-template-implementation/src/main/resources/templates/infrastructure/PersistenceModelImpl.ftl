@@ -1,6 +1,9 @@
 <#-- Template for generating PersistenceModelImpl class -->
 package ${basePackage()}.infrastructure.persistence.repository;
 
+<#if jpaConverterProperties()?has_content>
+import ${basePackage()}.infrastructure.persistence.converter.${persistenceJpaConvertersTypeName()};
+</#if>
 import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 import jakarta.persistence.*;
@@ -31,12 +34,22 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	<#if property.isEnum()>
 	@Enumerated(EnumType.STRING)
 	</#if>
+	<#if requiresJpaConverter(property)>
+	@Convert(converter = ${persistenceJpaConvertersTypeName()}.${jpaConverterNestedClassName(property)}.class)
+	@Column(name = "${sqlColumnName(property)}", nullable = false, columnDefinition = "TEXT")
+	<#else>
 	@Column(name = "${sqlColumnName(property)}", nullable = false)
+	</#if>
 	<#else>
 	<#if property.isEnum()>
 	@Enumerated(EnumType.STRING)
 	</#if>
+	<#if requiresJpaConverter(property)>
+	@Convert(converter = ${persistenceJpaConvertersTypeName()}.${jpaConverterNestedClassName(property)}.class)
+	@Column(name = "${sqlColumnName(property)}", columnDefinition = "TEXT")
+	<#else>
 	@Column(name = "${sqlColumnName(property)}"<#if property.type() == "String">, columnDefinition = "TEXT"</#if>)
+	</#if>
 	</#if>
 	private ${persistenceResolvedType(property.baseType())} ${property.name()};
 </#list>
