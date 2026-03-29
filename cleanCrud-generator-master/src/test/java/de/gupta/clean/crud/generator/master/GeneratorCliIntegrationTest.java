@@ -76,6 +76,28 @@ class GeneratorCliIntegrationTest
 	}
 
 	@Test
+	void generateSubcommandAcceptsPropertiesConfigurationFile(@TempDir final Path tempDir)
+			throws IOException
+	{
+		Path repoRoot = tempDir.resolve("cleanCrud-sampleImplementation-copy");
+		Path contentRoot = repoRoot.resolve("src/main/java");
+		Path modelPath =
+				contentRoot.resolve("de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java");
+		Path configPath = repoRoot.resolve(".run/person-generator-config.properties");
+		Files.createDirectories(modelPath.getParent());
+		Files.createDirectories(configPath.getParent());
+		Files.writeString(modelPath, PERSON_MODEL_SOURCE);
+		Files.writeString(configPath, propertiesConfig());
+
+		int exitCode = commandLine().execute("generate", "--config", configPath.toString());
+		assertEquals(0, exitCode);
+		assertTrue(Files.exists(contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/domain/model/PersonDomainModel.java")));
+		assertTrue(Files.exists(contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/save/application/service/PersonSaveService.java")));
+	}
+
+	@Test
 	void listTemplatesSubcommandExecutesSuccessfully()
 	{
 		assertEquals(0, commandLine().execute("list-templates"));
@@ -147,6 +169,21 @@ class GeneratorCliIntegrationTest
 						  },
 						  "historized": true
 						}
+				""";
+	}
+
+	private String propertiesConfig()
+	{
+		return """
+				inputs.baseModelSourceCodeFilePath=../src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java
+				genericTypes.domain.U=String
+				genericTypes.domain.V=Integer
+				genericTypes.persistence.U=String
+				genericTypes.persistence.V=Integer
+				genericTypes.api.U=String
+				genericTypes.api.V=Integer
+				overwrite.defaultOverwrite=true
+				historized=true
 				""";
 	}
 }

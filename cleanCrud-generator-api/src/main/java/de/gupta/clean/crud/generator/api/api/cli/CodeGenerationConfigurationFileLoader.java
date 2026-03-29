@@ -2,16 +2,16 @@ package de.gupta.clean.crud.generator.api.api.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
-import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GenerationInputs;
-import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 final class CodeGenerationConfigurationFileLoader
@@ -22,8 +22,7 @@ final class CodeGenerationConfigurationFileLoader
 	{
 		try
 		{
-			var configuration = objectMapperFor(configurationFilePath)
-					.readValue(configurationFilePath.toFile(), CodeGenerationConfiguration.class);
+			var configuration = loadRawConfiguration(configurationFilePath);
 			return normalize(configuration, configurationFilePath);
 		}
 		catch (IOException e)
@@ -39,6 +38,62 @@ final class CodeGenerationConfigurationFileLoader
 		return fileName.endsWith(".yaml") || fileName.endsWith(".yml")
 				? new ObjectMapper(new YAMLFactory())
 				: new ObjectMapper();
+	}
+
+	private CodeGenerationConfiguration loadRawConfiguration(final Path configurationFilePath) throws IOException
+	{
+		String fileName = configurationFilePath.getFileName().toString().toLowerCase();
+		if (fileName.endsWith(".properties"))
+		{
+			return loadPropertiesConfiguration(configurationFilePath);
+		}
+		return objectMapperFor(configurationFilePath).readValue(configurationFilePath.toFile(),
+				CodeGenerationConfiguration.class);
+	}
+
+	private CodeGenerationConfiguration loadPropertiesConfiguration(final Path configurationFilePath) throws IOException
+	{
+		Properties properties = new Properties();
+		try (InputStream inputStream = java.nio.file.Files.newInputStream(configurationFilePath))
+		{
+			properties.load(inputStream);
+		}
+
+		return new CodeGenerationConfiguration(
+				new GenerationInputs(
+						properties.getProperty("inputs.baseModelSourceCodeFilePath"),
+						properties.getProperty("inputs.domainModelSourceCodeFilePath"),
+						properties.getProperty("inputs.persistenceModelSourceCodeFilePath"),
+						properties.getProperty("inputs.apiModelSourceCodeFilePath")
+				),
+				new LayerConcreteTypes(
+						extractPrefixedMap(properties, "genericTypes.domain."),
+						extractPrefixedMap(properties, "genericTypes.persistence."),
+						extractPrefixedMap(properties, "genericTypes.api.")
+				),
+				new GenerationSelection(
+						extractCsvSet(properties, "generation.groups"),
+						extractCsvSet(properties, "generation.templates"),
+						extractCsvSet(properties, "generation.tags"),
+						extractCsvSet(properties, "generation.excludeGroups"),
+						extractCsvSet(properties, "generation.excludeTemplates"),
+						extractCsvSet(properties, "generation.excludeTags")
+				),
+				new OwnershipConfiguration(
+						parseOwnership(properties.getProperty("ownership.baseModel")),
+						parseOwnership(properties.getProperty("ownership.domainModel")),
+						parseOwnership(properties.getProperty("ownership.persistenceModel")),
+						parseOwnership(properties.getProperty("ownership.apiModel"))
+				),
+				new OverwriteConfiguration(
+						Boolean.parseBoolean(properties.getProperty("overwrite.defaultOverwrite", "false")),
+						extractBooleanMap(properties, "overwrite.groups."),
+						extractBooleanMap(properties, "overwrite.templates."),
+						extractBooleanMap(properties, "overwrite.tags."),
+						extractBooleanMap(properties, "overwrite.files.")
+				),
+				Boolean.parseBoolean(properties.getProperty("historized", "false"))
+		);
 	}
 
 	private CodeGenerationConfiguration normalize(
@@ -129,5 +184,53 @@ final class CodeGenerationConfigurationFileLoader
 		}
 		matcher.appendTail(expanded);
 		return expanded.toString();
+	}
+
+	private Map<String, String> extractPrefixedMap(final Properties properties, final String prefix)
+	{
+		return properties.stringPropertyNames()
+		                 .stream()
+		                 .filter(name -> name.startsWith(prefix))
+		                 .collect(Collectors.toMap(
+								 name -> name.substring(prefix.length()),
+								 properties::getProperty,
+								 (left, right) -> right,
+								 LinkedHashMap::new
+						 ));
+	}
+
+	private Map<String, Boolean> extractBooleanMap(final Properties properties, final String prefix)
+	{
+		return properties.stringPropertyNames()
+		                 .stream()
+		                 .filter(name -> name.startsWith(prefix))
+		                 .collect(Collectors.toMap(
+								 name -> name.substring(prefix.length()),
+								 name -> Boolean.parseBoolean(properties.getProperty(name)),
+								 (left, right) -> right,
+								 LinkedHashMap::new
+						 ));
+	}
+
+	private Set<String> extractCsvSet(final Properties properties, final String key)
+	{
+		String value = properties.getProperty(key);
+		if (value == null || value.isBlank())
+		{
+			return Set.of();
+		}
+		return Arrays.stream(value.split(","))
+		             .map(String::trim)
+		             .filter(token -> !token.isBlank())
+		             .collect(Collectors.toUnmodifiableSet());
+	}
+
+	private GeneratedArtifactOwnership parseOwnership(final String value)
+	{
+		if (value == null || value.isBlank())
+		{
+			return null;
+		}
+		return GeneratedArtifactOwnership.valueOf(value.trim().toUpperCase());
 	}
 }
