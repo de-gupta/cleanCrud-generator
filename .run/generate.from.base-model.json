@@ -1,25 +1,44 @@
 {
-  "domainModelSourceCodeFilePath": "${CLEANCRUD_BASE_MODEL_FILE}",
-  "domainConcreteTypes": {
-    "U": "String",
-    "V": "Integer"
+  "inputs": {
+    "baseModelSourceCodeFilePath": "${CLEANCRUD_BASE_MODEL_FILE}"
   },
-  "persistenceConcreteTypes": {
-    "U": "String",
-    "V": "Integer"
+  "genericTypes": {
+    "domain": {
+      "U": "String",
+      "V": "Integer"
+    },
+    "persistence": {
+      "U": "String",
+      "V": "Integer"
+    },
+    "api": {
+      "U": "String",
+      "V": "Integer"
+    }
   },
-  "apiConcreteTypes": {
-    "U": "String",
-    "V": "Integer"
+  "generation": {
+    "groups": [
+      "COMMON",
+      "CONFIGURATION",
+      "DOMAIN_MODELS",
+      "DOMAIN_SUPPORT",
+      "API_DTOS",
+      "API_ADAPTERS",
+      "API_CONTROLLERS",
+      "PERSISTENCE_MODELS",
+      "PERSISTENCE_ADAPTERS",
+      "PERSISTENCE_REPOSITORIES",
+      "PERSISTENCE_HISTORY",
+      "SECURITY",
+      "USE_CASE_FETCH",
+      "USE_CASE_SAVE",
+      "USE_CASE_UPDATE",
+      "USE_CASE_DELETE"
+    ]
   },
-  "templateGroups": [
-    "API",
-    "DOMAIN",
-    "INFRASTRUCTURE",
-    "USE_CASES",
-    "COMMON"
-  ],
-  "generateCommonFiles": true,
-  "forceOverwrite": true,
+  "ownership": {},
+  "overwrite": {
+    "defaultOverwrite": true
+  },
   "historized": true
 }

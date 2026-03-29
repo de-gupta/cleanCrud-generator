@@ -35,11 +35,22 @@ final class SourceCodeTemplateProcessorImpl implements SourceCodeTemplateProcess
 
 	private Set<SourceCodeTemplate> resolveTemplates(final TemplateSelector selector)
 	{
-		if (selector == null || selector.templateGroups().isEmpty())
+		if (selector == null)
 		{
 			return templateRepository.allTemplates();
 		}
-		return templateRepository.findTemplatesByGroups(selector.templateGroups());
+		return templateRepository.allTemplates().stream()
+		                         .filter(template -> selector.groups().isEmpty() || selector.groups().contains(
+										 template.templateGroup()))
+		                         .filter(template -> selector.templates().isEmpty() || selector.templates().contains(
+										 template.templateName()))
+		                         .filter(template -> selector.tags().isEmpty()
+										 || template.metadata().tags().stream().anyMatch(selector.tags()::contains))
+		                         .filter(template -> !selector.excludeGroups().contains(template.templateGroup()))
+		                         .filter(template -> !selector.excludeTemplates().contains(template.templateName()))
+		                         .filter(template -> template.metadata().tags().stream()
+		                                                     .noneMatch(selector.excludeTags()::contains))
+		                         .collect(Collectors.toUnmodifiableSet());
 	}
 
 	SourceCodeTemplateProcessorImpl(

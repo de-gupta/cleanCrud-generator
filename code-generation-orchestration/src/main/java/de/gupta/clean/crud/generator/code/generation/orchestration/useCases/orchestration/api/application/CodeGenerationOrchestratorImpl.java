@@ -3,6 +3,8 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orc
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCodeFile;
 import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteResolver;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModelFactory;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateSelector;
@@ -21,11 +23,42 @@ import java.util.regex.Pattern;
 final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 {
 	private static final Set<String> DEFAULT_TEMPLATE_GROUPS = Set.of(
-			TemplateGroup.API.name(),
-			TemplateGroup.DOMAIN.name(),
-			TemplateGroup.INFRASTRUCTURE.name(),
-			TemplateGroup.USE_CASES.name());
+			TemplateGroup.CONFIGURATION.name(),
+			TemplateGroup.DOMAIN_MODELS.name(),
+			TemplateGroup.DOMAIN_SUPPORT.name(),
+			TemplateGroup.API_DTOS.name(),
+			TemplateGroup.API_ADAPTERS.name(),
+			TemplateGroup.API_CONTROLLERS.name(),
+			TemplateGroup.PERSISTENCE_MODELS.name(),
+			TemplateGroup.PERSISTENCE_ADAPTERS.name(),
+			TemplateGroup.PERSISTENCE_REPOSITORIES.name(),
+			TemplateGroup.PERSISTENCE_HISTORY.name(),
+			TemplateGroup.SECURITY.name(),
+			TemplateGroup.USE_CASE_FETCH.name(),
+			TemplateGroup.USE_CASE_SAVE.name(),
+			TemplateGroup.USE_CASE_UPDATE.name(),
+			TemplateGroup.USE_CASE_DELETE.name());
 	private static final Pattern PACKAGE_PATTERN = Pattern.compile("(?m)^\\s*package\\s+([a-zA-Z_][\\w.]*)\\s*;");
+	private static final Set<String> BASE_MODEL_TEMPLATES = Set.of("BaseModel");
+	private static final Set<String> DOMAIN_MODEL_TEMPLATES = Set.of(
+			"DomainModel",
+			"DomainModelImpl",
+			"DomainModelBuilder",
+			"DomainModelBuilderFactory",
+			"DomainModelCreateDTO",
+			"DomainModelUpdatePatchDTO",
+			"DomainModelResponseDTO",
+			"DomainModelPatcher",
+			"DomainResponseBuilder");
+	private static final Set<String> PERSISTENCE_MODEL_TEMPLATES = Set.of(
+			"PersistenceModel",
+			"PersistenceModelImpl",
+			"PersistenceModelBuilderFactory",
+			"PersistenceJpaConverters");
+	private static final Set<String> API_MODEL_TEMPLATES = Set.of(
+			"APIModelCreateDTO",
+			"APIModelResponseDTO",
+			"APIModelUpdatePatchDTO");
 	private final DomainModelParser modelParser;
 	private final SourceCodeTemplateProcessor templateProcessor;
 	private final SourceCodeFileWriter sourceCodeFileWriter;
@@ -33,24 +66,32 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	@Override
 	public int generateCode(final CodeGenerationConfiguration configuration)
 	{
-		var model = modelParser.parseDomainModel(configuration.domainModelSourceCodeFilePath());
+		var model = modelParser.parseDomainModel(configuration.inputs().baseModelSourceCodeFilePath());
 		var templateModel = TemplateModelFactory.create(model.packageName(), model.modelName(),
-				model.genericTypeParameters(), model.properties(), configuration.domainConcreteTypes(),
-				configuration.persistenceConcreteTypes(), configuration.apiConcreteTypes(), Set.of(),
+				model.genericTypeParameters(), model.properties(), configuration.genericTypes().domain(),
+				configuration.genericTypes().persistence(), configuration.genericTypes().api(), Set.of(),
 				configuration.historized());
+		var overwriteResolver = OverwriteResolver.with(configuration.overwrite());
 
 		var files = templateProcessor.generateSourceCode(templateModel,
-				TemplateSelector.with(resolveTemplateGroups(configuration)));
+				TemplateSelector.with(
+						resolveTemplateGroups(configuration),
+						resolveTemplates(configuration),
+						resolveTags(configuration),
+						configuration.generation().excludeGroups(),
+						resolveExcludedTemplates(configuration),
+						resolveExcludedTags(configuration)));
 
 		files.forEach((template, sourceCodeFile) ->
 		{
-			if (!shouldWrite(template, sourceCodeFile, model.contentRootPath(), configuration))
+			if (!shouldWrite(template, sourceCodeFile, model.contentRootPath(), configuration, overwriteResolver))
 			{
 				return;
 			}
+			var targetPath = resolveTargetPath(model.contentRootPath(), sourceCodeFile);
 			var request = SourceCodeWriteRequest.from(model.contentRootPath(), sourceCodeFile.fileName(),
 					sourceCodeFile.sourceCode().sourceCode(),
-					template.forceOverwrite() || configuration.forceOverwrite());
+					overwriteResolver.shouldOverwrite(template, targetPath));
 
 			sourceCodeFileWriter.writeSourceCode(request);
 		});
@@ -60,28 +101,63 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 
 	private Set<String> resolveTemplateGroups(final CodeGenerationConfiguration configuration)
 	{
-		return configuration.templateGroups().isEmpty() ? DEFAULT_TEMPLATE_GROUPS : configuration.templateGroups();
+		return configuration.generation().groups().isEmpty() ? DEFAULT_TEMPLATE_GROUPS :
+				configuration.generation().groups();
+	}
+
+	private Set<String> resolveTemplates(final CodeGenerationConfiguration configuration)
+	{
+		return configuration.generation().templates();
+	}
+
+	private Set<String> resolveExcludedTemplates(final CodeGenerationConfiguration configuration)
+	{
+		var templates = new java.util.LinkedHashSet<>(configuration.generation().excludeTemplates());
+		applyOwnershipExclusions(templates, configuration);
+		return Set.copyOf(templates);
+	}
+
+	private Set<String> resolveTags(final CodeGenerationConfiguration configuration)
+	{
+		return configuration.generation().tags();
+	}
+
+	private Set<String> resolveExcludedTags(final CodeGenerationConfiguration configuration)
+	{
+		return configuration.generation().excludeTags();
+	}
+
+	private void applyOwnershipExclusions(
+			final java.util.Set<String> templates,
+			final CodeGenerationConfiguration configuration)
+	{
+		if (configuration.ownership().baseModel() == GeneratedArtifactOwnership.USER)
+		{
+			templates.addAll(BASE_MODEL_TEMPLATES);
+		}
+		if (configuration.ownership().domainModel() == GeneratedArtifactOwnership.USER)
+		{
+			templates.addAll(DOMAIN_MODEL_TEMPLATES);
+		}
+		if (configuration.ownership().persistenceModel() == GeneratedArtifactOwnership.USER)
+		{
+			templates.addAll(PERSISTENCE_MODEL_TEMPLATES);
+		}
+		if (configuration.ownership().apiModel() == GeneratedArtifactOwnership.USER)
+		{
+			templates.addAll(API_MODEL_TEMPLATES);
+		}
 	}
 
 	private boolean shouldWrite(
 			final SourceCodeTemplate template,
 			final SourceCodeFile sourceCodeFile,
 			final Path contentRootPath,
-			final CodeGenerationConfiguration configuration)
+			final CodeGenerationConfiguration configuration,
+			final OverwriteResolver overwriteResolver)
 	{
-		if (template.templateGroup() != TemplateGroup.COMMON)
-		{
-			return true;
-		}
-		if (Boolean.FALSE.equals(configuration.generateCommonFiles()))
-		{
-			return false;
-		}
-		if (Boolean.TRUE.equals(configuration.generateCommonFiles()))
-		{
-			return true;
-		}
-		return !Files.exists(resolveTargetPath(contentRootPath, sourceCodeFile));
+		var targetPath = resolveTargetPath(contentRootPath, sourceCodeFile);
+		return !Files.exists(targetPath) || overwriteResolver.shouldOverwrite(template, targetPath);
 	}
 
 	private Path resolveTargetPath(final Path contentRootPath, final SourceCodeFile sourceCodeFile)
@@ -93,7 +169,7 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 			return contentRootPath.resolve(sourceCodeFile.fileName());
 		}
 		return contentRootPath.resolve(matcher.group(1).replace('.', java.io.File.separatorChar))
-							  .resolve(sourceCodeFile.fileName());
+		                      .resolve(sourceCodeFile.fileName());
 	}
 
 	CodeGenerationOrchestratorImpl(

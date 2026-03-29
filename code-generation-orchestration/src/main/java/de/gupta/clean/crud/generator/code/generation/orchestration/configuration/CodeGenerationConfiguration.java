@@ -1,51 +1,38 @@
 package de.gupta.clean.crud.generator.code.generation.orchestration.configuration;
 
-import java.util.Map;
-import java.util.Set;
-
 public record CodeGenerationConfiguration(
-		String domainModelSourceCodeFilePath,
-		Map<String, String> domainConcreteTypes,
-		Map<String, String> persistenceConcreteTypes,
-		Map<String, String> apiConcreteTypes,
-		Set<String> templateGroups,
-		Boolean generateCommonFiles,
-		boolean forceOverwrite,
+		GenerationInputs inputs,
+		LayerConcreteTypes genericTypes,
+		GenerationSelection generation,
+		OwnershipConfiguration ownership,
+		OverwriteConfiguration overwrite,
 		boolean historized
 )
 {
-	public static CodeGenerationConfiguration of(
-			final String domainModelSourceCodeFilePath,
-			final boolean historized)
+	public static CodeGenerationConfiguration of(final String baseModelSourceCodeFilePath, final boolean historized)
 	{
-		var map = defaultConcreteTypes();
-		return new CodeGenerationConfiguration(domainModelSourceCodeFilePath, map, map, map,
-				Set.of(),
-				null,
-				false,
-				historized);
+		return new CodeGenerationConfiguration(
+				new GenerationInputs(baseModelSourceCodeFilePath, null, null, null),
+				LayerConcreteTypes.defaults(),
+				GenerationSelection.defaults(),
+				OwnershipConfiguration.defaults(),
+				OverwriteConfiguration.defaults(),
+				historized
+		);
 	}
 
-	public static CodeGenerationConfiguration of(final String domainModelSourceCodeFilePath)
+	public static CodeGenerationConfiguration of(final String baseModelSourceCodeFilePath)
 	{
-		return of(domainModelSourceCodeFilePath, false);
-	}
-
-	public static Map<String, String> defaultConcreteTypes()
-	{
-		return Map.of("U", "String", "V", "Long");
+		return of(baseModelSourceCodeFilePath, false);
 	}
 
 	public CodeGenerationConfiguration
 	{
-		domainConcreteTypes = normalizeConcreteTypes(domainConcreteTypes);
-		persistenceConcreteTypes = normalizeConcreteTypes(persistenceConcreteTypes);
-		apiConcreteTypes = normalizeConcreteTypes(apiConcreteTypes);
-		templateGroups = templateGroups == null ? Set.of() : Set.copyOf(templateGroups);
-	}
-
-	private static Map<String, String> normalizeConcreteTypes(final Map<String, String> concreteTypes)
-	{
-		return concreteTypes == null || concreteTypes.isEmpty() ? defaultConcreteTypes() : Map.copyOf(concreteTypes);
+		inputs = inputs == null ? GenerationInputs.empty() : inputs.normalized();
+		genericTypes = genericTypes == null ? LayerConcreteTypes.defaults() : genericTypes.normalized();
+		generation = generation == null ? GenerationSelection.defaults() : generation.normalized();
+		ownership =
+				ownership == null ? OwnershipConfiguration.defaults().normalized(inputs) : ownership.normalized(inputs);
+		overwrite = overwrite == null ? OverwriteConfiguration.defaults() : overwrite.normalized();
 	}
 }

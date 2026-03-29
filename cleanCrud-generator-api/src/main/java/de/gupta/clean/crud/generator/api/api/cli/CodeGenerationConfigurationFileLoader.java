@@ -3,10 +3,13 @@ package de.gupta.clean.crud.generator.api.api.cli;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GenerationInputs;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteConfiguration;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +22,7 @@ final class CodeGenerationConfigurationFileLoader
 	{
 		try
 		{
-			CodeGenerationConfiguration configuration = objectMapperFor(configurationFilePath)
+			var configuration = objectMapperFor(configurationFilePath)
 					.readValue(configurationFilePath.toFile(), CodeGenerationConfiguration.class);
 			return normalize(configuration, configurationFilePath);
 		}
@@ -43,20 +46,70 @@ final class CodeGenerationConfigurationFileLoader
 			final Path configurationFilePath)
 	{
 		Path configDirectory = configurationFilePath.toAbsolutePath().getParent();
-		Path modelPath = Path.of(expandEnvironmentVariables(configuration.domainModelSourceCodeFilePath()));
-		if (!modelPath.isAbsolute())
-		{
-			modelPath = configDirectory.resolve(modelPath).normalize();
-		}
 		return new CodeGenerationConfiguration(
-				modelPath.toString(),
-				configuration.domainConcreteTypes(),
-				configuration.persistenceConcreteTypes(),
-				configuration.apiConcreteTypes(),
-				configuration.templateGroups(),
-				configuration.generateCommonFiles(),
-				configuration.forceOverwrite(),
+				normalizeInputs(configuration.inputs(), configDirectory),
+				configuration.genericTypes(),
+				configuration.generation(),
+				configuration.ownership(),
+				normalizeOverwrite(configuration.overwrite(), configDirectory),
 				configuration.historized());
+	}
+
+	private GenerationInputs normalizeInputs(final GenerationInputs inputs, final Path configDirectory)
+	{
+		var normalized = inputs == null ? GenerationInputs.empty() : inputs.normalized();
+		return new GenerationInputs(
+				normalizePath(normalized.baseModelSourceCodeFilePath(), configDirectory),
+				normalizePath(normalized.domainModelSourceCodeFilePath(), configDirectory),
+				normalizePath(normalized.persistenceModelSourceCodeFilePath(), configDirectory),
+				normalizePath(normalized.apiModelSourceCodeFilePath(), configDirectory)
+		);
+	}
+
+	private OverwriteConfiguration normalizeOverwrite(
+			final OverwriteConfiguration overwrite,
+			final Path configDirectory)
+	{
+		var normalized = overwrite == null ? OverwriteConfiguration.defaults() : overwrite.normalized();
+		return new OverwriteConfiguration(
+				normalized.defaultOverwrite(),
+				normalized.groups(),
+				normalized.templates(),
+				normalized.tags(),
+				normalizeOverwriteFiles(normalized.files(), configDirectory)
+		);
+	}
+
+	private Map<String, Boolean> normalizeOverwriteFiles(final Map<String, Boolean> files, final Path configDirectory)
+	{
+		if (files == null || files.isEmpty())
+		{
+			return Map.of();
+		}
+		return files.entrySet()
+		            .stream()
+		            .collect(java.util.stream.Collectors.toUnmodifiableMap(
+							entry -> Path.of(expandEnvironmentVariables(entry.getKey())).isAbsolute()
+									? Path.of(expandEnvironmentVariables(entry.getKey())).normalize().toString()
+									: configDirectory.resolve(expandEnvironmentVariables(entry.getKey())).normalize()
+						                             .toString(),
+							Map.Entry::getValue,
+							(left, right) -> right
+					));
+	}
+
+	private String normalizePath(final String pathValue, final Path configDirectory)
+	{
+		if (pathValue == null || pathValue.isBlank())
+		{
+			return null;
+		}
+		Path path = Path.of(expandEnvironmentVariables(pathValue));
+		if (!path.isAbsolute())
+		{
+			path = configDirectory.resolve(path).normalize();
+		}
+		return path.toString();
 	}
 
 	private String expandEnvironmentVariables(final String value)

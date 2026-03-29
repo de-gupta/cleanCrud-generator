@@ -31,7 +31,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModel", new TemplateMetadataConfig(
@@ -43,7 +43,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainAPITypeConverter", new TemplateMetadataConfig(
@@ -55,7 +55,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_SUPPORT
 		));
 
 		templates.put("DomainConstraintService", new TemplateMetadataConfig(
@@ -67,7 +67,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_SUPPORT
 		));
 
 		templates.put("ExistingModelsConstraintService", new TemplateMetadataConfig(
@@ -79,7 +79,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_SUPPORT
 		));
 
 		templates.put("DomainModelBuilder", new TemplateMetadataConfig(
@@ -91,7 +91,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModelBuilderFactory", new TemplateMetadataConfig(
@@ -103,7 +103,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModelCreateDTO", new TemplateMetadataConfig(
@@ -115,7 +115,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModelImpl", new TemplateMetadataConfig(
@@ -127,7 +127,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModelPatcher", new TemplateMetadataConfig(
@@ -139,7 +139,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModelResponseDTO", new TemplateMetadataConfig(
@@ -151,7 +151,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainModelUpdatePatchDTO", new TemplateMetadataConfig(
@@ -163,7 +163,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainResponseBuilder", new TemplateMetadataConfig(
@@ -175,7 +175,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_MODELS
 		));
 
 		templates.put("DomainSecurityPolicy", new TemplateMetadataConfig(
@@ -187,7 +187,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.SECURITY
 		));
 
 		templates.put("LongDomainIDGenerator", new TemplateMetadataConfig(
@@ -199,7 +199,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.DOMAIN
+				TemplateGroup.DOMAIN_SUPPORT
 		));
 
 		// API Templates
@@ -213,7 +213,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_DTOS
 		));
 
 		templates.put("APIModelResponseDTO", new TemplateMetadataConfig(
@@ -225,7 +225,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_DTOS
 		));
 
 		templates.put("APIModelUpdatePatchDTO", new TemplateMetadataConfig(
@@ -237,7 +237,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_DTOS
 		));
 
 		templates.put("APIToDomainCreateAdapter", new TemplateMetadataConfig(
@@ -249,7 +249,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_ADAPTERS
 		));
 
 		templates.put("APIToDomainUpdateAdapter", new TemplateMetadataConfig(
@@ -261,7 +261,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_ADAPTERS
 		));
 
 		templates.put("DomainToAPIResponseAdapter", new TemplateMetadataConfig(
@@ -273,7 +273,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_ADAPTERS
 		));
 
 		templates.put("SpringRestDeleteController", new TemplateMetadataConfig(
@@ -285,7 +285,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_CONTROLLERS
 		));
 
 		templates.put("SpringRestFetchController", new TemplateMetadataConfig(
@@ -297,7 +297,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_CONTROLLERS
 		));
 
 		templates.put("SpringRestSaveController", new TemplateMetadataConfig(
@@ -309,7 +309,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_CONTROLLERS
 		));
 
 		templates.put("SpringRestUpdateController", new TemplateMetadataConfig(
@@ -321,7 +321,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.API
+				TemplateGroup.API_CONTROLLERS
 		));
 
 		// INFRASTRUCTURE Templates
@@ -334,7 +334,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));
 
 		templates.put("DomainPersistenceAdapterModel", new TemplateMetadataConfig(
@@ -346,7 +346,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_MODELS
 		));
 
 		templates.put("DomainPersistenceAdapterModelBuilderFactory", new TemplateMetadataConfig(
@@ -358,7 +358,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_MODELS
 		));
 
 		templates.put("DomainPersistenceAdapterRepository", new TemplateMetadataConfig(
@@ -370,7 +370,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));
 
 		templates.put("DomainPersistenceIDAdapter", new TemplateMetadataConfig(
@@ -382,7 +382,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_ADAPTERS
 		));
 
 		templates.put("DomainPersistenceIDManagement", new TemplateMetadataConfig(
@@ -394,7 +394,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_ADAPTERS
 		));
 
 		templates.put("DomainPersistenceModelAdapter", new TemplateMetadataConfig(
@@ -406,7 +406,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_ADAPTERS
 		));
 
 		templates.put("DomainPersistenceTypeConverter", new TemplateMetadataConfig(
@@ -418,7 +418,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_ADAPTERS
 		));
 
 		templates.put("JpaRepository", new TemplateMetadataConfig(
@@ -430,7 +430,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));
 
 		templates.put("CommonPersistenceConfiguration", new TemplateMetadataConfig(
@@ -478,7 +478,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.CONFIGURATION
 		));
 
 		templates.put("ExistingDomainModelsSupplier", new TemplateMetadataConfig(
@@ -490,7 +490,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_ADAPTERS
 		));
 
 		templates.put("PersistenceModel", new TemplateMetadataConfig(
@@ -502,7 +502,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_MODELS
 		));
 
 		templates.put("PersistenceModelBuilderFactory", new TemplateMetadataConfig(
@@ -514,7 +514,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_MODELS
 		));
 
 		templates.put("PersistenceModelImpl", new TemplateMetadataConfig(
@@ -526,7 +526,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_MODELS
 		));
 
 		templates.put("PersistenceModelJpaDeleteRepository", new TemplateMetadataConfig(
@@ -538,7 +538,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));
 
 		templates.put("PersistenceModelJpaFetchRepository", new TemplateMetadataConfig(
@@ -550,7 +550,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));
 
 		templates.put("PersistenceModelJpaSaveRepository", new TemplateMetadataConfig(
@@ -562,7 +562,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));
 
 		templates.put("DomainPersistenceAdapterHistoryModel", new TemplateMetadataConfig(
@@ -574,7 +574,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("DomainPersistenceAdapterHistoryJpaRepository", new TemplateMetadataConfig(
@@ -586,7 +586,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("PersistenceModelHistory", new TemplateMetadataConfig(
@@ -598,7 +598,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("PersistenceJpaConverters", new TemplateMetadataConfig(
@@ -610,7 +610,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("PersistenceModelHistoryJpaRepository", new TemplateMetadataConfig(
@@ -622,7 +622,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("PersistenceHistorySnapshotFactory", new TemplateMetadataConfig(
@@ -634,7 +634,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("PersistenceModelJpaUpdateRepository", new TemplateMetadataConfig(
@@ -646,7 +646,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.INFRASTRUCTURE
+				TemplateGroup.PERSISTENCE_REPOSITORIES
 		));// USE_CASES Templates
 
 		templates.put("ControllerSecurityAspect", new TemplateMetadataConfig(
@@ -658,7 +658,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.COMMON
+				TemplateGroup.SECURITY
 		));
 
 		templates.put("DeleteApplicationController", new TemplateMetadataConfig(
@@ -670,7 +670,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_DELETE
 		));
 
 		templates.put("DeletePersistenceService", new TemplateMetadataConfig(
@@ -682,7 +682,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_DELETE
 		));
 
 		templates.put("DeleteService", new TemplateMetadataConfig(
@@ -694,7 +694,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_DELETE
 		));
 
 		templates.put("DeleteServiceFacade", new TemplateMetadataConfig(
@@ -706,7 +706,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_DELETE
 		));
 
 		templates.put("DeletionPolicy", new TemplateMetadataConfig(
@@ -718,7 +718,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_DELETE
 		));
 
 		templates.put("DuplicateInsertionMessage", new TemplateMetadataConfig(
@@ -730,7 +730,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("DuplicateDefinition", new TemplateMetadataConfig(
@@ -742,7 +742,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("DuplicateKey", new TemplateMetadataConfig(
@@ -754,7 +754,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("EndpointSecurityPolicy", new TemplateMetadataConfig(
@@ -766,7 +766,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.SECURITY
 		));
 
 		templates.put("FetchApplicationController", new TemplateMetadataConfig(
@@ -778,7 +778,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_FETCH
 		));
 
 		templates.put("FetchPersistenceService", new TemplateMetadataConfig(
@@ -790,7 +790,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_FETCH
 		));
 
 		templates.put("FetchService", new TemplateMetadataConfig(
@@ -802,7 +802,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_FETCH
 		));
 
 		templates.put("FetchServiceFacade", new TemplateMetadataConfig(
@@ -814,7 +814,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_FETCH
 		));
 
 		templates.put("InsertionPolicy", new TemplateMetadataConfig(
@@ -826,7 +826,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("ChangePolicy", new TemplateMetadataConfig(
@@ -838,7 +838,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_UPDATE
 		));
 
 		templates.put("PatchPolicy", new TemplateMetadataConfig(
@@ -850,7 +850,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_UPDATE
 		));
 
 		templates.put("SaveApplicationController", new TemplateMetadataConfig(
@@ -862,7 +862,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("SavePersistenceService", new TemplateMetadataConfig(
@@ -874,7 +874,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("SaveService", new TemplateMetadataConfig(
@@ -886,7 +886,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("SaveServiceFacade", new TemplateMetadataConfig(
@@ -898,7 +898,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_SAVE
 		));
 
 		templates.put("UpdateApplicationController", new TemplateMetadataConfig(
@@ -910,7 +910,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_UPDATE
 		));
 
 		templates.put("UpdatePersistenceService", new TemplateMetadataConfig(
@@ -922,7 +922,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_UPDATE
 		));
 
 		templates.put("UpdateService", new TemplateMetadataConfig(
@@ -934,7 +934,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_UPDATE
 		));
 
 		templates.put("UpdateServiceFacade", new TemplateMetadataConfig(
@@ -946,7 +946,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.USE_CASES
+				TemplateGroup.USE_CASE_UPDATE
 		));
 
 		TEMPLATE_METADATA_MAP = Map.copyOf(templates);
@@ -975,3 +975,4 @@ public final class TemplateMetadataRegistry
 	{
 	}
 }
+

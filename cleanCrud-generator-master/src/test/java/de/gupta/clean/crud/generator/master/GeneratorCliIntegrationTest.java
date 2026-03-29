@@ -64,8 +64,8 @@ class GeneratorCliIntegrationTest
 		try (Stream<Path> stream = Files.walk(contentRoot))
 		{
 			var generatedFiles = stream.filter(path -> path.toString().endsWith(".java"))
-									   .sorted(Comparator.naturalOrder())
-									   .toList();
+			                           .sorted(Comparator.naturalOrder())
+			                           .toList();
 
 			assertTrue(generatedFiles.size() > 20, "CLI generation should create a non-trivial tree");
 			assertTrue(generatedFiles.stream().allMatch(path -> path.startsWith(contentRoot)),
@@ -81,6 +81,35 @@ class GeneratorCliIntegrationTest
 		assertEquals(0, commandLine().execute("list-templates"));
 	}
 
+	@Test
+	void generateSubcommandAcceptsDirectOptions(@TempDir final Path tempDir)
+			throws IOException
+	{
+		Path repoRoot = tempDir.resolve("cleanCrud-sampleImplementation-copy");
+		Path contentRoot = repoRoot.resolve("src/main/java");
+		Path modelPath =
+				contentRoot.resolve("de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java");
+		Files.createDirectories(modelPath.getParent());
+		Files.writeString(modelPath, PERSON_MODEL_SOURCE);
+
+		int exitCode = commandLine().execute(
+				"generate",
+				"--base-model", modelPath.toString(),
+				"--domain-type", "U=String", "--domain-type", "V=Integer",
+				"--persistence-type", "U=String", "--persistence-type", "V=Integer",
+				"--api-type", "U=String", "--api-type", "V=Integer",
+				"--group", "DOMAIN_MODELS",
+				"--group", "USE_CASE_SAVE",
+				"--group", "PERSISTENCE_MODELS",
+				"--overwrite-default"
+		);
+		assertEquals(0, exitCode);
+		assertTrue(Files.exists(contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/domain/model/PersonDomainModel.java")));
+		assertTrue(Files.exists(contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/save/application/service/PersonSaveService.java")));
+	}
+
 	private CommandLine commandLine()
 	{
 		var rootCommand = applicationContext.getBean(CleanCrudGeneratorCLI.class);
@@ -94,22 +123,28 @@ class GeneratorCliIntegrationTest
 	{
 		return """
 						{
-						  "domainModelSourceCodeFilePath": "../src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java",
-						  "domainConcreteTypes": {
-						    "U": "String",
-						    "V": "Integer"
+						  "inputs": {
+						    "baseModelSourceCodeFilePath": "../src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java"
 						  },
-						  "persistenceConcreteTypes": {
-						    "U": "String",
-						    "V": "Integer"
+						  "genericTypes": {
+						    "domain": {
+						      "U": "String",
+						      "V": "Integer"
+						    },
+						    "persistence": {
+						      "U": "String",
+						      "V": "Integer"
+						    },
+						    "api": {
+						      "U": "String",
+						      "V": "Integer"
+						    }
 						  },
-						  "apiConcreteTypes": {
-						    "U": "String",
-						    "V": "Integer"
+						  "generation": {},
+						  "ownership": {},
+						  "overwrite": {
+						    "defaultOverwrite": true
 						  },
-						  "templateGroups": [],
-						  "generateCommonFiles": false,
-				"forceOverwrite": true,
 						  "historized": true
 						}
 				""";
