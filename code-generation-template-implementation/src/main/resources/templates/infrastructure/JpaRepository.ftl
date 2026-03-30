@@ -9,12 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-<#list properties() as property>
-<#if !requiresJpaConverter(property)>
-<#assign resolvedType = persistenceResolvedType(property.baseType())>
-<#if resolvedType?contains('.') && resolvedType != "java.util.UUID">
-import ${resolvedType};
-</#if>
+<#list propertyImports() as importName>
+<#if importName != "java.util.Optional" && importName != "java.util.UUID">
+import ${importName};
 </#if>
 </#list>
 
