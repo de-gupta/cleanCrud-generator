@@ -32,7 +32,7 @@ import java.util.Arrays;
 )
 public class SpringBootMasterApplication
 {
-	public static void main(String[] args)
+	static void main(String[] args)
 	{
 		setSpringProfileFromArgs(args);
 
@@ -57,8 +57,8 @@ public class SpringBootMasterApplication
 	private static void setSpringProfileFromArgs(String[] args)
 	{
 		Arrays.stream(args)
-			  .filter(argument -> argument.startsWith("-s") || argument.startsWith("--spring-profile"))
-			  .map(argument -> argument.split("=")[1])
-			  .forEach(p -> System.setProperty("spring.profiles.active", p));
+		      .filter(argument -> argument.startsWith("-s") || argument.startsWith("--spring-profile"))
+		      .map(argument -> argument.split("=")[1])
+		      .forEach(p -> System.setProperty("spring.profiles.active", p));
 	}
 }
