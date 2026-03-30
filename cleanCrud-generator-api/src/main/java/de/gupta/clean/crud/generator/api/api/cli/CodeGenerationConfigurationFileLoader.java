@@ -83,7 +83,10 @@ final class CodeGenerationConfigurationFileLoader
 						parseOwnership(properties.getProperty("ownership.baseModel")),
 						parseOwnership(properties.getProperty("ownership.domainModel")),
 						parseOwnership(properties.getProperty("ownership.persistenceModel")),
-						parseOwnership(properties.getProperty("ownership.apiModel"))
+						parseOwnership(properties.getProperty("ownership.apiModel")),
+						extractOwnershipMap(properties, "ownership.groups."),
+						extractOwnershipMap(properties, "ownership.templates."),
+						extractOwnershipMap(properties, "ownership.tags.")
 				),
 				new OverwriteConfiguration(
 						Boolean.parseBoolean(properties.getProperty("overwrite.defaultOverwrite", "false")),
@@ -207,6 +210,21 @@ final class CodeGenerationConfigurationFileLoader
 		                 .collect(Collectors.toMap(
 								 name -> name.substring(prefix.length()),
 								 name -> Boolean.parseBoolean(properties.getProperty(name)),
+								 (left, right) -> right,
+								 LinkedHashMap::new
+						 ));
+	}
+
+	private Map<String, GeneratedArtifactOwnership> extractOwnershipMap(final Properties properties,
+	                                                                    final String prefix)
+	{
+		return properties.stringPropertyNames()
+		                 .stream()
+		                 .filter(name -> name.startsWith(prefix))
+		                 .collect(Collectors.toMap(
+								 name -> name.substring(prefix.length()),
+								 name -> GeneratedArtifactOwnership.valueOf(
+										 properties.getProperty(name).trim().toUpperCase()),
 								 (left, right) -> right,
 								 LinkedHashMap::new
 						 ));

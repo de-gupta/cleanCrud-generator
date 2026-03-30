@@ -81,6 +81,15 @@ public final class GenerateCommand implements Callable<Integer>
 	@CommandLine.Option(names = "--own-api-model", description = "Ownership of the API model: ${COMPLETION-CANDIDATES}")
 	private GeneratedArtifactOwnership apiModelOwnership;
 
+	@CommandLine.Option(names = "--own-group", description = "Ownership rule for a group, e.g. API_ADAPTERS=USER", split = ",")
+	private List<String> ownershipGroupRules = new ArrayList<>();
+
+	@CommandLine.Option(names = "--own-template", description = "Ownership rule for a template, e.g. DomainPersistenceModelAdapter=USER", split = ",")
+	private List<String> ownershipTemplateRules = new ArrayList<>();
+
+	@CommandLine.Option(names = "--own-tag", description = "Ownership rule for a tag, e.g. adapter=USER", split = ",")
+	private List<String> ownershipTagRules = new ArrayList<>();
+
 	@CommandLine.Option(names = "--overwrite-default", description = "Default overwrite behavior for generated files")
 	private Boolean overwriteDefault;
 
@@ -138,7 +147,9 @@ public final class GenerateCommand implements Callable<Integer>
 				new GenerationSelection(includeGroups, includeTemplates, includeTags, excludeGroups, excludeTemplates,
 						excludeTags),
 				new OwnershipConfiguration(baseModelOwnership, domainModelOwnership, persistenceModelOwnership,
-						apiModelOwnership),
+						apiModelOwnership, parseOwnershipAssignments(ownershipGroupRules),
+						parseOwnershipAssignments(ownershipTemplateRules),
+						parseOwnershipAssignments(ownershipTagRules)),
 				new OverwriteConfiguration(
 						Boolean.TRUE.equals(overwriteDefault),
 						parseBooleanAssignments(overwriteGroupRules),
@@ -168,6 +179,9 @@ public final class GenerateCommand implements Callable<Integer>
 				|| domainModelOwnership != null
 				|| persistenceModelOwnership != null
 				|| apiModelOwnership != null
+				|| !ownershipGroupRules.isEmpty()
+				|| !ownershipTemplateRules.isEmpty()
+				|| !ownershipTagRules.isEmpty()
 				|| overwriteDefault != null
 				|| !overwriteGroupRules.isEmpty()
 				|| !overwriteTemplateRules.isEmpty()
@@ -205,6 +219,30 @@ public final class GenerateCommand implements Callable<Integer>
 								   "Invalid assignment `" + assignment + "`. Expected KEY=VALUE.");
 					   }
 					   result.put(split[0].trim(), split[1].trim());
+				   });
+		return Map.copyOf(result);
+	}
+
+	private Map<String, GeneratedArtifactOwnership> parseOwnershipAssignments(final List<String> assignments)
+	{
+		if (assignments == null || assignments.isEmpty())
+		{
+			return Map.of();
+		}
+		var result = new LinkedHashMap<String, GeneratedArtifactOwnership>();
+		assignments.stream()
+		           .filter(Objects::nonNull)
+		           .map(String::trim)
+		           .filter(value -> !value.isBlank())
+		           .forEach(assignment ->
+				   {
+					   var split = assignment.split("=", 2);
+					   if (split.length != 2 || split[0].isBlank() || split[1].isBlank())
+					   {
+						   throw new CommandLine.ParameterException(spec.commandLine(),
+								   "Invalid ownership rule `" + assignment + "`. Expected KEY=USER|GENERATED.");
+					   }
+					   result.put(split[0].trim(), GeneratedArtifactOwnership.valueOf(split[1].trim().toUpperCase()));
 				   });
 		return Map.copyOf(result);
 	}
@@ -254,6 +292,9 @@ public final class GenerateCommand implements Callable<Integer>
 		domainModelOwnership = null;
 		persistenceModelOwnership = null;
 		apiModelOwnership = null;
+		ownershipGroupRules = new ArrayList<>();
+		ownershipTemplateRules = new ArrayList<>();
+		ownershipTagRules = new ArrayList<>();
 		overwriteDefault = null;
 		overwriteGroupRules = new ArrayList<>();
 		overwriteTemplateRules = new ArrayList<>();

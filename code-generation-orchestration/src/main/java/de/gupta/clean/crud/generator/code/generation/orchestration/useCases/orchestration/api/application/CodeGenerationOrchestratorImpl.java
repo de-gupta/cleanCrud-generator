@@ -5,11 +5,13 @@ import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteResolver;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OwnershipResolver;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModelFactory;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateSelector;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template.SourceCodeTemplate;
 import de.gupta.clean.crud.generator.code.generation.template.api.useCases.processing.api.application.SourceCodeTemplateProcessor;
+import de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.configuration.TemplateMetadataRegistry;
 import de.gupta.clean.crud.generator.code.generation.writing.api.domain.model.SourceCodeWriteRequest;
 import de.gupta.clean.crud.generator.code.generation.writing.api.useCases.processing.api.application.SourceCodeFileWriter;
 import org.springframework.stereotype.Component;
@@ -131,22 +133,49 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 			final java.util.Set<String> templates,
 			final CodeGenerationConfiguration configuration)
 	{
-		if (configuration.ownership().baseModel() == GeneratedArtifactOwnership.USER)
+		var ownershipResolver = OwnershipResolver.with(configuration.ownership());
+		TemplateMetadataRegistry.getAllTemplateMetadata().forEach((templateName, metadataConfig) ->
 		{
-			templates.addAll(BASE_MODEL_TEMPLATES);
-		}
-		if (configuration.ownership().domainModel() == GeneratedArtifactOwnership.USER)
+			var template = new SourceCodeTemplate(templateName, templateName + ".ftl", false,
+					metadataConfig.templateGroup(), metadataConfig.metadata());
+			if (isUserOwned(template, ownershipResolver, configuration))
+			{
+				templates.add(templateName);
+			}
+		});
+	}
+
+	private boolean isUserOwned(
+			final SourceCodeTemplate template,
+			final OwnershipResolver ownershipResolver,
+			final CodeGenerationConfiguration configuration)
+	{
+		return ownershipResolver.ownershipOf(template)
+		                        .orElseGet(() -> defaultOwnershipFor(template.templateName(), configuration))
+				== GeneratedArtifactOwnership.USER;
+	}
+
+	private GeneratedArtifactOwnership defaultOwnershipFor(
+			final String templateName,
+			final CodeGenerationConfiguration configuration)
+	{
+		if (BASE_MODEL_TEMPLATES.contains(templateName))
 		{
-			templates.addAll(DOMAIN_MODEL_TEMPLATES);
+			return configuration.ownership().baseModel();
 		}
-		if (configuration.ownership().persistenceModel() == GeneratedArtifactOwnership.USER)
+		if (DOMAIN_MODEL_TEMPLATES.contains(templateName))
 		{
-			templates.addAll(PERSISTENCE_MODEL_TEMPLATES);
+			return configuration.ownership().domainModel();
 		}
-		if (configuration.ownership().apiModel() == GeneratedArtifactOwnership.USER)
+		if (PERSISTENCE_MODEL_TEMPLATES.contains(templateName))
 		{
-			templates.addAll(API_MODEL_TEMPLATES);
+			return configuration.ownership().persistenceModel();
 		}
+		if (API_MODEL_TEMPLATES.contains(templateName))
+		{
+			return configuration.ownership().apiModel();
+		}
+		return GeneratedArtifactOwnership.GENERATED;
 	}
 
 	private boolean shouldWrite(

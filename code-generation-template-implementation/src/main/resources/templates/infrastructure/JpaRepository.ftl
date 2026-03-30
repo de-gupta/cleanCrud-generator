@@ -9,22 +9,25 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-<#if persistenceModelImports()?has_content>
-<#list persistenceModelImports() as import>
-<#if import != "java.util.Optional" && import != "java.util.UUID">
-import ${import};
+<#list properties() as property>
+<#if !requiresJpaConverter(property)>
+<#assign resolvedType = persistenceResolvedType(property.baseType())>
+<#if resolvedType?contains('.') && resolvedType != "java.util.UUID">
+import ${resolvedType};
+</#if>
 </#if>
 </#list>
-</#if>
 
 @Repository
 public interface ${modelBaseName()}JpaRepository extends JpaRepository<${modelBaseName()}PersistenceModelImpl, UUID>
 {
 <#list properties() as property>
+<#if !requiresJpaConverter(property)>
 	boolean existsBy${property.capitalizedName()}(final ${persistenceResolvedType(property.baseType())} ${property.name()});
 
 	@Query("SELECT t.${property.name()} FROM ${modelBaseName()}PersistenceModelImpl t WHERE t.${property.name()} IN :${property.name()}s")
 	List<${persistenceResolvedType(property.baseType())}> find${property.capitalizedName()}sBy${property.capitalizedName()}In(@Param("${property.name()}s") final Collection<${persistenceResolvedType(property.baseType())}> ${property.name()}s);
 
+</#if>
 </#list>
 }
