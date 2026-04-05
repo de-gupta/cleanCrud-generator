@@ -17,11 +17,7 @@ public ${modelBaseName()}DomainModel toModel(final ${modelBaseName()}DomainModel
 {
 final var builder = modelBuilderFactory.builder();
 <#list properties() as property>
-	<#if property.optional()>
-domainModelCreate.${property.getter()}().ifPresent(builder::with${property.capitalizedName()});
-	<#else>
 builder.with${property.capitalizedName()}(domainModelCreate.${property.getter()}());
-	</#if>
 </#list>
 return builder.build();
 }

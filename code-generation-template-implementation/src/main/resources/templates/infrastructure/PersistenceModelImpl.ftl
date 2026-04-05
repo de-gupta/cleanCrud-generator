@@ -110,7 +110,11 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 		@Override
 		public ${modelBaseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistenceBuilderPropertyType(property)} ${property.name()})
 		{
+			<#if property.optional()>
+			model.${property.name()} = ${property.name()}.orElse(null);
+			<#else>
 			model.${property.name()} = ${property.name()};
+			</#if>
 			return this;
 		}
 

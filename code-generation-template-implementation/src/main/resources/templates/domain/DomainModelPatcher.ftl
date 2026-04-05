@@ -19,14 +19,7 @@ final ${modelBaseName()}DomainModelUpdatePatch updatePatch)
 final var builder = modelBuilderFactory.builder();
 <#list properties() as property>
 	<#if property.optional()>
-if (updatePatch.${property.name()}().isPresent())
-{
-	builder.with${property.capitalizedName()}(updatePatch.${property.name()}().get());
-}
-else
-{
-	originalModel.${property.getter()}().ifPresent(builder::with${property.capitalizedName()});
-}
+builder.with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ? updatePatch.${property.name()}() : originalModel.${property.getter()}());
 	<#else>
 builder.with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()));
 	</#if>

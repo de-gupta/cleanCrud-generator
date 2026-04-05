@@ -48,9 +48,9 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 <#list properties() as property>
 <#if property.optional()>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
-		domainModel.${property.getter()}().map(${property.baseType()?lower_case}DomainToPersistenceConverter).ifPresent(builder::with${property.capitalizedName()});
+		builder.with${property.capitalizedName()}(domainModel.${property.getter()}().map(${property.baseType()?lower_case}DomainToPersistenceConverter));
 		<#else>
-		domainModel.${property.getter()}().ifPresent(builder::with${property.capitalizedName()});
+		builder.with${property.capitalizedName()}(domainModel.${property.getter()}());
 		</#if>
 <#else>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
@@ -70,9 +70,9 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 <#list properties() as property>
 <#if property.optional()>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
-		persistenceModel.${property.getter()}().map(${property.baseType()?lower_case}PersistenceToDomainConverter).ifPresent(builder::with${property.capitalizedName()});
+		builder.with${property.capitalizedName()}(persistenceModel.${property.getter()}().map(${property.baseType()?lower_case}PersistenceToDomainConverter));
 		<#else>
-		persistenceModel.${property.getter()}().ifPresent(builder::with${property.capitalizedName()});
+		builder.with${property.capitalizedName()}(persistenceModel.${property.getter()}());
 		</#if>
 <#else>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>

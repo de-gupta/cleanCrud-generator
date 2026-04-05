@@ -27,7 +27,7 @@ public interface ${modelName()}<#if isGeneric()><<#list genericTypeParameters() 
 	interface ${modelName()}Builder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M extends ${modelName()}<#if isGeneric()><<#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>></#if>, B extends ${modelName()}Builder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M, B${">"}${">"} extends ModelBuilder${"<"}M${">"}
 	{
     <#list properties() as property>
-		B with${property.capitalizedName()}(${baseBuilderPropertyType(property)} ${property.name()});
+		B with${property.capitalizedName()}(final ${baseBuilderPropertyType(property)} ${property.name()});
     </#list>
 	}
 }

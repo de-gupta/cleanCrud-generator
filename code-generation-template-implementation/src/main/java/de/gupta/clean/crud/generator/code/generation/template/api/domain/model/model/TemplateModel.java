@@ -221,12 +221,13 @@ public interface TemplateModel
 
 	default String baseBuilderPropertyType(final Property property)
 	{
-		return property.optional() ? property.baseType() : property.paramType();
+		return property.paramType();
 	}
 
 	default String domainBuilderPropertyType(final Property property)
 	{
-		return property.optional() ? domainResolvedType(property.baseType()) : domainResolvedType(property.type());
+		return property.optional() ? "Optional<" + domainResolvedType(property.baseType()) + ">" :
+				domainResolvedType(property.type());
 	}
 
 	default String persistencePropertyType(final Property property)
@@ -237,7 +238,7 @@ public interface TemplateModel
 
 	default String persistenceBuilderPropertyType(final Property property)
 	{
-		return property.optional() ? persistenceResolvedType(property.baseType()) :
+		return property.optional() ? "Optional<" + persistenceResolvedType(property.baseType()) + ">" :
 				persistenceResolvedType(property.type());
 	}
 
