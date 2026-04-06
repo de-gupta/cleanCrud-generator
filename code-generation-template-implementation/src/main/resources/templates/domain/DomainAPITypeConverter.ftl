@@ -21,7 +21,7 @@ import ${import};
 </#list>
 </#if>
 
-<#list apiDomainDifferingGenericTypeParameters() as param>
+<#list genericTypeParameters() as param>
 @Component
 @Qualifier("${beanNamePrefix()}${param}DomainToAPIConverter")
 final class ${modelBaseName()}${param}DomainToAPIConverter implements Function<${domainConcreteType(param)}, ${apiConcreteType(param)}>
@@ -29,8 +29,13 @@ final class ${modelBaseName()}${param}DomainToAPIConverter implements Function<$
 	@Override
 	public ${apiConcreteType(param)} apply(final ${domainConcreteType(param)} domainValue)
 	{
+<#if apiAndDomainTypesDiffer(param)>
 		// TODO from Template: implement conversion from ${domainConcreteType(param)} to ${apiConcreteType(param)}.
 		throw new UnsupportedOperationException("TODO from Template: implement ${param} domain-to-API conversion");
+<#else>
+		// TODO from Template: replace this identity conversion if ${param} diverges semantically between domain and API.
+		return domainValue;
+</#if>
 	}
 }
 
@@ -41,8 +46,13 @@ final class ${modelBaseName()}${param}APIToDomainConverter implements Function<$
 	@Override
 	public ${domainConcreteType(param)} apply(final ${apiConcreteType(param)} apiValue)
 	{
+<#if apiAndDomainTypesDiffer(param)>
 		// TODO from Template: implement conversion from ${apiConcreteType(param)} to ${domainConcreteType(param)}.
 		throw new UnsupportedOperationException("TODO from Template: implement ${param} API-to-domain conversion");
+<#else>
+		// TODO from Template: replace this identity conversion if ${param} diverges semantically between API and domain.
+		return apiValue;
+</#if>
 	}
 }
 

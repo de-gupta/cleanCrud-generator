@@ -8,8 +8,8 @@
       "V": "Integer"
     },
     "persistence": {
-      "U": "String",
-      "V": "Integer"
+      "U": "Integer",
+      "V": "String"
     },
     "api": {
       "U": "String",
