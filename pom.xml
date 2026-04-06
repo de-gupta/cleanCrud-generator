@@ -27,7 +27,7 @@
 
         <aletheia.version>0.2.1</aletheia.version>
         <athena.version>0.3.1</athena.version>
-        <clean.crud.version>0.6.0</clean.crud.version>
+        <clean.crud.version>0.7.1-SNAPSHOT</clean.crud.version>
 
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.release.plugin.version>3.1.1</maven.release.plugin.version>

@@ -4,7 +4,7 @@ package ${basePackage()}.useCases.crud.save.infrastructure.persistence.repositor
 import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}JpaRepository;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistory;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistoryJpaRepository;
+import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistoryRepository;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.adapter.TriTemporalHistorySnapshotFactory;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
@@ -23,7 +23,7 @@ class ${modelBaseName()}PersistenceModelJpaSaveRepository
 {
 	${modelBaseName()}PersistenceModelJpaSaveRepository(
 			final ${modelBaseName()}JpaRepository jpaRepository,
-			final ${modelBaseName()}PersistenceModelHistoryJpaRepository historyRepository,
+			final ${modelBaseName()}PersistenceModelHistoryRepository historyRepository,
 			final TriTemporalHistorySnapshotFactory<UUID, ${modelBaseName()}PersistenceModel, ${modelBaseName()}PersistenceModelHistory> snapshotFactory,
 			@Qualifier("${beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
 	{

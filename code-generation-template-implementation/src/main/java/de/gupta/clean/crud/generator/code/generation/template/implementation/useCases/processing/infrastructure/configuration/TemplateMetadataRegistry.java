@@ -502,7 +502,7 @@ public final class TemplateMetadataRegistry
 						Optional.of("1.0"),
 						false
 				),
-				TemplateGroup.PERSISTENCE_ADAPTERS
+				TemplateGroup.PERSISTENCE_HISTORY
 		));
 
 		templates.put("PersistenceModel", new TemplateMetadataConfig(
@@ -630,6 +630,30 @@ public final class TemplateMetadataRegistry
 						Optional.of("History JPA repository for persistence models"),
 						Set.of("JpaRepository", "History", "PersistenceModel"),
 						Set.of("infrastructure", "persistence", "history", "repository"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.PERSISTENCE_HISTORY
+		));
+
+		templates.put("PersistenceModelHistoryRepository", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("History repository adapter for persistence models"),
+						Set.of("History", "Repository", "Adapter", "PersistenceModel"),
+						Set.of("infrastructure", "persistence", "history", "adapter", "repository"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.PERSISTENCE_HISTORY
+		));
+
+		templates.put("DomainPersistenceAdapterHistoryRepository", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("History repository adapter for domain-persistence ID mappings"),
+						Set.of("History", "Repository", "Adapter", "PersistenceAdapter"),
+						Set.of("infrastructure", "persistence", "adapter", "history", "repository"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false

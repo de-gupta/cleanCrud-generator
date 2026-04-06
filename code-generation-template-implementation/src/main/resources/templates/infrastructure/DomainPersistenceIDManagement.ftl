@@ -1,7 +1,7 @@
 <#-- Template for generating DomainPersistenceIDManagement class -->
 package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.adapter;
 
-import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryJpaRepository;
+import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryRepository;
 import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryModel;
 import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterModel;
 import de.gupta.clean.crud.template.domain.model.builder.BuilderFactories;
@@ -23,7 +23,7 @@ final class ${modelBaseName()}DomainPersistenceIDManagement
 {
 	${modelBaseName()}DomainPersistenceIDManagement(
 			final DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel> repository,
-			final ${modelBaseName()}DomainPersistenceAdapterHistoryJpaRepository historyRepository,
+			final ${modelBaseName()}DomainPersistenceAdapterHistoryRepository historyRepository,
 			@Qualifier("${beanNamePrefix()}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator,
 			@Qualifier("${beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
 	{
