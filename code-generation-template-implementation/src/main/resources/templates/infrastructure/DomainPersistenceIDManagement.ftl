@@ -9,6 +9,7 @@ import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persisten
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.repository.DomainPersistenceAdapterRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.service.DomainIDGenerator;
+import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +24,13 @@ final class ${modelBaseName()}DomainPersistenceIDManagement
 	${modelBaseName()}DomainPersistenceIDManagement(
 			final DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel> repository,
 			final ${modelBaseName()}DomainPersistenceAdapterHistoryJpaRepository historyRepository,
-			@Qualifier("${beanNamePrefix()}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator)
+			@Qualifier("${beanNamePrefix()}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator,
+			@Qualifier("${beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
 	{
 		super(repository,
 				BuilderFactories.of(${modelBaseName()}DomainPersistenceAdapterModel::builder),
 				historyRepository,
 				BuilderFactories.of(${modelBaseName()}DomainPersistenceAdapterHistoryModel::builder),
-				domainIDGenerator);
+				domainIDGenerator, auditActorSupplier);
 	}
 }

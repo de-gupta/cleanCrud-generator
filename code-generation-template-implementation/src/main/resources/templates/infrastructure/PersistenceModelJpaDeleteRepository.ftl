@@ -7,6 +7,7 @@ import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistoryJpaRepository;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.adapter.TriTemporalHistorySnapshotFactory;
+import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
 import de.gupta.clean.crud.template.useCases.crud.delete.infrastructure.persistence.repository.AbstractPersistenceModelJpaDeleteRepository;
 import de.gupta.clean.crud.template.useCases.crud.delete.infrastructure.persistence.service.DeletePersistenceModelRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,8 +25,9 @@ class ${modelBaseName()}PersistenceModelJpaDeleteRepository
 	${modelBaseName()}PersistenceModelJpaDeleteRepository(
 			final ${modelBaseName()}JpaRepository jpaRepository,
 			final ${modelBaseName()}PersistenceModelHistoryJpaRepository historyRepository,
-			final TriTemporalHistorySnapshotFactory<UUID, ${modelBaseName()}PersistenceModel, ${modelBaseName()}PersistenceModelHistory> snapshotFactory)
+			final TriTemporalHistorySnapshotFactory<UUID, ${modelBaseName()}PersistenceModel, ${modelBaseName()}PersistenceModelHistory> snapshotFactory,
+			final @Qualifier("${beanNamePrefix()}AuditActorSupplier") AuditActorSupplier auditActorSupplier)
 	{
-		super(jpaRepository, historyRepository, snapshotFactory);
+		super(jpaRepository, historyRepository, snapshotFactory, auditActorSupplier);
 	}
 }

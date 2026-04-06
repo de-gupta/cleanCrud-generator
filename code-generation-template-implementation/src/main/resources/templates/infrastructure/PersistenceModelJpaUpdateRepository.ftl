@@ -7,8 +7,10 @@ import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistory;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistoryJpaRepository;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
+import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
 import de.gupta.clean.crud.template.useCases.crud.update.infrastructure.persistence.repository.AbstractPersistenceModelJpaUpdateRepository;
 import de.gupta.clean.crud.template.useCases.crud.update.infrastructure.persistence.service.UpdatePersistenceModelRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -22,8 +24,9 @@ public class ${modelBaseName()}PersistenceModelJpaUpdateRepository
 	public ${modelBaseName()}PersistenceModelJpaUpdateRepository(
 			final ${modelBaseName()}JpaRepository jpaRepository,
 			final ${modelBaseName()}PersistenceModelHistoryJpaRepository historyRepository,
-			final ${modelBaseName()}PersistenceHistorySnapshotFactory snapshotFactory)
+			final ${modelBaseName()}PersistenceHistorySnapshotFactory snapshotFactory,
+			@Qualifier("${beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
 	{
-		super(jpaRepository, historyRepository, snapshotFactory);
+		super(jpaRepository, historyRepository, snapshotFactory, auditActorSupplier);
 	}
 }

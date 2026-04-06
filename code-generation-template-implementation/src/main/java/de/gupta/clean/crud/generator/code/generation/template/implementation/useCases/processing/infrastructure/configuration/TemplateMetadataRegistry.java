@@ -493,6 +493,18 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.PERSISTENCE_ADAPTERS
 		));
 
+		templates.put("AuditActorSupplier", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Per-module audit actor supplier for historized persistence operations"),
+						Set.of("Audit", "Actor", "Supplier", "Persistence"),
+						Set.of("infrastructure", "persistence", "audit", "supplier"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.PERSISTENCE_ADAPTERS
+		));
+
 		templates.put("PersistenceModel", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Persistence model entity"),
@@ -975,4 +987,3 @@ public final class TemplateMetadataRegistry
 	{
 	}
 }
-
