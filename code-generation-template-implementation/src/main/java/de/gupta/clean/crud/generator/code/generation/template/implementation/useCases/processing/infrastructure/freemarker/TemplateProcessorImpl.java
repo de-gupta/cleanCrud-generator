@@ -29,8 +29,8 @@ final class TemplateProcessorImpl implements TemplateProcessor
 	@Override
 	public SourceCodeFile process(final SourceCodeTemplate template, final TemplateModel model)
 	{
-		SourceCodeTemplate validTemplate = Unfolding.of(template)
-													.decree(() -> InvalidTemplateException.withMessage(
+		SourceCodeTemplate validTemplate = Unfolding.beckon(template)
+		                                            .decree(() -> InvalidTemplateException.withMessage(
 															"Template cannot be null"));
 		SourceCode sourceCode = templateCode(validTemplate, model);
 		return SourceCodeFile.with(
