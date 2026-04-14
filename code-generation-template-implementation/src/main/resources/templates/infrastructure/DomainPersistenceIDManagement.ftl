@@ -1,7 +1,6 @@
 <#-- Template for generating DomainPersistenceIDManagement class -->
 package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.adapter;
 
-import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryRepository;
 import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterHistoryModel;
 import ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model.${modelBaseName()}DomainPersistenceAdapterModel;
 import de.gupta.clean.crud.template.domain.model.builder.BuilderFactories;
@@ -9,6 +8,7 @@ import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persisten
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.repository.DomainPersistenceAdapterRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.service.DomainIDGenerator;
+import de.gupta.clean.crud.template.infrastructure.persistence.history.repository.TriTemporalHistoryRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ final class ${modelBaseName()}DomainPersistenceIDManagement
 {
 	${modelBaseName()}DomainPersistenceIDManagement(
 			final DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel> repository,
-			final ${modelBaseName()}DomainPersistenceAdapterHistoryRepository historyRepository,
+			final TriTemporalHistoryRepository<Long, ${modelBaseName()}DomainPersistenceAdapterHistoryModel> historyRepository,
 			@Qualifier("${beanNamePrefix()}LongDomainIDGenerator") final DomainIDGenerator<Long> domainIDGenerator,
 			@Qualifier("${beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
 	{

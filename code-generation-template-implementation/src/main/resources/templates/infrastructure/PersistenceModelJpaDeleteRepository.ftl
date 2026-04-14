@@ -4,9 +4,9 @@ package ${basePackage()}.useCases.crud.delete.infrastructure.persistence.reposit
 import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}JpaRepository;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistory;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistoryRepository;
 import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.adapter.TriTemporalHistorySnapshotFactory;
+import de.gupta.clean.crud.template.infrastructure.persistence.history.repository.TriTemporalHistoryRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
 import de.gupta.clean.crud.template.useCases.crud.delete.infrastructure.persistence.repository.AbstractPersistenceModelJpaDeleteRepository;
 import de.gupta.clean.crud.template.useCases.crud.delete.infrastructure.persistence.service.DeletePersistenceModelRepository;
@@ -24,7 +24,7 @@ class ${modelBaseName()}PersistenceModelJpaDeleteRepository
 {
 	${modelBaseName()}PersistenceModelJpaDeleteRepository(
 			final ${modelBaseName()}JpaRepository jpaRepository,
-			final ${modelBaseName()}PersistenceModelHistoryRepository historyRepository,
+			final TriTemporalHistoryRepository<UUID, ${modelBaseName()}PersistenceModelHistory> historyRepository,
 			final TriTemporalHistorySnapshotFactory<UUID, ${modelBaseName()}PersistenceModel, ${modelBaseName()}PersistenceModelHistory> snapshotFactory,
 			final @Qualifier("${beanNamePrefix()}AuditActorSupplier") AuditActorSupplier auditActorSupplier)
 	{
