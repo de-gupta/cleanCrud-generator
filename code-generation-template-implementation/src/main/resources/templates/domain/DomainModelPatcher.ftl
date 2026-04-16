@@ -16,16 +16,16 @@ private final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBas
 public ${modelBaseName()}DomainModel patchModel(final ${modelBaseName()}DomainModel originalModel,
 final ${modelBaseName()}DomainModelUpdatePatch updatePatch)
 {
-final var builder = modelBuilderFactory.builder();
+return modelBuilderFactory.builder()
 <#list properties() as property>
 	<#if property.optional()>
-builder.with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ? updatePatch.${property.name()}() : originalModel.${property.getter()}());
+.with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ? updatePatch.${property.name()}() : originalModel.${property.getter()}())
 	<#else>
-builder.with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()));
+.with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()))
 	</#if>
 
 </#list>
-return builder.build();
+.build();
 }
 
 ${modelBaseName()}DomainModelPatcher(

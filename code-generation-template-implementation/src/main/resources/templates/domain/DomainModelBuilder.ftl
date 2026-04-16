@@ -15,11 +15,11 @@ private final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBas
 @Override
 public ${modelBaseName()}DomainModel toModel(final ${modelBaseName()}DomainModelCreate domainModelCreate)
 {
-final var builder = modelBuilderFactory.builder();
+return modelBuilderFactory.builder()
 <#list properties() as property>
-builder.with${property.capitalizedName()}(domainModelCreate.${property.getter()}());
+.with${property.capitalizedName()}(domainModelCreate.${property.getter()}())
 </#list>
-return builder.build();
+.build();
 }
 
 ${modelBaseName()}DomainModelBuilder(

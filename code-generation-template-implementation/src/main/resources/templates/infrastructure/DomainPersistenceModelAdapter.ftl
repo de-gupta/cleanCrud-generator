@@ -44,45 +44,45 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 	@Override
 	public ${modelBaseName()}PersistenceModel toPersistenceModel(final ${modelBaseName()}DomainModel domainModel)
 	{
-		final var builder = persistenceModelBuilderFactory.builder();
+		return persistenceModelBuilderFactory.builder()
 <#list properties() as property>
 <#if property.optional()>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
-		builder.with${property.capitalizedName()}(domainModel.${property.getter()}().map(${property.baseType()?lower_case}DomainToPersistenceConverter));
+		.with${property.capitalizedName()}(domainModel.${property.getter()}().map(${property.baseType()?lower_case}DomainToPersistenceConverter))
 		<#else>
-		builder.with${property.capitalizedName()}(domainModel.${property.getter()}());
+		.with${property.capitalizedName()}(domainModel.${property.getter()}())
 		</#if>
 <#else>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
-		builder.with${property.capitalizedName()}(${property.baseType()?lower_case}DomainToPersistenceConverter.apply(domainModel.${property.getter()}()));
+		.with${property.capitalizedName()}(${property.baseType()?lower_case}DomainToPersistenceConverter.apply(domainModel.${property.getter()}()))
 		<#else>
-		builder.with${property.capitalizedName()}(domainModel.${property.getter()}());
+		.with${property.capitalizedName()}(domainModel.${property.getter()}())
 		</#if>
 </#if>
 </#list>
-		return builder.build();
+		.build();
 	}
 
 	@Override
 	public ${modelBaseName()}DomainModel toDomainModel(final ${modelBaseName()}PersistenceModel persistenceModel)
 	{
-		final var builder = domainModelBuilderFactory.builder();
+		return domainModelBuilderFactory.builder()
 <#list properties() as property>
 <#if property.optional()>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
-		builder.with${property.capitalizedName()}(persistenceModel.${property.getter()}().map(${property.baseType()?lower_case}PersistenceToDomainConverter));
+		.with${property.capitalizedName()}(persistenceModel.${property.getter()}().map(${property.baseType()?lower_case}PersistenceToDomainConverter))
 		<#else>
-		builder.with${property.capitalizedName()}(persistenceModel.${property.getter()}());
+		.with${property.capitalizedName()}(persistenceModel.${property.getter()}())
 		</#if>
 <#else>
 		<#if persistenceAndDomainTypesDiffer(property.baseType())>
-		builder.with${property.capitalizedName()}(${property.baseType()?lower_case}PersistenceToDomainConverter.apply(persistenceModel.${property.getter()}()));
+		.with${property.capitalizedName()}(${property.baseType()?lower_case}PersistenceToDomainConverter.apply(persistenceModel.${property.getter()}()))
 		<#else>
-		builder.with${property.capitalizedName()}(persistenceModel.${property.getter()}());
+		.with${property.capitalizedName()}(persistenceModel.${property.getter()}())
 		</#if>
 </#if>
 </#list>
-		return builder.build();
+		.build();
 	}
 
 	@Override
