@@ -436,7 +436,7 @@ public final class TemplateMetadataRegistry
 		templates.put("CommonPersistenceConfiguration", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Shared persistence configuration for common infrastructure beans"),
-						Set.of("Configuration", "Spring", "PersistenceTransactionRunner"),
+						Set.of("Configuration", "Spring", "PersistenceTransactionRunner", "AggregateLifecycleEngine"),
 						Set.of("common", "configuration", "persistence"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
@@ -474,6 +474,42 @@ public final class TemplateMetadataRegistry
 						Optional.of("Spring module configuration"),
 						Set.of("Configuration", "Spring"),
 						Set.of("infrastructure", "configuration", "module"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.CONFIGURATION
+		));
+
+		templates.put("CrudPortsConfiguration", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Aggregate CRUD ports configuration"),
+						Set.of("Configuration", "Aggregate", "Ports", "CRUD"),
+						Set.of("configuration", "crud", "aggregate", "ports"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.CONFIGURATION
+		));
+
+		templates.put("CrudDefinitionConfiguration", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Aggregate CRUD definition configuration"),
+						Set.of("Configuration", "Aggregate", "Definition", "CRUD"),
+						Set.of("configuration", "crud", "aggregate", "definition"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.CONFIGURATION
+		));
+
+		templates.put("CrudServicesConfiguration", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Aggregate CRUD services configuration"),
+						Set.of("Configuration", "Aggregate", "Services", "CRUD"),
+						Set.of("configuration", "crud", "aggregate", "services"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false
@@ -721,18 +757,6 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.USE_CASE_DELETE
 		));
 
-		templates.put("DeleteService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Service for delete operations"),
-						Set.of("Service", "Delete"),
-						Set.of("usecase", "service", "delete"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASE_DELETE
-		));
-
 		templates.put("DeleteServiceFacade", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Facade for delete services"),
@@ -829,18 +853,6 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.USE_CASE_FETCH
 		));
 
-		templates.put("FetchService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Service for fetch operations"),
-						Set.of("Service", "Fetch"),
-						Set.of("usecase", "service", "fetch"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASE_FETCH
-		));
-
 		templates.put("FetchServiceFacade", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Facade for fetch services"),
@@ -913,18 +925,6 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.USE_CASE_SAVE
 		));
 
-		templates.put("SaveService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Service for save operations"),
-						Set.of("Service", "Save"),
-						Set.of("usecase", "service", "save"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASE_SAVE
-		));
-
 		templates.put("SaveServiceFacade", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Facade for save services"),
@@ -954,18 +954,6 @@ public final class TemplateMetadataRegistry
 						Optional.of("Persistence service for update operations"),
 						Set.of("PersistenceService", "Update"),
 						Set.of("usecase", "persistence", "update"),
-						Optional.of("Clean CRUD Generator"),
-						Optional.of("1.0"),
-						false
-				),
-				TemplateGroup.USE_CASE_UPDATE
-		));
-
-		templates.put("UpdateService", new TemplateMetadataConfig(
-				new TemplateMetadata(
-						Optional.of("Service for update operations"),
-						Set.of("Service", "Update"),
-						Set.of("usecase", "service", "update"),
 						Optional.of("Clean CRUD Generator"),
 						Optional.of("1.0"),
 						false

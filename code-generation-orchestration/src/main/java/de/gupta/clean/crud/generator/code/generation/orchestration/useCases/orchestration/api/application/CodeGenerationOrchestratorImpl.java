@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 {
 	private static final Set<String> DEFAULT_TEMPLATE_GROUPS = Set.of(
+			TemplateGroup.COMMON.name(),
 			TemplateGroup.CONFIGURATION.name(),
 			TemplateGroup.DOMAIN_MODELS.name(),
 			TemplateGroup.DOMAIN_SUPPORT.name(),

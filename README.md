@@ -140,6 +140,15 @@ Available groups:
 - `USE_CASE_UPDATE`
 - `USE_CASE_DELETE`
 
+Generated standalone CRUD modules now use aggregate-based wiring under `useCases.crud.configuration`.
+That means the generator emits:
+
+- `<Model>CrudPortsConfiguration`
+- `<Model>CrudDefinitionConfiguration`
+- `<Model>CrudServicesConfiguration`
+
+instead of concrete standalone CRUD service classes like `<Model>SaveService`.
+
 Example:
 
 ```json
@@ -181,6 +190,17 @@ Example:
 
 If a surface is `USER`, the generator excludes the corresponding generated templates and only generates the surrounding
 scaffolding.
+
+## Current Standalone Output Shape
+
+For a normal standalone aggregate, the generator now produces:
+
+- shared `CommonPersistenceConfiguration` with both `PersistenceTransactionRunner` and `AggregateLifecycleEngine`
+- aggregate ports configuration
+- aggregate definition configuration
+- aggregate services configuration using `AggregateCrudServices`
+
+Relationship / satellite generation is not yet inferred from the base model alone and remains a future step.
 
 ### `overwrite`
 

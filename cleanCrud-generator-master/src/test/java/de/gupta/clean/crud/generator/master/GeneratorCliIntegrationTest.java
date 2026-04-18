@@ -10,14 +10,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import picocli.CommandLine;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = SpringBootMasterApplication.class)
 class GeneratorCliIntegrationTest
@@ -94,13 +96,29 @@ class GeneratorCliIntegrationTest
 		assertTrue(Files.exists(contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/person/domain/model/PersonDomainModel.java")));
 		assertTrue(Files.exists(contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/configuration/PersonCrudServicesConfiguration.java")));
+		assertFalse(Files.exists(contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/save/application/service/PersonSaveService.java")));
 	}
 
 	@Test
 	void listTemplatesSubcommandExecutesSuccessfully()
 	{
-		assertEquals(0, commandLine().execute("list-templates"));
+		var standardOut = new ByteArrayOutputStream();
+		var standardErr = new ByteArrayOutputStream();
+		var commandLine = commandLine();
+		commandLine.setOut(new PrintWriter(standardOut, true));
+		commandLine.setErr(new PrintWriter(standardErr, true));
+
+		assertEquals(0, commandLine.execute("list-templates"));
+		var templateNames = Set.of(standardOut.toString().split("\\R"));
+		assertTrue(templateNames.contains("CrudPortsConfiguration"));
+		assertTrue(templateNames.contains("CrudDefinitionConfiguration"));
+		assertTrue(templateNames.contains("CrudServicesConfiguration"));
+		assertFalse(templateNames.contains("SaveService"));
+		assertFalse(templateNames.contains("FetchService"));
+		assertFalse(templateNames.contains("UpdateService"));
+		assertFalse(templateNames.contains("DeleteService"));
 	}
 
 	@Test
@@ -120,8 +138,16 @@ class GeneratorCliIntegrationTest
 				"--domain-type", "U=String", "--domain-type", "V=Integer",
 				"--persistence-type", "U=String", "--persistence-type", "V=Integer",
 				"--api-type", "U=String", "--api-type", "V=Integer",
+				"--group", "COMMON",
+				"--group", "CONFIGURATION",
 				"--group", "DOMAIN_MODELS",
+				"--group", "DOMAIN_SUPPORT",
+				"--group", "SECURITY",
+				"--group", "USE_CASE_FETCH",
 				"--group", "USE_CASE_SAVE",
+				"--group", "USE_CASE_UPDATE",
+				"--group", "USE_CASE_DELETE",
+				"--group", "PERSISTENCE_ADAPTERS",
 				"--group", "PERSISTENCE_MODELS",
 				"--overwrite-default"
 		);
@@ -129,6 +155,8 @@ class GeneratorCliIntegrationTest
 		assertTrue(Files.exists(contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/person/domain/model/PersonDomainModel.java")));
 		assertTrue(Files.exists(contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/configuration/PersonCrudDefinitionConfiguration.java")));
+		assertFalse(Files.exists(contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/save/application/service/PersonSaveService.java")));
 	}
 

@@ -4,7 +4,6 @@ package ${basePackage()}.useCases.crud.delete.infrastructure.persistence.service
 import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDAdapter;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
-import de.gupta.clean.crud.template.infrastructure.persistence.transaction.PersistenceTransactionRunner;
 import de.gupta.clean.crud.template.useCases.crud.delete.application.service.DeletePersistenceService;
 import de.gupta.clean.crud.template.useCases.crud.delete.infrastructure.persistence.service.AbstractDeletePersistenceService;
 import de.gupta.clean.crud.template.useCases.crud.delete.infrastructure.persistence.service.DeletePersistenceModelRepository;
@@ -23,9 +22,8 @@ final class ${modelBaseName()}DeletePersistenceService extends AbstractDeletePer
 			final FetchPersistenceModelRepository<${modelBaseName()}PersistenceModel, UUID> fetchRepository,
 			@Qualifier("${beanNamePrefix()}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
 			@Qualifier("${beanNamePrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
-			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
-			final PersistenceTransactionRunner transactionRunner)
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement)
 	{
-		super(fetchRepository, deleteRepository, idAdapter, idManagement, transactionRunner);
+		super(fetchRepository, deleteRepository, idAdapter, idManagement);
 	}
 }
