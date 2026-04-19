@@ -4,6 +4,9 @@ package ${basePackage()}.useCases.crud.common.dto;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+<#if hasRelationships()>
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.standard.SatelliteUpdatePatchItem;
+</#if>
 <#if apiModelImports()?has_content>
 <#list apiModelImports() as import>
 <#if import != "java.util.Optional" && import != "java.util.Collection" && import != "java.util.List">
@@ -42,28 +45,8 @@ public record ${modelBaseName()}APIModelUpdatePatch(
 		${property.name()} = Optional.ofNullable(${property.name()}).orElse(Optional.empty());
 </#list>
 <#list relationships() as relationship>
-		<#if relationship.many()>
 		${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty()).map(List::copyOf);
 		${relationship.removeFieldName()} = Optional.ofNullable(${relationship.removeFieldName()}).map(List::copyOf).orElse(List.of());
-		<#else>
-		${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty());
-		</#if>
 </#list>
 	}
-
-<#list relationships() as relationship>
-
-	public record ${relationship.apiUpdatePatchItemSimpleType()}(
-			Optional<Long> id,
-			${relationship.updatePatchType()} patch
-	)
-	{
-		public ${relationship.apiUpdatePatchItemSimpleType()}
-		{
-			id = Optional.ofNullable(id).orElse(Optional.empty());
-		}
-	}
-</#list>
 }
-
-

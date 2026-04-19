@@ -5,7 +5,7 @@ public record RelationshipGenerationConfiguration(
 		String satelliteAggregate,
 		RelationshipCardinality cardinality,
 		RelationshipReconciliationStrategy reconciliationStrategy,
-		String satelliteDomainIdType,
+		String satelliteApiIdType,
 		Boolean cascadeCreate,
 		Boolean cascadeUpdate,
 		Boolean cascadeDelete,
@@ -27,7 +27,7 @@ public record RelationshipGenerationConfiguration(
 						: reconciliationStrategy == null && normalizedCardinality == RelationshipCardinality.MANY
 						  ? RelationshipReconciliationStrategy.MERGE_BY_ID
 						  : reconciliationStrategy,
-				normalize(satelliteDomainIdType),
+				normalize(satelliteApiIdType),
 				cascadeCreate == null || cascadeCreate,
 				cascadeUpdate == null || cascadeUpdate,
 				cascadeDelete != null && cascadeDelete,

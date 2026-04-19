@@ -276,7 +276,7 @@ final class CodeGenerationConfigurationFileLoader
 					parseEnum(properties.getProperty(prefix + "cardinality"), RelationshipCardinality.class),
 					parseEnum(properties.getProperty(prefix + "reconciliationStrategy"),
 							RelationshipReconciliationStrategy.class),
-					properties.getProperty(prefix + "satelliteDomainIdType"),
+					properties.getProperty(prefix + "satelliteApiIdType"),
 					parseBooleanObject(properties.getProperty(prefix + "cascadeCreate")),
 					parseBooleanObject(properties.getProperty(prefix + "cascadeUpdate")),
 					parseBooleanObject(properties.getProperty(prefix + "cascadeDelete")),

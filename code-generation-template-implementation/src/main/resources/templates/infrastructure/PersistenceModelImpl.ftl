@@ -60,10 +60,10 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	@ElementCollection
 	@CollectionTable(name = "${persistenceModelTableName()}_${relationship.persistenceIdPropertyName()?lower_case}", joinColumns = @JoinColumn(name = "${modelBaseName()?lower_case}_id"))
 	@Column(name = "${sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
-	private Collection<${relationship.satelliteDomainIdType()}> ${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>();
+	private Collection<${relationship.satelliteApiIdType()}> ${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>();
 	<#else>
 	@Column(name = "${sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
-	private ${relationship.satelliteDomainIdType()} ${relationship.persistenceIdPropertyName()};
+	private ${relationship.satelliteApiIdType()} ${relationship.persistenceIdPropertyName()};
 	</#if>
 </#list>
 
@@ -106,7 +106,7 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 
 	@Override
 	public void set${relationship.propertyCapitalizedName()}Id(
-			final <#if relationship.many()>Collection<${relationship.satelliteDomainIdType()}><#else>${relationship.satelliteDomainIdType()}</#if> ${relationship.persistenceIdPropertyName()})
+			final <#if relationship.many()>Collection<${relationship.satelliteApiIdType()}><#else>${relationship.satelliteApiIdType()}</#if> ${relationship.persistenceIdPropertyName()})
 	{
 		<#if relationship.many()>
 		this.${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>(${relationship.persistenceIdPropertyName()});
@@ -185,3 +185,4 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 		}
 	}
 }
+

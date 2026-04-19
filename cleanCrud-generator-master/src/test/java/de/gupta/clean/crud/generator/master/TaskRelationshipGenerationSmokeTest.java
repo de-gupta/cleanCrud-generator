@@ -54,7 +54,7 @@ class TaskRelationshipGenerationSmokeTest
 				Collection<NoteAPIModelResponse> notes();
 			}
 			""";
-	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.7.3-SNAPSHOT");
+	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.1-SNAPSHOT");
 
 	@Autowired
 	private CodeGenerationOrchestrator orchestrator;
@@ -97,8 +97,14 @@ class TaskRelationshipGenerationSmokeTest
 		                .contains("relationshipDefinition(versionRelationshipDefinition)"));
 		assertTrue(Files.readString(taskCrudDefinitionConfiguration)
 		                .contains("relationshipDefinition(notesRelationshipDefinition)"));
-		assertTrue(Files.readString(taskApiUpdatePatch).contains("record VersionItem("));
-		assertTrue(Files.readString(taskApiUpdatePatch).contains("record NotesItem("));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains("oneToOneSatellite(\"version\""));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains("oneToManySatellite(\"notes\""));
+		assertTrue(Files.readString(taskApiUpdatePatch)
+		                .contains("SatelliteUpdatePatchItem<Long, VersionAPIModelUpdatePatch>"));
+		assertTrue(Files.readString(taskApiUpdatePatch)
+		                .contains("SatelliteUpdatePatchItem<Long, NoteAPIModelUpdatePatch>"));
+		assertFalse(Files.readString(taskApiUpdatePatch).contains("record VersionItem("));
+		assertFalse(Files.readString(taskApiUpdatePatch).contains("record NotesItem("));
 		assertFalse(Files.readString(noteApiUpdatePatch).contains("Optional<Long> id"));
 		assertFalse(Files.readString(versionApiUpdatePatch).contains("Optional<Long> id"));
 

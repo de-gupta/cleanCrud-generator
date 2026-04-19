@@ -50,9 +50,9 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 	private final Function<${persistenceConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}PersistenceToDomainConverter;
 </#list>
 <#list relationships() as relationship>
-	private final AggregateFetchPort<${relationship.satelliteDomainIdType()}, ${relationship.satelliteAggregate()}DomainModel> ${relationship.relationshipVariablePrefix()}AggregateFetchPort;
+	private final AggregateFetchPort<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel> ${relationship.relationshipVariablePrefix()}AggregateFetchPort;
 	private final DomainResponseBuilder<${relationship.satelliteAggregate()}DomainModel, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainResponseBuilder;
-	private final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteDomainIdType()}, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter;
+	private final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter;
 </#list>
 
 	@Override
@@ -153,7 +153,7 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 	}
 
 <#list relationships() as relationship>
-	private java.util.Optional<${relationship.responseType()}> ${relationship.relationshipVariablePrefix()}(final ${relationship.satelliteDomainIdType()} satelliteId)
+	private java.util.Optional<${relationship.responseType()}> ${relationship.relationshipVariablePrefix()}(final ${relationship.satelliteApiIdType()} satelliteId)
 	{
 		return ${relationship.relationshipVariablePrefix()}AggregateFetchPort.findById(satelliteId)
 		                                                         .map(satelliteDomainModel -> IdentifiedModel.of(
@@ -176,9 +176,9 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 <#elseif relationships()?has_content>,
 </#if>
 <#list relationships() as relationship>
-			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateFetchPort") final AggregateFetchPort<${relationship.satelliteDomainIdType()}, ${relationship.satelliteAggregate()}DomainModel> ${relationship.relationshipVariablePrefix()}AggregateFetchPort,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateFetchPort") final AggregateFetchPort<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel> ${relationship.relationshipVariablePrefix()}AggregateFetchPort,
 			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainResponseBuilder") final DomainResponseBuilder<${relationship.satelliteAggregate()}DomainModel, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainResponseBuilder,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainToAPIResponseAdapter") final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteDomainIdType()}, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter<#if relationship_has_next>,</#if>
+			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainToAPIResponseAdapter") final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter<#if relationship_has_next>,</#if>
 </#list>)
 	{
 		this.domainModelBuilderFactory = domainModelBuilderFactory;
@@ -194,5 +194,6 @@ final class ${modelBaseName()}DomainPersistenceModelAdapter
 </#list>
 	}
 }
+
 
 

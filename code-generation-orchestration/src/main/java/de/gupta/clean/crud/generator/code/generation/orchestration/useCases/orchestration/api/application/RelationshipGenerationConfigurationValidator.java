@@ -36,7 +36,7 @@ final class RelationshipGenerationConfigurationValidator
 				 throw new IllegalArgumentException(
 						 "Property `" + property.name() + "` on model `" + model.modelName() +
 								 "` looks like a relationship candidate (`" + property.candidateAggregateType() +
-								 "`), but no explicit relationship configuration was provided. Relationship generation requires satelliteDomainIdType and lifecycle configuration.");
+								 "`), but no explicit relationship configuration was provided. Relationship generation requires satelliteApiIdType and lifecycle configuration.");
 			 });
 
 		for (RelationshipGenerationConfiguration relationship : relationships)
@@ -77,11 +77,11 @@ final class RelationshipGenerationConfigurationValidator
 								relationship.satelliteAggregate() + "` but the property type implies `" +
 								property.candidateAggregateType() + "`");
 			}
-			if (relationship.satelliteDomainIdType() == null || relationship.satelliteDomainIdType().isBlank())
+			if (relationship.satelliteApiIdType() == null || relationship.satelliteApiIdType().isBlank())
 			{
 				throw new IllegalArgumentException(
 						"Relationship `" + relationship.masterProperty() +
-								"` must declare a satelliteDomainIdType");
+								"` must declare a satelliteApiIdType");
 			}
 			String expectedResponseType = relationship.satelliteAggregate() + "APIModelResponse";
 			String actualResponseType =

@@ -110,7 +110,7 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 																			   normalizedRelationship.satelliteAggregate(),
 																			   effectiveCardinality,
 																			   effectiveReconciliationStrategy,
-																			   normalizedRelationship.satelliteDomainIdType(),
+																			   normalizedRelationship.satelliteApiIdType(),
 																			   normalizedRelationship.cascadeCreate(),
 																			   normalizedRelationship.cascadeUpdate(),
 																			   normalizedRelationship.cascadeDelete(),

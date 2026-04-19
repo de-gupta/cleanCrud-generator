@@ -47,19 +47,8 @@ final class ${modelBaseName()}APIToDomainUpdateAdapter
 </#if>
 </#list>
 <#list relationships() as relationship>
-			<#if relationship.many()>
-			apiModel.${relationship.propertyName()}().map(items -> items.stream()
-			                                                      .map(item -> new ${modelBaseName()}DomainModelUpdatePatch.${relationship.domainUpdatePatchItemSimpleType()}(
-					                                                      item.id(),
-					                                                      item.patch()))
-			                                                      .toList()),
+			apiModel.${relationship.propertyName()}(),
 			apiModel.${relationship.removeFieldName()}()<#if relationship_has_next>,</#if>
-			<#else>
-			apiModel.${relationship.propertyName()}().map(item -> new ${modelBaseName()}DomainModelUpdatePatch.${relationship.domainUpdatePatchItemSimpleType()}(
-					item.id(),
-					item.patch())),
-			apiModel.${relationship.removeFieldName()}()<#if relationship_has_next>,</#if>
-			</#if>
 </#list>
 		);
 	}

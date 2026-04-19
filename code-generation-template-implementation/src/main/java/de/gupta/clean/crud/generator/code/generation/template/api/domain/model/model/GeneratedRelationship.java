@@ -8,7 +8,7 @@ public record GeneratedRelationship(
 		String satelliteAggregate,
 		String cardinality,
 		String reconciliationStrategy,
-		String satelliteDomainIdType,
+		String satelliteApiIdType,
 		boolean cascadeCreate,
 		boolean cascadeUpdate,
 		boolean cascadeDelete,
@@ -141,26 +141,6 @@ public record GeneratedRelationship(
 				.replace("APIModelResponse", "DomainModelResponse");
 	}
 
-	public String apiUpdatePatchItemSimpleType()
-	{
-		return propertyCapitalizedName() + "Item";
-	}
-
-	public String apiUpdatePatchItemType()
-	{
-		return masterAggregate + "APIModelUpdatePatch." + apiUpdatePatchItemSimpleType();
-	}
-
-	public String domainUpdatePatchItemSimpleType()
-	{
-		return propertyCapitalizedName() + "Item";
-	}
-
-	public String domainUpdatePatchItemType()
-	{
-		return masterAggregate + "DomainModelUpdatePatch." + domainUpdatePatchItemSimpleType();
-	}
-
 	public String persistenceIdPropertyName()
 	{
 		return many() ? singularPropertyName() + "Ids" : propertyName() + "Id";
@@ -169,8 +149,8 @@ public record GeneratedRelationship(
 	public String persistenceIdPropertyType()
 	{
 		return many()
-				? "Collection<" + satelliteDomainIdType + ">"
-				: optional() ? "Optional<" + satelliteDomainIdType + ">" : satelliteDomainIdType;
+				? "Collection<" + satelliteApiIdType + ">"
+				: optional() ? "Optional<" + satelliteApiIdType + ">" : satelliteApiIdType;
 	}
 
 	public String createFieldType()
@@ -182,32 +162,35 @@ public record GeneratedRelationship(
 
 	public String apiUpdateFieldType()
 	{
-		return many()
-				? "Optional<Collection<" + apiUpdatePatchItemType() + ">>"
-				: "Optional<" + apiUpdatePatchItemType() + ">";
+		return "Optional<Collection<SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>";
 	}
 
 	public String domainUpdateFieldType()
 	{
-		return many()
-				? "Optional<Collection<" + domainUpdatePatchItemType() + ">>"
-				: "Optional<" + domainUpdatePatchItemType() + ">";
+		return "Optional<Collection<SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>";
 	}
 
 	public String removeFieldName()
 	{
-		return many() ? "remove" + propertyCapitalizedName() + "Ids" : "remove" + propertyCapitalizedName();
+		return "remove" + singularPropertyCapitalizedName() + "Ids";
 	}
 
 	public String removeFieldType()
 	{
-		return many() ? "Collection<" + satelliteDomainIdType + ">" : "boolean";
+		return "Collection<" + satelliteApiIdType + ">";
 	}
 
 	private String singularPropertyName()
 	{
-		return many() && propertyName().endsWith("s") && propertyName().length() > 1
+		return propertyName().endsWith("s") && propertyName().length() > 1
 				? propertyName().substring(0, propertyName().length() - 1)
 				: propertyName();
 	}
+
+	private String singularPropertyCapitalizedName()
+	{
+		String singularPropertyName = singularPropertyName();
+		return Character.toUpperCase(singularPropertyName.charAt(0)) + singularPropertyName.substring(1);
+	}
 }
+

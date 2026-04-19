@@ -42,21 +42,21 @@
       "satelliteAggregate": "Note",
       "cardinality": "MANY",
       "reconciliationStrategy": "MERGE_BY_ID",
-      "satelliteDomainIdType": "Long"
+      "satelliteApiIdType": "Long"
     },
     {
       "masterProperty": "currentVersion",
       "satelliteAggregate": "Version",
       "cardinality": "ONE",
       "reconciliationStrategy": "REPLACE",
-      "satelliteDomainIdType": "Long"
+      "satelliteApiIdType": "Long"
     },
     {
       "masterProperty": "lastKnownVersion",
       "satelliteAggregate": "Version",
       "cardinality": "ONE",
       "reconciliationStrategy": "REPLACE",
-      "satelliteDomainIdType": "Long"
+      "satelliteApiIdType": "Long"
     }
   ],
   "ownership": {},
@@ -65,3 +65,4 @@
   },
   "historized": true
 }
+

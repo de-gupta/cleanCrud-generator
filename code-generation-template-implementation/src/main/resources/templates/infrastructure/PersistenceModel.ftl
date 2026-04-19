@@ -26,11 +26,11 @@ public interface ${modelBaseName()}PersistenceModel extends BasePersistenceModel
 	${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()}();
 void set${relationship.propertyCapitalizedName()}Id(
 		<#if relationship.many()>
-		final Collection<${relationship.satelliteDomainIdType()}> ${relationship.persistenceIdPropertyName()}
+		final Collection<${relationship.satelliteApiIdType()}> ${relationship.persistenceIdPropertyName()}
 		<#elseif relationship.optional()>
-		final ${relationship.satelliteDomainIdType()} ${relationship.persistenceIdPropertyName()}
+		final ${relationship.satelliteApiIdType()} ${relationship.persistenceIdPropertyName()}
 		<#else>
-		final ${relationship.satelliteDomainIdType()} ${relationship.persistenceIdPropertyName()}
+		final ${relationship.satelliteApiIdType()} ${relationship.persistenceIdPropertyName()}
 		</#if>);
 </#list>
 

@@ -88,7 +88,7 @@ Example JSON:
       "satelliteAggregate": "Version",
       "cardinality": "ONE",
       "reconciliationStrategy": "REPLACE",
-      "satelliteDomainIdType": "Long",
+      "satelliteApiIdType": "Long",
       "cascadeCreate": true,
       "cascadeUpdate": true,
       "cascadeDelete": false,
@@ -102,7 +102,7 @@ Example JSON:
       "satelliteAggregate": "Note",
       "cardinality": "MANY",
       "reconciliationStrategy": "MERGE_BY_ID",
-      "satelliteDomainIdType": "Long",
+      "satelliteApiIdType": "Long",
       "cascadeCreate": true,
       "cascadeUpdate": true,
       "cascadeDelete": false,
@@ -122,7 +122,7 @@ relationships.0.masterProperty=version
 relationships.0.satelliteAggregate=Version
 relationships.0.cardinality=ONE
 relationships.0.reconciliationStrategy=REPLACE
-relationships.0.satelliteDomainIdType=Long
+relationships.0.satelliteApiIdType=Long
 relationships.0.cascadeCreate=true
 relationships.0.cascadeUpdate=true
 relationships.0.cascadeDelete=false
@@ -135,7 +135,7 @@ relationships.1.masterProperty=notes
 relationships.1.satelliteAggregate=Note
 relationships.1.cardinality=MANY
 relationships.1.reconciliationStrategy=MERGE_BY_ID
-relationships.1.satelliteDomainIdType=Long
+relationships.1.satelliteApiIdType=Long
 relationships.1.cascadeCreate=true
 relationships.1.cascadeUpdate=true
 relationships.1.cascadeDelete=false
@@ -145,7 +145,7 @@ relationships.1.generateNestedCreate=true
 relationships.1.generateNestedUpdate=true
 ```
 
-## Why `satelliteDomainIdType` Is Required
+## Why `satelliteApiIdType` Is Required
 
 The base model expresses the **consumer-facing relationship shape**.
 
@@ -159,9 +159,9 @@ But persistence must store **satellite IDs**, not hydrated response objects.
 So once a relationship is declared, the generator:
 
 - keeps the response-oriented relationship shape on the domain/API side
-- generates persistence-side relationship fields using the configured `satelliteDomainIdType`
+- generates persistence-side relationship fields using the configured `satelliteApiIdType`
 
-If a relationship config is present but `satelliteDomainIdType` is missing, generation fails fast.
+If a relationship config is present but `satelliteApiIdType` is missing, generation fails fast.
 
 ## Generated Relationship Output
 
