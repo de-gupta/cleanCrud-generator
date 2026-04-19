@@ -146,6 +146,7 @@ public final class GenerateCommand implements Callable<Integer>
 						parseAssignments(apiTypes)),
 				new GenerationSelection(includeGroups, includeTemplates, includeTags, excludeGroups, excludeTemplates,
 						excludeTags),
+				List.of(),
 				new OwnershipConfiguration(baseModelOwnership, domainModelOwnership, persistenceModelOwnership,
 						apiModelOwnership, parseOwnershipAssignments(ownershipGroupRules),
 						parseOwnershipAssignments(ownershipTemplateRules),

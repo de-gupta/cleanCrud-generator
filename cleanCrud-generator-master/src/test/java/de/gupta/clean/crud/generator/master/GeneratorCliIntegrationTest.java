@@ -115,6 +115,7 @@ class GeneratorCliIntegrationTest
 		assertTrue(templateNames.contains("CrudPortsConfiguration"));
 		assertTrue(templateNames.contains("CrudDefinitionConfiguration"));
 		assertTrue(templateNames.contains("CrudServicesConfiguration"));
+		assertTrue(templateNames.contains("CrudRelationshipConfiguration"));
 		assertFalse(templateNames.contains("SaveService"));
 		assertFalse(templateNames.contains("FetchService"));
 		assertFalse(templateNames.contains("UpdateService"));

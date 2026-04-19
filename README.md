@@ -23,24 +23,184 @@ The generator always starts from an existing base model file.
 Examples:
 
 - `PersonModel.java`
+- `VersionModel.java`
+- `NoteModel.java`
 - `TaskModel.java`
 
 The path must point to the actual source file, not just the repo root. Generated files are written back into the same
-target repository by deriving the content root and package structure from that file.
+repository by deriving the content root and package structure from that file.
 
-## Quick Start
+## Standalone First, Relationships Second
 
-Set the full absolute path to the base model file:
+The generator is strongest when used in two steps:
 
-```powershell
-$env:CLEANCRUD_BASE_MODEL_FILE="C:\Path\To\PersonModel.java"
+1. generate each standalone aggregate first
+2. then generate the owning aggregate with explicit relationship configuration
+
+For example:
+
+1. generate `Version`
+2. generate `Note`
+3. generate `Task`
+4. add explicit relationship config for:
+    - `Task -> Version` (`ONE`)
+    - `Task -> Note` (`MANY`)
+
+The owning aggregate usually comes last because its generated relationship wiring depends on the owned aggregates'
+public CRUD contracts.
+
+## Relationship Generation Model
+
+Relationship generation is opt-in.
+
+The generator now does two things:
+
+- it **infers candidate relationships** from base-model properties such as:
+    - `Optional<VersionAPIModelResponse>`
+    - `Collection<NoteAPIModelResponse>`
+- it **requires explicit relationship configuration** before generating relationship wiring
+
+Property shape only gives the generator:
+
+- property name
+- likely cardinality
+- satellite aggregate name
+
+It does **not** decide lifecycle semantics, reconciliation strategy, or persistence-side satellite ID storage by itself.
+
+If a property looks like a relationship candidate but no matching relationship config is provided, the generator warns
+and
+leaves that property as ordinary standalone model structure.
+
+## Relationship Configuration
+
+Relationship generation is configured with a `relationships` section.
+
+Each entry describes one master-side relationship.
+
+Example JSON:
+
+```json
+{
+  "relationships": [
+    {
+      "masterProperty": "version",
+      "satelliteAggregate": "Version",
+      "cardinality": "ONE",
+      "reconciliationStrategy": "REPLACE",
+      "satelliteDomainIdType": "Long",
+      "cascadeCreate": true,
+      "cascadeUpdate": true,
+      "cascadeDelete": false,
+      "orphanDelete": false,
+      "hydrateOnFetch": true,
+      "generateNestedCreate": true,
+      "generateNestedUpdate": true
+    },
+    {
+      "masterProperty": "notes",
+      "satelliteAggregate": "Note",
+      "cardinality": "MANY",
+      "reconciliationStrategy": "MERGE_BY_ID",
+      "satelliteDomainIdType": "Long",
+      "cascadeCreate": true,
+      "cascadeUpdate": true,
+      "cascadeDelete": false,
+      "orphanDelete": false,
+      "hydrateOnFetch": true,
+      "generateNestedCreate": true,
+      "generateNestedUpdate": true
+    }
+  ]
+}
 ```
 
-Then run:
+Example properties format:
 
-```powershell
-java -jar .\cleanCrud-generator-master\target\cleanCrud-generator-master-0.2.3-SNAPSHOT.jar generate --config .\.run\generate.from.base-model.json
+```properties
+relationships.0.masterProperty=version
+relationships.0.satelliteAggregate=Version
+relationships.0.cardinality=ONE
+relationships.0.reconciliationStrategy=REPLACE
+relationships.0.satelliteDomainIdType=Long
+relationships.0.cascadeCreate=true
+relationships.0.cascadeUpdate=true
+relationships.0.cascadeDelete=false
+relationships.0.orphanDelete=false
+relationships.0.hydrateOnFetch=true
+relationships.0.generateNestedCreate=true
+relationships.0.generateNestedUpdate=true
+
+relationships.1.masterProperty=notes
+relationships.1.satelliteAggregate=Note
+relationships.1.cardinality=MANY
+relationships.1.reconciliationStrategy=MERGE_BY_ID
+relationships.1.satelliteDomainIdType=Long
+relationships.1.cascadeCreate=true
+relationships.1.cascadeUpdate=true
+relationships.1.cascadeDelete=false
+relationships.1.orphanDelete=false
+relationships.1.hydrateOnFetch=true
+relationships.1.generateNestedCreate=true
+relationships.1.generateNestedUpdate=true
 ```
+
+## Why `satelliteDomainIdType` Is Required
+
+The base model expresses the **consumer-facing relationship shape**.
+
+Example:
+
+- `Optional<VersionAPIModelResponse>` on `TaskModel`
+- `Collection<NoteAPIModelResponse>` on `TaskModel`
+
+But persistence must store **satellite IDs**, not hydrated response objects.
+
+So once a relationship is declared, the generator:
+
+- keeps the response-oriented relationship shape on the domain/API side
+- generates persistence-side relationship fields using the configured `satelliteDomainIdType`
+
+If a relationship config is present but `satelliteDomainIdType` is missing, generation fails fast.
+
+## Generated Relationship Output
+
+When relationship generation is enabled for an aggregate, the generator adds:
+
+- `CrudRelationshipConfiguration`
+- relationship lifecycle semantics with sensible defaults
+- create input resolvers
+- patch input resolvers
+- identity resolvers
+- link strategies
+- hydration strategies
+- relationship definition beans
+- relationship attachment in the aggregate CRUD definition
+
+It also generates master-side nested patch item wrappers while keeping the standalone satellite update patch DTOs
+id-less.
+
+## Default Generated Semantics
+
+Generated relationships start from these defaults:
+
+- `cascadeCreate = true`
+- `cascadeUpdate = true`
+- `cascadeDelete = false`
+- `orphanDelete = false`
+- `hydrateOnFetch = true`
+
+The generated relationship configuration includes `TODO` comments so consumers can review and change those semantics if
+needed.
+
+## Current Standalone Output Shape
+
+For a normal standalone aggregate, the generator produces:
+
+- shared `CommonPersistenceConfiguration` with both `PersistenceTransactionRunner` and `AggregateLifecycleEngine`
+- aggregate ports configuration
+- aggregate definition configuration
+- aggregate services configuration using `AggregateCrudServices`
 
 ## Config File Formats
 
@@ -51,8 +211,7 @@ Supported today:
 - `.yml`
 - `.properties`
 
-`.properties` is now supported. YAML is still supported for compatibility, but JSON or properties are the preferred
-formats going forward.
+`.properties` is supported. YAML remains supported for compatibility, but JSON or properties are the preferred formats.
 
 ## Configuration Model
 
@@ -64,54 +223,15 @@ The generator now uses a modular additive config model with these top-level sect
 - `ownership`
 - `overwrite`
 - `historized`
+- `relationships`
 
 ### `inputs`
 
 Controls which source models already exist.
 
-Example:
-
-```json
-{
-  "inputs": {
-    "baseModelSourceCodeFilePath": ".../PersonModel.java",
-    "domainModelSourceCodeFilePath": null,
-    "persistenceModelSourceCodeFilePath": null,
-    "apiModelSourceCodeFilePath": null
-  }
-}
-```
-
-Meaning:
-
-- `baseModelSourceCodeFilePath` is required
-- the others are optional
-- if a domain/api/persistence model path is provided, ownership defaults to `USER` unless explicitly overridden
-
 ### `genericTypes`
 
 Lets you supply different concrete generic substitutions for domain, persistence, and API layers.
-
-Example:
-
-```json
-{
-  "genericTypes": {
-    "domain": {
-      "U": "String",
-      "V": "Long"
-    },
-    "persistence": {
-      "U": "UUID",
-      "V": "UUID"
-    },
-    "api": {
-      "U": "String",
-      "V": "Long"
-    }
-  }
-}
-```
 
 ### `generation`
 
@@ -140,237 +260,35 @@ Available groups:
 - `USE_CASE_UPDATE`
 - `USE_CASE_DELETE`
 
-Generated standalone CRUD modules now use aggregate-based wiring under `useCases.crud.configuration`.
+Generated standalone CRUD modules use aggregate-based wiring under `useCases.crud.configuration`.
 That means the generator emits:
 
 - `<Model>CrudPortsConfiguration`
 - `<Model>CrudDefinitionConfiguration`
 - `<Model>CrudServicesConfiguration`
 
-instead of concrete standalone CRUD service classes like `<Model>SaveService`.
+When relationships are configured, the generator also emits:
 
-Example:
-
-```json
-{
-  "generation": {
-    "groups": [
-      "DOMAIN_MODELS",
-      "API_DTOS",
-      "PERSISTENCE_REPOSITORIES"
-    ],
-    "excludeTemplates": [
-      "ModuleConfiguration"
-    ]
-  }
-}
-```
+- `<Model>CrudRelationshipConfiguration`
 
 ### `ownership`
 
 Lets you declare whether the generator or the user owns each top-level surface.
 
-Possible values:
-
-- `GENERATED`
-- `USER`
-
-Example:
-
-```json
-{
-  "ownership": {
-    "baseModel": "USER",
-    "domainModel": "GENERATED",
-    "persistenceModel": "USER",
-    "apiModel": "GENERATED"
-  }
-}
-```
-
-If a surface is `USER`, the generator excludes the corresponding generated templates and only generates the surrounding
-scaffolding.
-
-## Current Standalone Output Shape
-
-For a normal standalone aggregate, the generator now produces:
-
-- shared `CommonPersistenceConfiguration` with both `PersistenceTransactionRunner` and `AggregateLifecycleEngine`
-- aggregate ports configuration
-- aggregate definition configuration
-- aggregate services configuration using `AggregateCrudServices`
-
-Relationship / satellite generation is not yet inferred from the base model alone and remains a future step.
-
 ### `overwrite`
 
 Overwrite can now be controlled at different levels.
-
-Supported scopes:
-
-- default
-- group
-- template
-- tag
-- file
-
-Precedence is:
-
-1. file
-2. template
-3. tag
-4. group
-5. default
-
-Example:
-
-```json
-{
-  "overwrite": {
-    "defaultOverwrite": false,
-    "groups": {
-      "API_CONTROLLERS": true
-    },
-    "templates": {
-      "ModuleConfiguration": false
-    },
-    "tags": {
-      "controller": true
-    },
-    "files": {
-      "src/main/java/.../PersonModuleConfiguration.java": false
-    }
-  }
-}
-```
 
 ### `historized`
 
 Boolean flag controlling historization-aware generation where supported.
 
-## Example JSON Config
-
-```json
-{
-  "inputs": {
-    "baseModelSourceCodeFilePath": "${CLEANCRUD_BASE_MODEL_FILE}"
-  },
-  "genericTypes": {
-    "domain": {
-      "U": "String",
-      "V": "Integer"
-    },
-    "persistence": {
-      "U": "String",
-      "V": "Integer"
-    },
-    "api": {
-      "U": "String",
-      "V": "Integer"
-    }
-  },
-  "generation": {
-    "groups": [
-      "COMMON",
-      "CONFIGURATION",
-      "DOMAIN_MODELS",
-      "DOMAIN_SUPPORT",
-      "API_DTOS",
-      "API_ADAPTERS",
-      "API_CONTROLLERS",
-      "PERSISTENCE_MODELS",
-      "PERSISTENCE_ADAPTERS",
-      "PERSISTENCE_REPOSITORIES",
-      "PERSISTENCE_HISTORY",
-      "SECURITY",
-      "USE_CASE_FETCH",
-      "USE_CASE_SAVE",
-      "USE_CASE_UPDATE",
-      "USE_CASE_DELETE"
-    ]
-  },
-  "ownership": {},
-  "overwrite": {
-    "defaultOverwrite": true
-  },
-  "historized": true
-}
-```
-
-## Example Properties Config
-
-```properties
-inputs.baseModelSourceCodeFilePath=${CLEANCRUD_BASE_MODEL_FILE}
-
-genericTypes.domain.U=String
-genericTypes.domain.V=Integer
-genericTypes.persistence.U=String
-genericTypes.persistence.V=Integer
-genericTypes.api.U=String
-genericTypes.api.V=Integer
-
-generation.groups=COMMON,CONFIGURATION,DOMAIN_MODELS,DOMAIN_SUPPORT,API_DTOS,API_ADAPTERS,API_CONTROLLERS,PERSISTENCE_MODELS,PERSISTENCE_ADAPTERS,PERSISTENCE_REPOSITORIES,PERSISTENCE_HISTORY,SECURITY,USE_CASE_FETCH,USE_CASE_SAVE,USE_CASE_UPDATE,USE_CASE_DELETE
-
-overwrite.defaultOverwrite=true
-
-historized=true
-```
-
 ## Direct CLI Options
 
 You can use `--config`, or supply options directly on the command line.
 
-Examples:
-
-```powershell
-java -jar .\cleanCrud-generator-master\target\cleanCrud-generator-master-0.2.3-SNAPSHOT.jar generate `
-  --base-model "C:\Path\To\PersonModel.java" `
-  --domain-type U=String --domain-type V=Integer `
-  --persistence-type U=UUID --persistence-type V=UUID `
-  --api-type U=String --api-type V=Integer `
-  --group DOMAIN_MODELS --group API_DTOS --group USE_CASE_SAVE `
-  --own-persistence-model USER `
-  --overwrite-template ModuleConfiguration=false `
-  --historized
-```
-
-Supported direct options include:
-
-- `--base-model`
-- `--domain-model`
-- `--persistence-model`
-- `--api-model`
-- `--domain-type`
-- `--persistence-type`
-- `--api-type`
-- `--group`
-- `--template`
-- `--tag`
-- `--exclude-group`
-- `--exclude-template`
-- `--exclude-tag`
-- `--own-base-model`
-- `--own-domain-model`
-- `--own-persistence-model`
-- `--own-api-model`
-- `--overwrite-default`
-- `--overwrite-group`
-- `--overwrite-template`
-- `--overwrite-tag`
-- `--overwrite-file`
-- `--historized`
-
-## Checked-In Run Config
-
-The checked-in run config uses:
-
-- [.run/generate.from.base-model.json](E:/Projects/Professional/OpenSource/java/de-gupta/crud/cleanCrud-generator/cleanCrud-generator/.run/generate.from.base-model.json)
-
-and expects:
-
-- `CLEANCRUD_BASE_MODEL_FILE`
-
-to be set to the full base model path.
+The direct CLI mode currently covers standalone generation and general selection/overwrite controls. Relationship
+configuration is best supplied via JSON/properties config files.
 
 ## Notes
 

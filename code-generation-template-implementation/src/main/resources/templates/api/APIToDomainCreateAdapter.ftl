@@ -38,16 +38,19 @@ final class ${modelBaseName()}APIToDomainCreateAdapter implements APIToDomainCre
 	public ${modelBaseName()}DomainModelCreate mapToDomainModelCreate(final ${modelBaseName()}APIModelCreate apiModel)
 	{
 		return new ${modelBaseName()}DomainModelCreate(
-<#list properties() as property>
+<#list standaloneProperties() as property>
 <#if apiAndDomainTypesDiffer(property.baseType())>
 			<#if property.optional()>
-			apiModel.${property.getter()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next>,</#if>
+			apiModel.${property.getter()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next || relationships()?has_content>,</#if>
 			<#else>
-			${property.baseType()?lower_case}APIToDomainConverter.apply(apiModel.${property.getter()}())<#if property_has_next>,</#if>
+			${property.baseType()?lower_case}APIToDomainConverter.apply(apiModel.${property.getter()}())<#if property_has_next || relationships()?has_content>,</#if>
 			</#if>
 <#else>
-			apiModel.${property.getter()}()<#if property_has_next>,</#if>
+			apiModel.${property.getter()}()<#if property_has_next || relationships()?has_content>,</#if>
 </#if>
+</#list>
+<#list relationships() as relationship>
+			apiModel.${relationship.propertyName()}()<#if relationship_has_next>,</#if>
 </#list>
 		);
 	}

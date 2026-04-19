@@ -79,6 +79,7 @@ final class CodeGenerationConfigurationFileLoader
 						extractCsvSet(properties, "generation.excludeTemplates"),
 						extractCsvSet(properties, "generation.excludeTags")
 				),
+				extractRelationshipConfigurations(properties),
 				new OwnershipConfiguration(
 						parseOwnership(properties.getProperty("ownership.baseModel")),
 						parseOwnership(properties.getProperty("ownership.domainModel")),
@@ -108,6 +109,7 @@ final class CodeGenerationConfigurationFileLoader
 				normalizeInputs(configuration.inputs(), configDirectory),
 				configuration.genericTypes(),
 				configuration.generation(),
+				configuration.relationships(),
 				configuration.ownership(),
 				normalizeOverwrite(configuration.overwrite(), configDirectory),
 				configuration.historized());
@@ -250,5 +252,54 @@ final class CodeGenerationConfigurationFileLoader
 			return null;
 		}
 		return GeneratedArtifactOwnership.valueOf(value.trim().toUpperCase());
+	}
+
+	private java.util.List<RelationshipGenerationConfiguration> extractRelationshipConfigurations(
+			final Properties properties)
+	{
+		var relationshipIndexes = properties.stringPropertyNames()
+		                                    .stream()
+		                                    .filter(name -> name.startsWith("relationships."))
+		                                    .map(name -> name.substring("relationships.".length()))
+		                                    .map(name -> name.split("\\.", 2)[0])
+		                                    .filter(index -> index.matches("\\d+"))
+		                                    .map(Integer::parseInt)
+		                                    .collect(java.util.stream.Collectors.toCollection(
+													java.util.TreeSet::new));
+		var relationships = new java.util.ArrayList<RelationshipGenerationConfiguration>();
+		for (Integer index : relationshipIndexes)
+		{
+			String prefix = "relationships." + index + ".";
+			relationships.add(new RelationshipGenerationConfiguration(
+					properties.getProperty(prefix + "masterProperty"),
+					properties.getProperty(prefix + "satelliteAggregate"),
+					parseEnum(properties.getProperty(prefix + "cardinality"), RelationshipCardinality.class),
+					parseEnum(properties.getProperty(prefix + "reconciliationStrategy"),
+							RelationshipReconciliationStrategy.class),
+					properties.getProperty(prefix + "satelliteDomainIdType"),
+					parseBooleanObject(properties.getProperty(prefix + "cascadeCreate")),
+					parseBooleanObject(properties.getProperty(prefix + "cascadeUpdate")),
+					parseBooleanObject(properties.getProperty(prefix + "cascadeDelete")),
+					parseBooleanObject(properties.getProperty(prefix + "orphanDelete")),
+					parseBooleanObject(properties.getProperty(prefix + "hydrateOnFetch")),
+					parseBooleanObject(properties.getProperty(prefix + "generateNestedCreate")),
+					parseBooleanObject(properties.getProperty(prefix + "generateNestedUpdate"))
+			));
+		}
+		return java.util.List.copyOf(relationships);
+	}
+
+	private <T extends Enum<T>> T parseEnum(final String value, final Class<T> enumClass)
+	{
+		if (value == null || value.isBlank())
+		{
+			return null;
+		}
+		return Enum.valueOf(enumClass, value.trim().toUpperCase(java.util.Locale.ROOT));
+	}
+
+	private Boolean parseBooleanObject(final String value)
+	{
+		return value == null || value.isBlank() ? null : Boolean.parseBoolean(value.trim());
 	}
 }

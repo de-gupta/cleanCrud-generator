@@ -23,7 +23,7 @@ public interface ${modelBaseName()}JpaRepository extends JpaRepository<${modelBa
 	boolean existsBy${property.capitalizedName()}(final ${persistenceResolvedType(property.baseType())} ${property.name()});
 
 	@Query("SELECT t.${property.name()} FROM ${modelBaseName()}PersistenceModelImpl t WHERE t.${property.name()} IN :${property.name()}s")
-	List<${persistenceResolvedType(property.baseType())}> find${property.capitalizedName()}sBy${property.capitalizedName()}In(@Param("${property.name()}s") final Collection<${persistenceResolvedType(property.baseType())}> ${property.name()}s);
+	List<${boxedPersistenceResolvedType(property.baseType())}> find${property.capitalizedName()}sBy${property.capitalizedName()}In(@Param("${property.name()}s") final Collection<${boxedPersistenceResolvedType(property.baseType())}> ${property.name()}s);
 
 </#if>
 </#list>

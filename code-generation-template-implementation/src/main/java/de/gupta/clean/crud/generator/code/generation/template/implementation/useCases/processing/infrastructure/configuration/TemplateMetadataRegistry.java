@@ -517,6 +517,30 @@ public final class TemplateMetadataRegistry
 				TemplateGroup.CONFIGURATION
 		));
 
+		templates.put("CrudRelationshipConfiguration", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Aggregate CRUD relationship configuration"),
+						Set.of("Configuration", "Aggregate", "Relationships", "CRUD"),
+						Set.of("configuration", "crud", "aggregate", "relationship"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.CONFIGURATION
+		));
+
+		templates.put("CrudRelationshipConfiguration", new TemplateMetadataConfig(
+				new TemplateMetadata(
+						Optional.of("Aggregate CRUD relationship configuration"),
+						Set.of("Configuration", "Aggregate", "Relationships", "CRUD"),
+						Set.of("configuration", "crud", "aggregate", "relationship"),
+						Optional.of("Clean CRUD Generator"),
+						Optional.of("1.0"),
+						false
+				),
+				TemplateGroup.CONFIGURATION
+		));
+
 		templates.put("ExistingDomainModelsSupplier", new TemplateMetadataConfig(
 				new TemplateMetadata(
 						Optional.of("Supplier for loading existing domain models from persistence"),

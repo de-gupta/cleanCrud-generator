@@ -15,7 +15,7 @@ import ${import};
 
 public interface ${modelName()}<#if isGeneric()><<#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>></#if> extends Validatable
 {
-<#list properties() as property>
+<#list standaloneProperties() as property>
     ${property.returnType()} ${property.name()}();
 
 </#list>
@@ -26,7 +26,7 @@ public interface ${modelName()}<#if isGeneric()><<#list genericTypeParameters() 
 
 	interface ${modelName()}Builder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M extends ${modelName()}<#if isGeneric()><<#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>></#if>, B extends ${modelName()}Builder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M, B${">"}${">"} extends ModelBuilder${"<"}M${">"}
 	{
-    <#list properties() as property>
+    <#list standaloneProperties() as property>
 		B with${property.capitalizedName()}(final ${baseBuilderPropertyType(property)} ${property.name()});
     </#list>
 	}

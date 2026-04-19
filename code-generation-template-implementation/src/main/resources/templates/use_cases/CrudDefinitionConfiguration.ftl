@@ -16,6 +16,9 @@ import de.gupta.clean.crud.template.useCases.crud.aggregate.builder.AggregateCru
 import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.AggregateCrudDefinition;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateFetchPort;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateMutationPort;
+<#if hasRelationships()>
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.AggregateRelationshipDefinitionContract;
+</#if>
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +39,11 @@ class ${modelBaseName()}CrudDefinitionConfiguration
 			@Qualifier("${beanNamePrefix()}PatchPolicy") final PatchPolicy<${modelBaseName()}DomainModel> patchPolicy,
 			@Qualifier("${beanNamePrefix()}DeletionPolicy") final DeletionPolicy<${modelBaseName()}DomainModel> deletionPolicy,
 			@Qualifier("${beanNamePrefix()}DomainSecurityPolicy") final DomainSecurityPolicy<${modelBaseName()}DomainModel> securityPolicy,
-			@Qualifier("${beanNamePrefix()}DuplicateDefinition") final DuplicateDefinition<${modelBaseName()}DomainModel> duplicateDefinition)
+			@Qualifier("${beanNamePrefix()}DuplicateDefinition") final DuplicateDefinition<${modelBaseName()}DomainModel> duplicateDefinition<#if hasRelationships()>,
+<#list relationships() as relationship>
+			@Qualifier("${relationship.relationshipBeanNamePrefix()}RelationshipDefinition") final AggregateRelationshipDefinitionContract<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition<#if relationship_has_next>,</#if>
+</#list>
+</#if>)
 	{
 		return AggregateCrudDefinitions
 				.<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse>aggregateCrudDefinition()
@@ -50,6 +57,9 @@ class ${modelBaseName()}CrudDefinitionConfiguration
 				.deletionPolicy(deletionPolicy)
 				.securityPolicy(securityPolicy)
 				.duplicateDefinition(duplicateDefinition)
+<#list relationships() as relationship>
+				.relationshipDefinition(${relationship.relationshipBeanNamePrefix()}RelationshipDefinition)
+</#list>
 				.build();
 	}
 }

@@ -3,11 +3,12 @@ package ${basePackage()}.domain.model;
 
 import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 <#if domainModelImports()?has_content>
 <#list domainModelImports() as import>
-<#if import != "java.util.Optional">
+<#if import != "java.util.Optional" && import != "java.util.List">
 import ${import};
 </#if>
 </#list>
@@ -15,8 +16,11 @@ import ${import};
 
 final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}DomainModel
 {
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	private ${domainResolvedType(property.baseType())} ${property.name()};
+</#list>
+<#list relationships() as relationship>
+	private ${relationship.responseFieldType()} ${relationship.propertyName()};
 </#list>
 
 	static ${modelBaseName()}DomainModelBuilder builder()
@@ -24,7 +28,7 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 		return new BuilderImpl();
 	}
 
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	@Override
 	public ${domainPropertyType(property)} ${property.getter()}()
 	{
@@ -36,14 +40,25 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 	}
 
 </#list>
+<#list relationships() as relationship>
+	@Override
+	public ${relationship.responseFieldType()} ${relationship.propertyName()}()
+	{
+		return ${relationship.propertyName()};
+	}
+
+</#list>
 	@Override
 	public int hashCode()
 	{
 		int result = 1;
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	<#if !property.optional()>
-		result = 31 * result + (${property.name()} != null ? ${property.name()}.hashCode() : 0);
+		result = 31 * result + Objects.hashCode(${property.name()});
 	</#if>
+</#list>
+<#list relationships() as relationship>
+		result = 31 * result + Objects.hashCode(${relationship.propertyName()});
 </#list>
 		return result;
 	}
@@ -53,10 +68,13 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 	{
 		return o == this ||
 				(o instanceof ${modelBaseName()}DomainModel that
-<#list properties() as property>
+<#list standaloneProperties() as property>
 				<#if !property.optional()>
 					&& Objects.equals(${property.name()}, that.${property.name()}())
 				</#if>
+</#list>
+<#list relationships() as relationship>
+					&& Objects.equals(${relationship.propertyName()}, that.${relationship.propertyName()}())
 </#list>
 				);
 	}
@@ -65,12 +83,12 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 	{
 	}
 
-	private static final class BuilderImpl extends AbstractModelBuilder${"<"}${modelBaseName()}DomainModel${">"}
+	private static final class BuilderImpl extends AbstractModelBuilder<${modelBaseName()}DomainModel>
 			implements ${modelBaseName()}DomainModelBuilder
 	{
 		private final ${modelBaseName()}DomainModelImpl model;
 
-<#list properties() as property>
+<#list standaloneProperties() as property>
 		@Override
 		public ${modelBaseName()}DomainModelBuilder with${property.capitalizedName()}(final ${domainBuilderPropertyType(property)} ${property.name()})
 		{
@@ -78,6 +96,21 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 			model.${property.name()} = ${property.name()}.orElse(null);
 			<#else>
 			model.${property.name()} = ${property.name()};
+			</#if>
+			return this;
+		}
+
+</#list>
+<#list relationships() as relationship>
+		@Override
+		public ${modelBaseName()}DomainModelBuilder with${relationship.propertyCapitalizedName()}(final ${relationship.responseFieldType()} ${relationship.propertyName()})
+		{
+			<#if relationship.many()>
+			model.${relationship.propertyName()} = ${relationship.propertyName()} == null ? List.of() : List.copyOf(${relationship.propertyName()});
+			<#elseif relationship.optional()>
+			model.${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty());
+			<#else>
+			model.${relationship.propertyName()} = ${relationship.propertyName()};
 			</#if>
 			return this;
 		}
@@ -95,3 +128,4 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 		}
 	}
 }
+

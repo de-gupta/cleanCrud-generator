@@ -13,6 +13,7 @@ class TemplateMetadataRegistryTest
 		assertTrue(TemplateMetadataRegistry.hasTemplate("CrudPortsConfiguration"));
 		assertTrue(TemplateMetadataRegistry.hasTemplate("CrudDefinitionConfiguration"));
 		assertTrue(TemplateMetadataRegistry.hasTemplate("CrudServicesConfiguration"));
+		assertTrue(TemplateMetadataRegistry.hasTemplate("CrudRelationshipConfiguration"));
 		assertFalse(TemplateMetadataRegistry.hasTemplate("SaveService"));
 		assertFalse(TemplateMetadataRegistry.hasTemplate("FetchService"));
 		assertFalse(TemplateMetadataRegistry.hasTemplate("UpdateService"));

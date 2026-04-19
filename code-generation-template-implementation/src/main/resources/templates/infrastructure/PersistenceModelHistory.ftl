@@ -33,7 +33,7 @@ import java.util.UUID;
 public class ${modelBaseName()}PersistenceModelHistory extends AbstractTriTemporalHistoryModel<UUID>
 		implements TriTemporalHistoryModel<UUID>
 {
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	<#if requiresJpaConverter(property)>
 	@Convert(converter = ${persistenceJpaConvertersTypeName()}.${jpaConverterNestedClassName(property)}.class)
 	</#if>
@@ -54,7 +54,7 @@ public class ${modelBaseName()}PersistenceModelHistory extends AbstractTriTempor
 		snapshot.setDecisionTime(decisionTime);
 		snapshot.setValidFrom(validFrom);
 		snapshot.setValidTo(validTo);
-<#list properties() as property>
+<#list standaloneProperties() as property>
 		snapshot.${property.name()} = <#if property.optional()>model.${property.name()}().orElse(null)<#else>model.${property.name()}()</#if>;
 </#list>
 		return snapshot;

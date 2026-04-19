@@ -9,12 +9,14 @@ import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 <#if persistenceModelImports()?has_content>
 <#list persistenceModelImports() as import>
-<#if import != "java.util.Optional" && import != "java.util.UUID">
+<#if import != "java.util.Optional" && import != "java.util.UUID" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>
 </#list>
@@ -28,7 +30,7 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	@GeneratedValue
 	private UUID id;
 
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	<#if !property.optional()>
 	@NotNull
 	<#if property.isEnum()>
@@ -53,13 +55,24 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	</#if>
 	private ${persistenceResolvedType(property.baseType())} ${property.name()};
 </#list>
+<#list relationships() as relationship>
+	<#if relationship.many()>
+	@ElementCollection
+	@CollectionTable(name = "${persistenceModelTableName()}_${relationship.persistenceIdPropertyName()?lower_case}", joinColumns = @JoinColumn(name = "${modelBaseName()?lower_case}_id"))
+	@Column(name = "${sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
+	private Collection<${relationship.satelliteDomainIdType()}> ${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>();
+	<#else>
+	@Column(name = "${sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
+	private ${relationship.satelliteDomainIdType()} ${relationship.persistenceIdPropertyName()};
+	</#if>
+</#list>
 
 	static ${modelBaseName()}PersistenceModelBuilder builder()
 	{
 		return new ${modelBaseName()}PersistenceModelBuilderImpl();
 	}
 
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	@Override
 	public ${persistencePropertyType(property)} ${property.getter()}()
 	{
@@ -74,6 +87,32 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	public void set${property.capitalizedName()}(final ${persistenceResolvedType(property.baseType())} ${property.name()})
 	{
 		this.${property.name()} = ${property.name()};
+		this.validate();
+	}
+
+</#list>
+<#list relationships() as relationship>
+	@Override
+	public ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()}()
+	{
+		<#if relationship.many()>
+		return List.copyOf(${relationship.persistenceIdPropertyName()});
+		<#elseif relationship.optional()>
+		return Optional.ofNullable(${relationship.persistenceIdPropertyName()});
+		<#else>
+		return ${relationship.persistenceIdPropertyName()};
+		</#if>
+	}
+
+	@Override
+	public void set${relationship.propertyCapitalizedName()}Id(
+			final <#if relationship.many()>Collection<${relationship.satelliteDomainIdType()}><#else>${relationship.satelliteDomainIdType()}</#if> ${relationship.persistenceIdPropertyName()})
+	{
+		<#if relationship.many()>
+		this.${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>(${relationship.persistenceIdPropertyName()});
+		<#else>
+		this.${relationship.persistenceIdPropertyName()} = ${relationship.persistenceIdPropertyName()};
+		</#if>
 		this.validate();
 	}
 
@@ -101,12 +140,12 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	{
 	}
 
-	private static final class ${modelBaseName()}PersistenceModelBuilderImpl extends AbstractModelBuilder${"<"}${modelBaseName()}PersistenceModel${">"}
+	private static final class ${modelBaseName()}PersistenceModelBuilderImpl extends AbstractModelBuilder<${modelBaseName()}PersistenceModel>
 			implements ${modelBaseName()}PersistenceModelBuilder
 	{
 		private final ${modelBaseName()}PersistenceModelImpl model;
 
-<#list properties() as property>
+<#list standaloneProperties() as property>
 		@Override
 		public ${modelBaseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistenceBuilderPropertyType(property)} ${property.name()})
 		{
@@ -114,6 +153,21 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 			model.${property.name()} = ${property.name()}.orElse(null);
 			<#else>
 			model.${property.name()} = ${property.name()};
+			</#if>
+			return this;
+		}
+
+</#list>
+<#list relationships() as relationship>
+		@Override
+		public ${modelBaseName()}PersistenceModelBuilder with${relationship.propertyCapitalizedName()}Id(final ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()})
+		{
+			<#if relationship.many()>
+			model.${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>(${relationship.persistenceIdPropertyName()});
+			<#elseif relationship.optional()>
+			model.${relationship.persistenceIdPropertyName()} = ${relationship.persistenceIdPropertyName()}.orElse(null);
+			<#else>
+			model.${relationship.persistenceIdPropertyName()} = ${relationship.persistenceIdPropertyName()};
 			</#if>
 			return this;
 		}
