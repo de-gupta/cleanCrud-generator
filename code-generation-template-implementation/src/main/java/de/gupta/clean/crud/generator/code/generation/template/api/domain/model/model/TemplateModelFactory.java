@@ -11,7 +11,8 @@ public final class TemplateModelFactory
 {
 	public static TemplateModel create(final String packageName, final String modelName)
 	{
-		return create(packageName, modelName, List.of(), Set.of(), Map.of(), Map.of(), Map.of(), Set.of(), false);
+		return create(packageName, modelName, List.of(), Set.of(), Map.of(), Map.of(), Map.of(), Set.of(), false,
+				List.of());
 	}
 
 	public static TemplateModel create(
@@ -23,10 +24,11 @@ public final class TemplateModelFactory
 			final Map<String, String> persistenceGenericTypes,
 			final Map<String, String> apiGenericTypes,
 			final Set<String> domainGenericImports,
-			final boolean historized)
+			final boolean historized,
+			final java.util.List<GeneratedRelationship> relationships)
 	{
 		return new TemplateModelImpl(packageName, modelName, genericTypeParameters, properties, domainGenericTypes,
-				persistenceGenericTypes, apiGenericTypes, domainGenericImports, historized);
+				persistenceGenericTypes, apiGenericTypes, domainGenericImports, historized, relationships);
 	}
 
 	private TemplateModelFactory()

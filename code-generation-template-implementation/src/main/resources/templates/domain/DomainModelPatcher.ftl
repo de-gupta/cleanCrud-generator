@@ -17,13 +17,16 @@ public ${modelBaseName()}DomainModel patchModel(final ${modelBaseName()}DomainMo
 final ${modelBaseName()}DomainModelUpdatePatch updatePatch)
 {
 return modelBuilderFactory.builder()
-<#list properties() as property>
+<#list standaloneProperties() as property>
 	<#if property.optional()>
 .with${property.capitalizedName()}(updatePatch.${property.name()}().isPresent() ? updatePatch.${property.name()}() : originalModel.${property.getter()}())
 	<#else>
 .with${property.capitalizedName()}(updatePatch.${property.name()}().orElse(originalModel.${property.getter()}()))
 	</#if>
 
+</#list>
+<#list relationships() as relationship>
+.with${relationship.propertyCapitalizedName()}(originalModel.${relationship.propertyName()}())
 </#list>
 .build();
 }

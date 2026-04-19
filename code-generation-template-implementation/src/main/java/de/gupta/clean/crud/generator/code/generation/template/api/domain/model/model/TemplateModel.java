@@ -116,6 +116,27 @@ public interface TemplateModel
 
 	Set<String> domainGenericImports();
 
+	java.util.List<GeneratedRelationship> relationships();
+
+	default boolean hasRelationships()
+	{
+		return !relationships().isEmpty();
+	}
+
+	default Set<String> relationshipPropertyNames()
+	{
+		return relationships().stream()
+		                      .map(GeneratedRelationship::propertyName)
+		                      .collect(java.util.stream.Collectors.toUnmodifiableSet());
+	}
+
+	default SequencedCollection<Property> standaloneProperties()
+	{
+		return properties().stream()
+		                   .filter(property -> !relationshipPropertyNames().contains(property.name()))
+		                   .toList();
+	}
+
 	default Set<String> propertyImports()
 	{
 		var imports = new LinkedHashSet<String>();
@@ -128,9 +149,21 @@ public interface TemplateModel
 		return imports;
 	}
 
+	default Set<String> relationshipImports()
+	{
+		var imports = new LinkedHashSet<String>();
+		relationships().forEach(relationship ->
+		{
+			imports.add(relationship.responseImport());
+			imports.add(relationship.createImport());
+			imports.add(relationship.updatePatchImport());
+		});
+		return imports;
+	}
+
 	default Set<String> domainModelImports()
 	{
-		return combineImports(domainGenericImports(), propertyImports());
+		return combineImports(domainGenericImports(), combineImports(propertyImports(), relationshipImports()));
 	}
 
 	default Set<String> persistenceGenericImports()
@@ -140,7 +173,19 @@ public interface TemplateModel
 
 	default Set<String> persistenceModelImports()
 	{
-		return combineImports(persistenceGenericImports(), propertyImports());
+		var imports = new LinkedHashSet<>(combineImports(persistenceGenericImports(), propertyImports()));
+		relationships().forEach(relationship ->
+		{
+			if (relationship.many())
+			{
+				imports.add("java.util.Collection");
+			}
+			if (relationship.optional())
+			{
+				imports.add("java.util.Optional");
+			}
+		});
+		return imports;
 	}
 
 	default Set<String> apiGenericImports()
@@ -150,7 +195,7 @@ public interface TemplateModel
 
 	default Set<String> apiModelImports()
 	{
-		return combineImports(apiGenericImports(), propertyImports());
+		return combineImports(apiGenericImports(), combineImports(propertyImports(), relationshipImports()));
 	}
 
 	SequencedCollection<String> genericTypeParameters();
@@ -164,12 +209,12 @@ public interface TemplateModel
 
 	default SequencedCollection<Property> requiredProperties()
 	{
-		return properties().stream().filter(property -> !property.optional()).toList();
+		return standaloneProperties().stream().filter(property -> !property.optional()).toList();
 	}
 
 	default SequencedCollection<Property> jpaConverterProperties()
 	{
-		return properties().stream().filter(this::requiresJpaConverter).toList();
+		return standaloneProperties().stream().filter(this::requiresJpaConverter).toList();
 	}
 
 	default String duplicateKeyTypeName()
@@ -215,8 +260,8 @@ public interface TemplateModel
 
 	default String domainPropertyType(final Property property)
 	{
-		return property.optional() ? "Optional<" + domainResolvedType(property.baseType()) + ">" :
-				domainResolvedType(property.type());
+		return property.optional() ? "Optional<" + boxedType(domainResolvedType(property.baseType())) + ">" :
+				normalizedGeneratedType(domainResolvedType(property.type()));
 	}
 
 	default String baseBuilderPropertyType(final Property property)
@@ -226,20 +271,20 @@ public interface TemplateModel
 
 	default String domainBuilderPropertyType(final Property property)
 	{
-		return property.optional() ? "Optional<" + domainResolvedType(property.baseType()) + ">" :
-				domainResolvedType(property.type());
+		return property.optional() ? "Optional<" + boxedType(domainResolvedType(property.baseType())) + ">" :
+				normalizedGeneratedType(domainResolvedType(property.type()));
 	}
 
 	default String persistencePropertyType(final Property property)
 	{
-		return property.optional() ? "Optional<" + persistenceResolvedType(property.baseType()) + ">" :
-				persistenceResolvedType(property.type());
+		return property.optional() ? "Optional<" + boxedType(persistenceResolvedType(property.baseType())) + ">" :
+				normalizedGeneratedType(persistenceResolvedType(property.type()));
 	}
 
 	default String persistenceBuilderPropertyType(final Property property)
 	{
-		return property.optional() ? "Optional<" + persistenceResolvedType(property.baseType()) + ">" :
-				persistenceResolvedType(property.type());
+		return property.optional() ? "Optional<" + boxedType(persistenceResolvedType(property.baseType())) + ">" :
+				normalizedGeneratedType(persistenceResolvedType(property.type()));
 	}
 
 	default boolean requiresJpaConverter(final Property property)
@@ -258,8 +303,23 @@ public interface TemplateModel
 
 	default String apiPropertyType(final Property property)
 	{
-		return property.optional() ? "Optional<" + apiResolvedType(property.baseType()) + ">" :
-				apiResolvedType(property.type());
+		return property.optional() ? "Optional<" + boxedType(apiResolvedType(property.baseType())) + ">" :
+				normalizedGeneratedType(apiResolvedType(property.type()));
+	}
+
+	default String boxedDomainResolvedType(final String declaredType)
+	{
+		return boxedType(domainResolvedType(declaredType));
+	}
+
+	default String boxedPersistenceResolvedType(final String declaredType)
+	{
+		return boxedType(persistenceResolvedType(declaredType));
+	}
+
+	default String boxedApiResolvedType(final String declaredType)
+	{
+		return boxedType(apiResolvedType(declaredType));
 	}
 
 	default boolean apiAndDomainTypesDiffer(final String genericType)
@@ -295,6 +355,62 @@ public interface TemplateModel
 	default String apiConcreteTypeAt(final int index)
 	{
 		return concreteTypeAt(apiConcreteTypes(), index);
+	}
+
+	private String normalizedGeneratedType(final String declaredType)
+	{
+		StringBuilder normalized = new StringBuilder();
+		StringBuilder token = new StringBuilder();
+		int genericDepth = 0;
+		for (int index = 0; index < declaredType.length(); index++)
+		{
+			char character = declaredType.charAt(index);
+			if (Character.isJavaIdentifierPart(character) || character == '.')
+			{
+				token.append(character);
+				continue;
+			}
+			appendNormalizedToken(normalized, token, genericDepth > 0);
+			normalized.append(character);
+			if (character == '<')
+			{
+				genericDepth++;
+			}
+			else if (character == '>')
+			{
+				genericDepth--;
+			}
+		}
+		appendNormalizedToken(normalized, token, genericDepth > 0);
+		return normalized.toString();
+	}
+
+	private void appendNormalizedToken(final StringBuilder normalized, final StringBuilder token,
+	                                   final boolean boxPrimitive)
+	{
+		if (token.isEmpty())
+		{
+			return;
+		}
+		String value = token.toString();
+		normalized.append(boxPrimitive ? boxedType(value) : value);
+		token.setLength(0);
+	}
+
+	private String boxedType(final String declaredType)
+	{
+		return switch (declaredType)
+		{
+			case "byte" -> "Byte";
+			case "short" -> "Short";
+			case "int" -> "Integer";
+			case "long" -> "Long";
+			case "float" -> "Float";
+			case "double" -> "Double";
+			case "boolean" -> "Boolean";
+			case "char" -> "Character";
+			default -> declaredType;
+		};
 	}
 
 	private String concreteTypeAt(final Map<String, String> concreteTypes, final int index)

@@ -15,7 +15,8 @@ record TemplateModelImpl(
 		Map<String, String> persistenceConcreteTypes,
 		Map<String, String> apiConcreteTypes,
 		Set<String> domainGenericImports,
-		boolean historized
+		boolean historized,
+		java.util.List<GeneratedRelationship> relationships
 )
 		implements TemplateModel
 {

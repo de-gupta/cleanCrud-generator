@@ -6,6 +6,7 @@ import de.gupta.clean.crud.generator.code.generation.orchestration.configuration
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteResolver;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OwnershipResolver;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.GeneratedRelationship;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModelFactory;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateSelector;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 {
 	private static final Set<String> DEFAULT_TEMPLATE_GROUPS = Set.of(
+			TemplateGroup.COMMON.name(),
 			TemplateGroup.CONFIGURATION.name(),
 			TemplateGroup.DOMAIN_MODELS.name(),
 			TemplateGroup.DOMAIN_SUPPORT.name(),
@@ -64,15 +66,65 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	private final DomainModelParser modelParser;
 	private final SourceCodeTemplateProcessor templateProcessor;
 	private final SourceCodeFileWriter sourceCodeFileWriter;
+	private final RelationshipGenerationConfigurationValidator relationshipConfigurationValidator;
 
 	@Override
 	public int generateCode(final CodeGenerationConfiguration configuration)
 	{
 		var model = modelParser.parseDomainModel(configuration.inputs().baseModelSourceCodeFilePath());
+		relationshipConfigurationValidator.validate(model, configuration.relationships());
+		var relationships = configuration.relationships().stream()
+		                                 .map(relationship -> model.properties()
+		                                                           .stream()
+		                                                           .filter(property -> property.name().equals(
+																		   relationship.masterProperty()))
+		                                                           .findFirst()
+		                                                           .map(property ->
+																   {
+																	   var normalizedRelationship =
+																			   relationship.normalized();
+																	   var effectiveCardinality =
+																			   normalizedRelationship.cardinality() == null
+																					   ? property.collectionValued() ?
+																						 "MANY" : "ONE"
+																					   :
+																					   normalizedRelationship.cardinality()
+							                                                                                 .name();
+																	   var effectiveReconciliationStrategy =
+																			   normalizedRelationship.reconciliationStrategy() == null
+																					   ? "ONE".equals(
+																					   effectiveCardinality)
+																						 ? "REPLACE"
+																						 : "MERGE_BY_ID"
+																					   :
+																					   normalizedRelationship.reconciliationStrategy()
+							                                                                                 .name();
+																	   return new GeneratedRelationship(
+																			   property,
+																			   model.modelName().endsWith("Model")
+																					   ? model.modelName().substring(
+																					   0,
+																					   model.modelName()
+							                                                                .length() - "Model".length())
+																					   : model.modelName(),
+																			   normalizedRelationship.satelliteAggregate(),
+																			   effectiveCardinality,
+																			   effectiveReconciliationStrategy,
+																			   normalizedRelationship.satelliteDomainIdType(),
+																			   normalizedRelationship.cascadeCreate(),
+																			   normalizedRelationship.cascadeUpdate(),
+																			   normalizedRelationship.cascadeDelete(),
+																			   normalizedRelationship.orphanDelete(),
+																			   normalizedRelationship.hydrateOnFetch(),
+																			   normalizedRelationship.generateNestedCreate(),
+																			   normalizedRelationship.generateNestedUpdate());
+																   })
+		                                                           .orElseThrow())
+		                                 .toList();
 		var templateModel = TemplateModelFactory.create(model.packageName(), model.modelName(),
 				model.genericTypeParameters(), model.properties(), configuration.genericTypes().domain(),
 				configuration.genericTypes().persistence(), configuration.genericTypes().api(), Set.of(),
-				configuration.historized());
+				configuration.historized(), relationships);
 		var overwriteResolver = OverwriteResolver.with(configuration.overwrite());
 
 		var files = templateProcessor.generateSourceCode(templateModel,
@@ -115,6 +167,7 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	private Set<String> resolveExcludedTemplates(final CodeGenerationConfiguration configuration)
 	{
 		var templates = new java.util.LinkedHashSet<>(configuration.generation().excludeTemplates());
+		applyRelationshipGenerationExclusions(templates, configuration);
 		applyOwnershipExclusions(templates, configuration);
 		return Set.copyOf(templates);
 	}
@@ -127,6 +180,16 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	private Set<String> resolveExcludedTags(final CodeGenerationConfiguration configuration)
 	{
 		return configuration.generation().excludeTags();
+	}
+
+	private void applyRelationshipGenerationExclusions(
+			final java.util.Set<String> templates,
+			final CodeGenerationConfiguration configuration)
+	{
+		if (configuration.relationships().isEmpty())
+		{
+			templates.add("CrudRelationshipConfiguration");
+		}
 	}
 
 	private void applyOwnershipExclusions(
@@ -204,10 +267,12 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	CodeGenerationOrchestratorImpl(
 			final DomainModelParser modelParser,
 			final SourceCodeTemplateProcessor templateProcessor,
-			final SourceCodeFileWriter sourceCodeFileWriter)
+			final SourceCodeFileWriter sourceCodeFileWriter,
+			final RelationshipGenerationConfigurationValidator relationshipConfigurationValidator)
 	{
 		this.modelParser = modelParser;
 		this.templateProcessor = templateProcessor;
 		this.sourceCodeFileWriter = sourceCodeFileWriter;
+		this.relationshipConfigurationValidator = relationshipConfigurationValidator;
 	}
 }

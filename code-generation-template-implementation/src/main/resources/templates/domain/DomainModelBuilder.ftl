@@ -7,6 +7,9 @@ import de.gupta.clean.crud.template.domain.mapping.save.DomainModelBuilder;
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilderFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+
 @Component
 final class ${modelBaseName()}DomainModelBuilder implements DomainModelBuilder${"<"}${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModel${">"}
 {
@@ -16,8 +19,17 @@ private final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBas
 public ${modelBaseName()}DomainModel toModel(final ${modelBaseName()}DomainModelCreate domainModelCreate)
 {
 return modelBuilderFactory.builder()
-<#list properties() as property>
+<#list standaloneProperties() as property>
 .with${property.capitalizedName()}(domainModelCreate.${property.getter()}())
+</#list>
+<#list relationships() as relationship>
+	<#if relationship.many()>
+.with${relationship.propertyCapitalizedName()}(List.of())
+	<#elseif relationship.optional()>
+.with${relationship.propertyCapitalizedName()}(Optional.empty())
+	<#else>
+.with${relationship.propertyCapitalizedName()}(null)
+	</#if>
 </#list>
 .build();
 }

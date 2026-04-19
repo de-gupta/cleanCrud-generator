@@ -39,12 +39,27 @@ final class ${modelBaseName()}APIToDomainUpdateAdapter
 	public ${modelBaseName()}DomainModelUpdatePatch mapToDomainModelUpdatePatch(final ${modelBaseName()}APIModelUpdatePatch apiModel)
 	{
 		return new ${modelBaseName()}DomainModelUpdatePatch(
-<#list properties() as property>
+<#list standaloneProperties() as property>
 <#if apiAndDomainTypesDiffer(property.baseType())>
-			apiModel.${property.name()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next>,</#if>
+			apiModel.${property.name()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next || relationships()?has_content>,</#if>
 <#else>
-			apiModel.${property.name()}()<#if property_has_next>,</#if>
+			apiModel.${property.name()}()<#if property_has_next || relationships()?has_content>,</#if>
 </#if>
+</#list>
+<#list relationships() as relationship>
+			<#if relationship.many()>
+			apiModel.${relationship.propertyName()}().map(items -> items.stream()
+			                                                      .map(item -> new ${modelBaseName()}DomainModelUpdatePatch.${relationship.domainUpdatePatchItemSimpleType()}(
+					                                                      item.id(),
+					                                                      item.patch()))
+			                                                      .toList()),
+			apiModel.${relationship.removeFieldName()}()<#if relationship_has_next>,</#if>
+			<#else>
+			apiModel.${relationship.propertyName()}().map(item -> new ${modelBaseName()}DomainModelUpdatePatch.${relationship.domainUpdatePatchItemSimpleType()}(
+					item.id(),
+					item.patch())),
+			apiModel.${relationship.removeFieldName()}()<#if relationship_has_next>,</#if>
+			</#if>
 </#list>
 		);
 	}

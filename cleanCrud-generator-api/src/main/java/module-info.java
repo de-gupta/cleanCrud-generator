@@ -1,6 +1,7 @@
 module cleanCrud.generator.api
 {
 	requires code.generation.orchestration;
+	requires code.generation.template.implementation;
 
 	requires info.picocli;
 	requires spring.context;

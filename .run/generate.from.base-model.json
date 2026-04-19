@@ -36,7 +36,8 @@
       "USE_CASE_DELETE"
     ]
   },
-  "ownership": {},
+  "ownership": {
+  },
   "overwrite": {
     "defaultOverwrite": true
   },

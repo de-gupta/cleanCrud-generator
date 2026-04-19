@@ -6,7 +6,6 @@ import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}Persi
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDAdapter;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.model.DomainPersistenceModelAdapter;
-import de.gupta.clean.crud.template.infrastructure.persistence.transaction.PersistenceTransactionRunner;
 import de.gupta.clean.crud.template.useCases.crud.fetch.infrastructure.persistence.service.FetchPersistenceModelRepository;
 import de.gupta.clean.crud.template.useCases.crud.save.infrastructure.persistence.service.SavePersistenceModelRepository;
 import de.gupta.clean.crud.template.useCases.crud.update.application.service.UpdatePersistenceService;
@@ -28,10 +27,8 @@ final class ${modelBaseName()}UpdatePersistenceService
 			final UpdatePersistenceModelRepository<${modelBaseName()}PersistenceModel> updateRepository,
 			final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter,
 			@Qualifier("${beanNamePrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
-			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement,
-			final PersistenceTransactionRunner transactionRunner)
+			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement)
 	{
-		super(fetchRepository, saveRepository, updateRepository, modelAdapter, idAdapter, idManagement,
-				transactionRunner);
+		super(fetchRepository, saveRepository, updateRepository, modelAdapter, idAdapter, idManagement);
 	}
 }
