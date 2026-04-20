@@ -3,6 +3,7 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.configuratio
 public record RelationshipGenerationConfiguration(
 		String masterProperty,
 		String satelliteAggregate,
+		RelationshipKind relationshipKind,
 		RelationshipCardinality cardinality,
 		RelationshipReconciliationStrategy reconciliationStrategy,
 		String satelliteApiIdType,
@@ -17,10 +18,12 @@ public record RelationshipGenerationConfiguration(
 {
 	public RelationshipGenerationConfiguration normalized()
 	{
+		RelationshipKind normalizedRelationshipKind = relationshipKind;
 		RelationshipCardinality normalizedCardinality = cardinality;
 		return new RelationshipGenerationConfiguration(
 				normalize(masterProperty),
 				normalizeAggregateName(satelliteAggregate),
+				normalizedRelationshipKind,
 				normalizedCardinality,
 				reconciliationStrategy == null && normalizedCardinality == RelationshipCardinality.ONE
 						? RelationshipReconciliationStrategy.REPLACE
@@ -28,7 +31,9 @@ public record RelationshipGenerationConfiguration(
 						  ? RelationshipReconciliationStrategy.MERGE_BY_ID
 						  : reconciliationStrategy,
 				normalize(satelliteApiIdType),
-				cascadeCreate == null || cascadeCreate,
+				cascadeCreate != null
+						? cascadeCreate
+						: normalizedRelationshipKind == RelationshipKind.OWNED,
 				cascadeUpdate == null || cascadeUpdate,
 				cascadeDelete != null && cascadeDelete,
 				orphanDelete != null && orphanDelete,

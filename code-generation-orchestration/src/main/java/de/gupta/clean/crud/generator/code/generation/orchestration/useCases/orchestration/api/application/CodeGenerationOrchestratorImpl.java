@@ -108,6 +108,8 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 							                                                                .length() - "Model".length())
 																					   : model.modelName(),
 																			   normalizedRelationship.satelliteAggregate(),
+																			   normalizedRelationship.relationshipKind()
+					                                                                                 .name(),
 																			   effectiveCardinality,
 																			   effectiveReconciliationStrategy,
 																			   normalizedRelationship.satelliteApiIdType(),

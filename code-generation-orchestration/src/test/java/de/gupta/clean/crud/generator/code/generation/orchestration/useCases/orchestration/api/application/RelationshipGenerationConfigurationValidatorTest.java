@@ -4,6 +4,7 @@ import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Mode
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipCardinality;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipKind;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipReconciliationStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RelationshipGenerationConfigurationValidatorTest
 {
@@ -35,6 +35,7 @@ class RelationshipGenerationConfigurationValidatorTest
 		assertDoesNotThrow(() -> validator.validate(model, List.of(new RelationshipGenerationConfiguration(
 				"version",
 				"Version",
+				RelationshipKind.OWNED,
 				RelationshipCardinality.ONE,
 				RelationshipReconciliationStrategy.REPLACE,
 				"Long",
@@ -65,6 +66,36 @@ class RelationshipGenerationConfigurationValidatorTest
 	}
 
 	@Test
+	void rejectsMissingRelationshipKind()
+	{
+		var model = Model.of(
+				"TaskModel",
+				"de.gupta.clean.crud.implementation.examples.task.domain.model",
+				Path.of("src/main/java"),
+				List.of(),
+				Set.of(Property.of(
+						"version",
+						"Optional<VersionAPIModelResponse>",
+						"java.util.Optional<de.gupta.clean.crud.implementation.examples.version.useCases.crud.common.dto.VersionAPIModelResponse>")));
+
+		assertThrows(IllegalArgumentException.class, () -> validator.validate(model, List.of(
+				new RelationshipGenerationConfiguration(
+						"version",
+						"Version",
+						null,
+						RelationshipCardinality.ONE,
+						RelationshipReconciliationStrategy.REPLACE,
+						"Long",
+						true,
+						true,
+						true,
+						true,
+						true,
+						true,
+						true))));
+	}
+
+	@Test
 	void rejectsCardinalityMismatch()
 	{
 		var model = Model.of(
@@ -81,6 +112,7 @@ class RelationshipGenerationConfigurationValidatorTest
 				new RelationshipGenerationConfiguration(
 						"notes",
 						"Note",
+						RelationshipKind.OWNED,
 						RelationshipCardinality.ONE,
 						RelationshipReconciliationStrategy.REPLACE,
 						"Long",
@@ -111,6 +143,7 @@ class RelationshipGenerationConfigurationValidatorTest
 				new RelationshipGenerationConfiguration(
 						"version",
 						"Version",
+						RelationshipKind.OWNED,
 						RelationshipCardinality.ONE,
 						RelationshipReconciliationStrategy.MERGE_BY_ID,
 						"Long",
@@ -122,5 +155,32 @@ class RelationshipGenerationConfigurationValidatorTest
 						true,
 						true
 				))));
+	}
+
+	@Test
+	void normalizesReferencedDefaults()
+	{
+		var normalized = new RelationshipGenerationConfiguration(
+				"organisation",
+				"Organisation",
+				RelationshipKind.REFERENCED,
+				RelationshipCardinality.ONE,
+				null,
+				"Long",
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null)
+				.normalized();
+
+		assertEquals(RelationshipReconciliationStrategy.REPLACE, normalized.reconciliationStrategy());
+		assertFalse(normalized.cascadeCreate());
+		assertTrue(normalized.cascadeUpdate());
+		assertFalse(normalized.cascadeDelete());
+		assertFalse(normalized.orphanDelete());
+		assertTrue(normalized.hydrateOnFetch());
 	}
 }

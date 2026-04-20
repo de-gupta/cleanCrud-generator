@@ -18,6 +18,7 @@
   },
   "generation": {
     "groups": [
+      "COMMON",
       "CONFIGURATION",
       "DOMAIN_MODELS",
       "DOMAIN_SUPPORT",
@@ -35,10 +36,33 @@
       "USE_CASE_DELETE"
     ]
   },
-  "ownership": {
-  },
+  "relationships": [
+    {
+      "masterProperty": "notes",
+      "satelliteAggregate": "Note",
+      "cardinality": "MANY",
+      "reconciliationStrategy": "MERGE_BY_ID",
+      "satelliteApiIdType": "Long"
+    },
+    {
+      "masterProperty": "currentVersion",
+      "satelliteAggregate": "Version",
+      "cardinality": "ONE",
+      "reconciliationStrategy": "REPLACE",
+      "satelliteApiIdType": "Long"
+    },
+    {
+      "masterProperty": "lastKnownVersion",
+      "satelliteAggregate": "Version",
+      "cardinality": "ONE",
+      "reconciliationStrategy": "REPLACE",
+      "satelliteApiIdType": "Long"
+    }
+  ],
+  "ownership": {},
   "overwrite": {
     "defaultOverwrite": true
   },
   "historized": true
 }
+

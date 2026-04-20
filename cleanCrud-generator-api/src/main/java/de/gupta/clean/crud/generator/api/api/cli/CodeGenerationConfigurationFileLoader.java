@@ -273,6 +273,7 @@ final class CodeGenerationConfigurationFileLoader
 			relationships.add(new RelationshipGenerationConfiguration(
 					properties.getProperty(prefix + "masterProperty"),
 					properties.getProperty(prefix + "satelliteAggregate"),
+					parseEnum(properties.getProperty(prefix + "relationshipKind"), RelationshipKind.class),
 					parseEnum(properties.getProperty(prefix + "cardinality"), RelationshipCardinality.class),
 					parseEnum(properties.getProperty(prefix + "reconciliationStrategy"),
 							RelationshipReconciliationStrategy.class),

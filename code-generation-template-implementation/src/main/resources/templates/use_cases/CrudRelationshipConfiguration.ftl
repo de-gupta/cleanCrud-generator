@@ -40,6 +40,7 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 	LifecycleSemantics ${relationship.relationshipBeanNamePrefix()}LifecycleSemantics()
 	{
 		// TODO: Review the generated lifecycle defaults for `${relationship.propertyName()}` and change them if your ownership semantics differ.
+		// TODO: For REFERENCED relationships, cascadeUpdate means relinking participation during master update, not mutation of the satellite aggregate.
 		return LifecycleSemanticsBuilder.lifecycleSemantics()
 				<#if relationship.cascadeCreate()>.cascadeCreate()
 				</#if><#if relationship.cascadeUpdate()>.cascadeUpdate()
@@ -54,15 +55,20 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 	AggregateRelationshipDefinition<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition(
 			final ModelBuilderFactory<${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder> ${beanNamePrefix()}DomainModelBuilderFactory,
 			@Qualifier("${relationship.relationshipBeanNamePrefix()}LifecycleSemantics") final LifecycleSemantics lifecycleSemantics,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition<#if relationship.owned()>,
 			@Qualifier("${relationship.satelliteQualifierPrefix()}APIToDomainCreateAdapter") final APIToDomainCreateAdapter<${relationship.createType()}, ${relationship.domainCreateType()}> ${relationship.relationshipVariablePrefix()}APIToDomainCreateAdapter,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}APIToDomainUpdateAdapter") final APIToDomainUpdateAdapter<${relationship.updatePatchType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}APIToDomainUpdateAdapter") final APIToDomainUpdateAdapter<${relationship.updatePatchType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter</#if>,
 			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainToAPIResponseAdapter") final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter)
 	{
 		// TODO: Review reconciliation and lifecycle semantics for `${relationship.propertyName()}` before using this generated relationship in production.
+		<#if relationship.referenced()>
+		// TODO: Review whether `${relationship.propertyName()}` should remain reference-only or should become lifecycle-owned.
+		// TODO: Review whether master update should be allowed to relink `${relationship.propertyName()}`.
+		</#if>
 		return AggregateRelationshipDefinitions
-				.<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}, ${relationship.createType()}, ${relationship.updatePatchType()}, ${relationship.responseType()}><#if relationship.many()>oneToManySatellite<#else>oneToOneSatellite</#if>("${relationship.propertyName()}", ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
+				.<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}<#if relationship.owned()>, ${relationship.createType()}, ${relationship.updatePatchType()}</#if>, ${relationship.responseType()}>${relationship.builderMethodName()}("${relationship.propertyName()}", ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
 				.lifecycleSemantics(lifecycleSemantics)
+				<#if relationship.owned()>
 				.createExtractor(<#if !relationship.generateNestedCreate()>ignored -> <#if relationship.many()>List.of()<#else>Optional.empty()</#if><#elseif relationship.many()>${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#elseif relationship.optional()>${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
 				.createMapper(${relationship.relationshipVariablePrefix()}APIToDomainCreateAdapter::mapToDomainModelCreate)
 				.patchExtractor(<#if relationship.many()><#if relationship.generateNestedUpdate()>${beanNamePrefix()}DomainModelUpdatePatch -> ${beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of())<#else>ignored -> List.of()</#if><#else><#if relationship.generateNestedUpdate()>${beanNamePrefix()}DomainModelUpdatePatch -> ${beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().map(${relationship.propertyName()} ->
@@ -75,6 +81,15 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 				}).orElse(Optional.empty())<#else>ignored -> Optional.empty()</#if></#if>)
 				.patchMapper(${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter::mapToDomainModelUpdatePatch)
 				.patchCreateMapper(${relationship.updatePatchType()?uncap_first} -> ${relationship.domainCreateType()}.fromUpdatePatch(${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter.mapToDomainModelUpdatePatch(${relationship.updatePatchType()?uncap_first})))
+				<#else>
+				<#if relationship.many()>
+				.createReferenceIdsExtractor(${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())
+				.patchReferenceIdsExtractor(${beanNamePrefix()}DomainModelUpdatePatch -> ${beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of()))
+				<#else>
+				.createReferenceIdExtractor(<#if relationship.optional()>${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
+				.patchReferenceIdExtractor(${modelBaseName()}DomainModelUpdatePatch::${relationship.propertyName()})
+				</#if>
+				</#if>
 				.removeIdExtractor(${modelBaseName()}DomainModelUpdatePatch::${relationship.removeFieldName()})
 				<#if relationship.many()>
 				.currentSatellites(${modelBaseName()}DomainModel::${relationship.propertyName()})
@@ -118,8 +133,3 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 				.build();
 	}
 }
-
-
-
-
-

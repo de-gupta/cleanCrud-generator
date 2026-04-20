@@ -38,25 +38,12 @@
   },
   "relationships": [
     {
-      "masterProperty": "notes",
-      "satelliteAggregate": "Note",
-      "cardinality": "MANY",
-      "reconciliationStrategy": "MERGE_BY_ID",
-      "satelliteApiIdType": "Long"
-    },
-    {
-      "masterProperty": "currentVersion",
-      "satelliteAggregate": "Version",
+      "masterProperty": "organization",
+      "satelliteAggregate": "Organization",
       "cardinality": "ONE",
       "reconciliationStrategy": "REPLACE",
-      "satelliteApiIdType": "Long"
-    },
-    {
-      "masterProperty": "lastKnownVersion",
-      "satelliteAggregate": "Version",
-      "cardinality": "ONE",
-      "reconciliationStrategy": "REPLACE",
-      "satelliteApiIdType": "Long"
+      "satelliteApiIdType": "Long",
+      "relationshipKind": "REFERENCED"
     }
   ],
   "ownership": {},
@@ -65,4 +52,3 @@
   },
   "historized": true
 }
-

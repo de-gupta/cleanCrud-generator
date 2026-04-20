@@ -36,7 +36,7 @@ final class RelationshipGenerationConfigurationValidator
 				 throw new IllegalArgumentException(
 						 "Property `" + property.name() + "` on model `" + model.modelName() +
 								 "` looks like a relationship candidate (`" + property.candidateAggregateType() +
-								 "`), but no explicit relationship configuration was provided. Relationship generation requires satelliteApiIdType and lifecycle configuration.");
+								 "`), but no explicit relationship configuration was provided. Relationship generation requires relationshipKind and satelliteApiIdType.");
 			 });
 
 		for (RelationshipGenerationConfiguration relationship : relationships)
@@ -76,6 +76,11 @@ final class RelationshipGenerationConfigurationValidator
 						"Relationship `" + relationship.masterProperty() + "` declares satellite aggregate `" +
 								relationship.satelliteAggregate() + "` but the property type implies `" +
 								property.candidateAggregateType() + "`");
+			}
+			if (relationship.relationshipKind() == null)
+			{
+				throw new IllegalArgumentException(
+						"Relationship `" + relationship.masterProperty() + "` must declare a relationshipKind");
 			}
 			if (relationship.satelliteApiIdType() == null || relationship.satelliteApiIdType().isBlank())
 			{

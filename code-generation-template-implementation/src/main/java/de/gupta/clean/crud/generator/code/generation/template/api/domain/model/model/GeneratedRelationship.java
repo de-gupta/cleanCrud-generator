@@ -6,6 +6,7 @@ public record GeneratedRelationship(
 		Property property,
 		String masterAggregate,
 		String satelliteAggregate,
+		String relationshipKind,
 		String cardinality,
 		String reconciliationStrategy,
 		String satelliteApiIdType,
@@ -46,6 +47,16 @@ public record GeneratedRelationship(
 	public boolean one()
 	{
 		return "ONE".equals(cardinality);
+	}
+
+	public boolean owned()
+	{
+		return "OWNED".equals(relationshipKind);
+	}
+
+	public boolean referenced()
+	{
+		return "REFERENCED".equals(relationshipKind);
 	}
 
 	public boolean optional()
@@ -155,6 +166,12 @@ public record GeneratedRelationship(
 
 	public String createFieldType()
 	{
+		if (referenced())
+		{
+			return many()
+					? "Collection<" + satelliteApiIdType + ">"
+					: optional() ? "Optional<" + satelliteApiIdType + ">" : satelliteApiIdType;
+		}
 		return many()
 				? "Collection<" + createType() + ">"
 				: optional() ? "Optional<" + createType() + ">" : createType();
@@ -162,11 +179,19 @@ public record GeneratedRelationship(
 
 	public String apiUpdateFieldType()
 	{
+		if (referenced())
+		{
+			return many() ? "Optional<Collection<" + satelliteApiIdType + ">>" : "Optional<" + satelliteApiIdType + ">";
+		}
 		return "Optional<Collection<SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>";
 	}
 
 	public String domainUpdateFieldType()
 	{
+		if (referenced())
+		{
+			return many() ? "Optional<Collection<" + satelliteApiIdType + ">>" : "Optional<" + satelliteApiIdType + ">";
+		}
 		return "Optional<Collection<SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>";
 	}
 
@@ -178,6 +203,15 @@ public record GeneratedRelationship(
 	public String removeFieldType()
 	{
 		return "Collection<" + satelliteApiIdType + ">";
+	}
+
+	public String builderMethodName()
+	{
+		if (referenced())
+		{
+			return many() ? "oneToManyReferencedSatellite" : "oneToOneReferencedSatellite";
+		}
+		return many() ? "oneToManySatellite" : "oneToOneSatellite";
 	}
 
 	private String singularPropertyName()
@@ -193,4 +227,3 @@ public record GeneratedRelationship(
 		return Character.toUpperCase(singularPropertyName.charAt(0)) + singularPropertyName.substring(1);
 	}
 }
-

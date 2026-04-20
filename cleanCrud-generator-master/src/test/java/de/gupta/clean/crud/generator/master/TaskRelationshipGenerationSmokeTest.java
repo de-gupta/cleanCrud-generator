@@ -131,9 +131,7 @@ class TaskRelationshipGenerationSmokeTest
 				new LayerConcreteTypes(Map.of(), Map.of(), Map.of()),
 				GenerationSelection.defaults(),
 				List.of(
-						new RelationshipGenerationConfiguration(
-								"version",
-								"Version",
+						new RelationshipGenerationConfiguration("version", "Version", RelationshipKind.OWNED,
 								RelationshipCardinality.ONE,
 								RelationshipReconciliationStrategy.REPLACE,
 								"Long",
@@ -144,9 +142,7 @@ class TaskRelationshipGenerationSmokeTest
 								true,
 								true,
 								true),
-						new RelationshipGenerationConfiguration(
-								"notes",
-								"Note",
+						new RelationshipGenerationConfiguration("notes", "Note", RelationshipKind.OWNED,
 								RelationshipCardinality.MANY,
 								RelationshipReconciliationStrategy.MERGE_BY_ID,
 								"Long",
