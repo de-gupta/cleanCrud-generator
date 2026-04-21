@@ -13,7 +13,7 @@ mvn clean install
 This builds all modules and produces a runnable jar at:
 
 ```text
-cleanCrud-generator-master\target\cleanCrud-generator-master-0.2.3-SNAPSHOT.jar
+cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar
 ```
 
 ## What The Generator Needs

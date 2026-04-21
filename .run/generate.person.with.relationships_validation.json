@@ -1,0 +1,70 @@
+{
+  "inputs": {
+    "baseModelSourceCodeFilePath": "${CLEANCRUD_BASE_MODEL_FILE}"
+  },
+  "genericTypes": {
+    "domain": {
+      "U": "String",
+      "V": "Integer"
+    },
+    "persistence": {
+      "U": "Integer",
+      "V": "String"
+    },
+    "api": {
+      "U": "String",
+      "V": "Integer"
+    }
+  },
+  "generation": {
+    "groups": [
+      "COMMON",
+      "CONFIGURATION",
+      "DOMAIN_MODELS",
+      "DOMAIN_SUPPORT",
+      "API_DTOS",
+      "API_ADAPTERS",
+      "API_CONTROLLERS",
+      "PERSISTENCE_MODELS",
+      "PERSISTENCE_ADAPTERS",
+      "PERSISTENCE_REPOSITORIES",
+      "PERSISTENCE_HISTORY",
+      "SECURITY",
+      "USE_CASE_FETCH",
+      "USE_CASE_SAVE",
+      "USE_CASE_UPDATE",
+      "USE_CASE_DELETE"
+    ]
+  },
+  "relationships": [
+    {
+      "masterProperty": "notes",
+      "satelliteAggregate": "Note",
+      "cardinality": "MANY",
+      "reconciliationStrategy": "MERGE_BY_ID",
+      "satelliteApiIdType": "Long",
+      "relationshipKind": "OWNED"
+    },
+    {
+      "masterProperty": "currentVersion",
+      "satelliteAggregate": "Version",
+      "cardinality": "ONE",
+      "reconciliationStrategy": "REPLACE",
+      "satelliteApiIdType": "Long",
+      "relationshipKind": "REFERENCED"
+    },
+    {
+      "masterProperty": "lastKnownVersion",
+      "satelliteAggregate": "Version",
+      "cardinality": "ONE",
+      "reconciliationStrategy": "REPLACE",
+      "satelliteApiIdType": "Long",
+      "relationshipKind": "REFERENCED"
+    }
+  ],
+  "ownership": {},
+  "overwrite": {
+    "defaultOverwrite": true
+  },
+  "historized": true
+}
