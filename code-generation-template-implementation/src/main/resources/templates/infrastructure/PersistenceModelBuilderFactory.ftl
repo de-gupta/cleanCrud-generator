@@ -1,17 +1,17 @@
 <#-- Template for generating PersistenceModelBuilderFactory class -->
-package ${basePackage()}.infrastructure.persistence.repository;
+package ${aggregate().basePackage()}.infrastructure.persistence.repository;
 
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilderFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}PersistenceModelBuilderFactory
-implements ModelBuilderFactory${"<"}${modelBaseName()}PersistenceModel, ${modelBaseName()}PersistenceModel.${modelBaseName()}PersistenceModelBuilder${">"}
+final class ${aggregate().baseName()}PersistenceModelBuilderFactory
+implements ModelBuilderFactory${"<"}${aggregate().baseName()}PersistenceModel, ${aggregate().baseName()}PersistenceModel.${aggregate().baseName()}PersistenceModelBuilder${">"}
 {
 @Override
-public ${modelBaseName()}PersistenceModel.${modelBaseName()}PersistenceModelBuilder builder()
+public ${aggregate().baseName()}PersistenceModel.${aggregate().baseName()}PersistenceModelBuilder builder()
 {
-return ${modelBaseName()}PersistenceModelImpl.builder();
+return ${aggregate().baseName()}PersistenceModelImpl.builder();
 }
 }

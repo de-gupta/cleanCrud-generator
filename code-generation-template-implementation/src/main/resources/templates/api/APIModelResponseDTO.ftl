@@ -1,27 +1,27 @@
 <#-- Template for generating APIModelResponse DTO -->
-package ${basePackage()}.useCases.crud.common.dto;
+package ${aggregate().basePackage()}.useCases.crud.common.dto;
 
 import java.util.Optional;
-<#if apiModelImports()?has_content>
-<#list apiModelImports() as import>
+<#if api().imports()?has_content>
+<#list api().imports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
 </#list>
 </#if>
 
-public record ${modelBaseName()}APIModelResponse(
+public record ${aggregate().baseName()}APIModelResponse(
 Long id,
-<#list properties() as property>
-    ${apiPropertyType(property)} ${property.name()}<#if property_has_next>,</#if>
+<#list composition().properties() as property>
+    ${api().propertyType(property)} ${property.name()}<#if property_has_next>,</#if>
 </#list>
 )
 {
-	public static ${modelBaseName()}APIModelResponse of(
-			final long id, <#list properties() as property>
-			final ${apiPropertyType(property)} ${property.name()}<#if property_has_next>, </#if></#list>)
+	public static ${aggregate().baseName()}APIModelResponse of(
+			final long id, <#list composition().properties() as property>
+			final ${api().propertyType(property)} ${property.name()}<#if property_has_next>, </#if></#list>)
 	{
-		return new ${modelBaseName()}APIModelResponse(
-				id, <#list properties() as property>${property.name()}<#if property_has_next>, </#if></#list>);
+		return new ${aggregate().baseName()}APIModelResponse(
+				id, <#list composition().properties() as property>${property.name()}<#if property_has_next>, </#if></#list>);
 	}
 }

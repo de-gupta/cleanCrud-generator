@@ -1,9 +1,9 @@
 <#-- Template for generating ExistingDomainModelsSupplier class -->
-package ${basePackage()}.infrastructure.persistence.service;
+package ${aggregate().basePackage()}.infrastructure.persistence.service;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}JpaRepository;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}JpaRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.model.DomainPersistenceModelAdapter;
 import org.springframework.stereotype.Component;
 
@@ -11,14 +11,14 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 @Component
-final class ${modelBaseName()}ExistingDomainModelsSupplier
-		implements Supplier<Collection<${modelBaseName()}DomainModel>>
+final class ${aggregate().baseName()}ExistingDomainModelsSupplier
+		implements Supplier<Collection<${aggregate().baseName()}DomainModel>>
 {
-	private final ${modelBaseName()}JpaRepository repository;
-	private final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter;
+	private final ${aggregate().baseName()}JpaRepository repository;
+	private final DomainPersistenceModelAdapter<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}PersistenceModel> modelAdapter;
 
 	@Override
-	public Collection<${modelBaseName()}DomainModel> get()
+	public Collection<${aggregate().baseName()}DomainModel> get()
 	{
 		return repository.findAll()
 						 .stream()
@@ -26,9 +26,9 @@ final class ${modelBaseName()}ExistingDomainModelsSupplier
 						 .toList();
 	}
 
-	${modelBaseName()}ExistingDomainModelsSupplier(
-			final ${modelBaseName()}JpaRepository repository,
-			final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter)
+	${aggregate().baseName()}ExistingDomainModelsSupplier(
+			final ${aggregate().baseName()}JpaRepository repository,
+			final DomainPersistenceModelAdapter<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}PersistenceModel> modelAdapter)
 	{
 		this.repository = repository;
 		this.modelAdapter = modelAdapter;

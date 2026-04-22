@@ -1,20 +1,20 @@
 <#-- Template for generating SaveApplicationController class -->
-package ${basePackage()}.useCases.crud.save.api.application;
+package ${aggregate().basePackage()}.useCases.crud.save.api.application;
 
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelCreate;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelCreate;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
 import de.gupta.clean.crud.template.useCases.crud.save.api.application.AbstractSaveApplicationController;
 import de.gupta.clean.crud.template.useCases.crud.save.api.application.SaveApplicationController;
 import de.gupta.clean.crud.template.useCases.crud.save.facade.SaveServiceFacade;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}SaveApplicationController extends
-		AbstractSaveApplicationController${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse${">"}
-		implements SaveApplicationController${"<"}${modelBaseName()}APIModelCreate,
-		${modelBaseName()}APIModelResponse${">"}
+final class ${aggregate().baseName()}SaveApplicationController extends
+		AbstractSaveApplicationController${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelResponse${">"}
+		implements SaveApplicationController${"<"}${aggregate().baseName()}APIModelCreate,
+		${aggregate().baseName()}APIModelResponse${">"}
 {
-	${modelBaseName()}SaveApplicationController(final SaveServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse${">"} service)
+	${aggregate().baseName()}SaveApplicationController(final SaveServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelResponse${">"} service)
 	{
 		super(service);
 	}

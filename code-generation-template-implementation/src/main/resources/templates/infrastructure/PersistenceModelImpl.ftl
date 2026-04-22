@@ -1,10 +1,10 @@
 <#-- Template for generating PersistenceModelImpl class -->
-package ${basePackage()}.infrastructure.persistence.repository;
+package ${aggregate().basePackage()}.infrastructure.persistence.repository;
 
-<#if jpaConverterProperties()?has_content>
-import ${basePackage()}.infrastructure.persistence.converter.${persistenceJpaConvertersTypeName()};
+<#if persistence().converterProperties()?has_content>
+import ${aggregate().basePackage()}.infrastructure.persistence.converter.${persistence().jpaConvertersTypeName()};
 </#if>
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
 import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-<#if persistenceModelImports()?has_content>
-<#list persistenceModelImports() as import>
+<#if persistence().imports()?has_content>
+<#list persistence().imports() as import>
 <#if import != "java.util.Optional" && import != "java.util.UUID" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>
@@ -23,58 +23,58 @@ import ${import};
 </#if>
 
 @Entity
-@Table(name = "${persistenceModelTableName()}")
-public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()}PersistenceModel
+@Table(name = "${persistence().modelTableName()}")
+public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregate().baseName()}PersistenceModel
 {
 	@Id
 	@GeneratedValue
 	private UUID id;
 
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 	<#if !property.optional()>
 	@NotNull
 	<#if property.isEnum()>
 	@Enumerated(EnumType.STRING)
 	</#if>
-	<#if requiresJpaConverter(property)>
-	@Convert(converter = ${persistenceJpaConvertersTypeName()}.${jpaConverterNestedClassName(property)}.class)
-	@Column(name = "${sqlColumnName(property)}", nullable = false, columnDefinition = "TEXT")
+	<#if persistence().requiresJpaConverter(property)>
+	@Convert(converter = ${persistence().jpaConvertersTypeName()}.${persistence().converterNestedClassName(property)}.class)
+	@Column(name = "${persistence().sqlColumnName(property)}", nullable = false, columnDefinition = "TEXT")
 	<#else>
-	@Column(name = "${sqlColumnName(property)}", nullable = false)
+	@Column(name = "${persistence().sqlColumnName(property)}", nullable = false)
 	</#if>
 	<#else>
 	<#if property.isEnum()>
 	@Enumerated(EnumType.STRING)
 	</#if>
-	<#if requiresJpaConverter(property)>
-	@Convert(converter = ${persistenceJpaConvertersTypeName()}.${jpaConverterNestedClassName(property)}.class)
-	@Column(name = "${sqlColumnName(property)}", columnDefinition = "TEXT")
+	<#if persistence().requiresJpaConverter(property)>
+	@Convert(converter = ${persistence().jpaConvertersTypeName()}.${persistence().converterNestedClassName(property)}.class)
+	@Column(name = "${persistence().sqlColumnName(property)}", columnDefinition = "TEXT")
 	<#else>
-	@Column(name = "${sqlColumnName(property)}"<#if property.type() == "String">, columnDefinition = "TEXT"</#if>)
+	@Column(name = "${persistence().sqlColumnName(property)}"<#if property.type() == "String">, columnDefinition = "TEXT"</#if>)
 	</#if>
 	</#if>
-	private ${persistenceResolvedType(property.baseType())} ${property.name()};
+	private ${persistence().resolvedType(property.baseType())} ${property.name()};
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 	<#if relationship.many()>
 	@ElementCollection
-	@CollectionTable(name = "${persistenceModelTableName()}_${relationship.persistenceIdPropertyName()?lower_case}", joinColumns = @JoinColumn(name = "${modelBaseName()?lower_case}_id"))
-	@Column(name = "${sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
+	@CollectionTable(name = "${persistence().modelTableName()}_${relationship.persistenceIdPropertyName()?lower_case}", joinColumns = @JoinColumn(name = "${aggregate().baseName()?lower_case}_id"))
+	@Column(name = "${persistence().sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
 	private Collection<${relationship.satelliteApiIdType()}> ${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>();
 	<#else>
-	@Column(name = "${sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
+	@Column(name = "${persistence().sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
 	private ${relationship.satelliteApiIdType()} ${relationship.persistenceIdPropertyName()};
 	</#if>
 </#list>
 
-	static ${modelBaseName()}PersistenceModelBuilder builder()
+	static ${aggregate().baseName()}PersistenceModelBuilder builder()
 	{
-		return new ${modelBaseName()}PersistenceModelBuilderImpl();
+		return new ${aggregate().baseName()}PersistenceModelBuilderImpl();
 	}
 
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 	@Override
-	public ${persistencePropertyType(property)} ${property.getter()}()
+	public ${persistence().propertyType(property)} ${property.getter()}()
 	{
 	<#if property.optional()>
 		return Optional.ofNullable(${property.name()});
@@ -84,14 +84,14 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	}
 
 	@Override
-	public void set${property.capitalizedName()}(final ${persistenceResolvedType(property.baseType())} ${property.name()})
+	public void set${property.capitalizedName()}(final ${persistence().resolvedType(property.baseType())} ${property.name()})
 	{
 		this.${property.name()} = ${property.name()};
 		this.validate();
 	}
 
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 	@Override
 	public ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()}()
 	{
@@ -132,22 +132,22 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 	@Override
 	public boolean equals(final Object o)
 	{
-		if (!(o instanceof final ${modelBaseName()}PersistenceModelImpl that)) return false;
+		if (!(o instanceof final ${aggregate().baseName()}PersistenceModelImpl that)) return false;
 		return this == that || Objects.equals(id, that.id);
 	}
 
-	protected ${modelBaseName()}PersistenceModelImpl()
+	protected ${aggregate().baseName()}PersistenceModelImpl()
 	{
 	}
 
-	private static final class ${modelBaseName()}PersistenceModelBuilderImpl extends AbstractModelBuilder<${modelBaseName()}PersistenceModel>
-			implements ${modelBaseName()}PersistenceModelBuilder
+	private static final class ${aggregate().baseName()}PersistenceModelBuilderImpl extends AbstractModelBuilder<${aggregate().baseName()}PersistenceModel>
+			implements ${aggregate().baseName()}PersistenceModelBuilder
 	{
-		private final ${modelBaseName()}PersistenceModelImpl model;
+		private final ${aggregate().baseName()}PersistenceModelImpl model;
 
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 		@Override
-		public ${modelBaseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistenceBuilderPropertyType(property)} ${property.name()})
+		public ${aggregate().baseName()}PersistenceModelBuilder with${property.capitalizedName()}(final ${persistence().builderPropertyType(property)} ${property.name()})
 		{
 			<#if property.optional()>
 			model.${property.name()} = ${property.name()}.orElse(null);
@@ -158,9 +158,9 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 		}
 
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 		@Override
-		public ${modelBaseName()}PersistenceModelBuilder with${relationship.propertyCapitalizedName()}Id(final ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()})
+		public ${aggregate().baseName()}PersistenceModelBuilder with${relationship.propertyCapitalizedName()}Id(final ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()})
 		{
 			<#if relationship.many()>
 			model.${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>(${relationship.persistenceIdPropertyName()});
@@ -174,14 +174,14 @@ public class ${modelBaseName()}PersistenceModelImpl implements ${modelBaseName()
 
 </#list>
 		@Override
-		protected ${modelBaseName()}PersistenceModel doBuild()
+		protected ${aggregate().baseName()}PersistenceModel doBuild()
 		{
 			return model;
 		}
 
-		private ${modelBaseName()}PersistenceModelBuilderImpl()
+		private ${aggregate().baseName()}PersistenceModelBuilderImpl()
 		{
-			this.model = new ${modelBaseName()}PersistenceModelImpl();
+			this.model = new ${aggregate().baseName()}PersistenceModelImpl();
 		}
 	}
 }

@@ -27,8 +27,21 @@ public final class TemplateModelFactory
 			final boolean historized,
 			final java.util.List<GeneratedRelationship> relationships)
 	{
-		return new TemplateModelImpl(packageName, modelName, genericTypeParameters, properties, domainGenericTypes,
-				persistenceGenericTypes, apiGenericTypes, domainGenericImports, historized, relationships);
+		AggregateDescriptor aggregate = new AggregateDescriptorImpl(packageName, modelName, historized);
+		AggregateComposition composition = new AggregateCompositionImpl(properties, relationships);
+		TemplateTypeBindings types = new TemplateTypeBindingsImpl(
+				genericTypeParameters,
+				domainGenericTypes,
+				persistenceGenericTypes,
+				apiGenericTypes);
+		DomainProjection domain = new DomainProjectionImpl(composition, domainGenericTypes, domainGenericImports);
+		PersistenceProjection persistence = new PersistenceProjectionImpl(
+				aggregate,
+				composition,
+				persistenceGenericTypes,
+				domainGenericImports);
+		ApiProjection api = new ApiProjectionImpl(composition, apiGenericTypes, domainGenericImports);
+		return new TemplateModelImpl(aggregate, composition, domain, persistence, api, types);
 	}
 
 	private TemplateModelFactory()

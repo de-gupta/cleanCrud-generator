@@ -1,5 +1,5 @@
 <#-- Template for generating DomainPersistenceAdapterHistoryModel class -->
-package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
+package ${aggregate().basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
 
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.model.AbstractDomainPersistenceAdapterHistoryModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.model.DomainPersistenceAdapterHistoryModel;
@@ -10,39 +10,39 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "${domainPersistenceAdapterHistoryTableName()}",
+@Table(name = "${persistence().adapterHistoryTableName()}",
 		indexes = {
-				@Index(name = "${modelBaseName()?lower_case}_domain_persistence_history_idx_entity_id", columnList = "entity_id"),
-				@Index(name = "${modelBaseName()?lower_case}_domain_persistence_history_idx_persistence_id", columnList = "persistence_id"),
-				@Index(name = "${modelBaseName()?lower_case}_domain_persistence_history_idx_validity", columnList = "valid_from, valid_to")
+				@Index(name = "${aggregate().baseName()?lower_case}_domain_persistence_history_idx_entity_id", columnList = "entity_id"),
+				@Index(name = "${aggregate().baseName()?lower_case}_domain_persistence_history_idx_persistence_id", columnList = "persistence_id"),
+				@Index(name = "${aggregate().baseName()?lower_case}_domain_persistence_history_idx_validity", columnList = "valid_from, valid_to")
 		})
-public class ${modelBaseName()}DomainPersistenceAdapterHistoryModel
+public class ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel
 		extends AbstractDomainPersistenceAdapterHistoryModel<Long, UUID>
 		implements DomainPersistenceAdapterHistoryModel<Long, UUID>
 {
-	public static DomainPersistenceAdapterHistoryModel.Builder<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterHistoryModel> builder()
+	public static DomainPersistenceAdapterHistoryModel.Builder<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel> builder()
 	{
 		return new Builder();
 	}
 
-	protected ${modelBaseName()}DomainPersistenceAdapterHistoryModel()
+	protected ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel()
 	{
 		super();
 	}
 
-	private static final class Builder extends AbstractBuilder<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterHistoryModel>
-			implements DomainPersistenceAdapterHistoryModel.Builder<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterHistoryModel>,
-			de.gupta.clean.crud.template.domain.model.builder.ModelBuilder<${modelBaseName()}DomainPersistenceAdapterHistoryModel>
+	private static final class Builder extends AbstractBuilder<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel>
+			implements DomainPersistenceAdapterHistoryModel.Builder<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel>,
+			de.gupta.clean.crud.template.domain.model.builder.ModelBuilder<${aggregate().baseName()}DomainPersistenceAdapterHistoryModel>
 	{
 		@Override
-		protected ${modelBaseName()}DomainPersistenceAdapterHistoryModel doBuild()
+		protected ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel doBuild()
 		{
-			return (${modelBaseName()}DomainPersistenceAdapterHistoryModel) model;
+			return (${aggregate().baseName()}DomainPersistenceAdapterHistoryModel) model;
 		}
 
 		private Builder()
 		{
-			super(new ${modelBaseName()}DomainPersistenceAdapterHistoryModel());
+			super(new ${aggregate().baseName()}DomainPersistenceAdapterHistoryModel());
 		}
 	}
 }

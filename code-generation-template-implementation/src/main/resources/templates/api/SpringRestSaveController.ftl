@@ -1,9 +1,9 @@
 <#-- Template for generating SpringRestSaveController class -->
-package ${basePackage()}.useCases.crud.save.api.web;
+package ${aggregate().basePackage()}.useCases.crud.save.api.web;
 
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelCreate;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
-import ${basePackage()}.useCases.crud.common.security.${modelBaseName()}EndpointSecurityPolicy;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelCreate;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
+import ${aggregate().basePackage()}.useCases.crud.common.security.${aggregate().baseName()}EndpointSecurityPolicy;
 import de.gupta.clean.crud.template.useCases.crud.save.api.web.AbstractSpringRestSaveController;
 import de.gupta.clean.crud.template.useCases.crud.save.api.web.SpringRestSaveController;
 import de.gupta.clean.crud.template.useCases.crud.save.facade.SaveServiceFacade;
@@ -12,16 +12,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "${modelBaseName()} Save" , description = "Save Operations pertaining to ${modelBaseName()}")
+@Tag(name = "${aggregate().baseName()} Save" , description = "Save Operations pertaining to ${aggregate().baseName()}")
 @RestController
-@RequestMapping("/${modelBaseName()?lower_case}/save")
-@EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
-class ${modelBaseName()}SpringRestSaveController extends
-		AbstractSpringRestSaveController${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse${">"}
-		implements SpringRestSaveController${"<"}${modelBaseName()}APIModelCreate,
-		${modelBaseName()}APIModelResponse${">"}
+@RequestMapping("/${aggregate().baseName()?lower_case}/save")
+@EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${aggregate().baseName()}EndpointSecurityPolicy.class)
+class ${aggregate().baseName()}SpringRestSaveController extends
+		AbstractSpringRestSaveController${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelResponse${">"}
+		implements SpringRestSaveController${"<"}${aggregate().baseName()}APIModelCreate,
+		${aggregate().baseName()}APIModelResponse${">"}
 {
-	${modelBaseName()}SpringRestSaveController(final SaveServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse${">"} service)
+	${aggregate().baseName()}SpringRestSaveController(final SaveServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelResponse${">"} service)
 	{
 		super(service);
 	}

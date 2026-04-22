@@ -1,5 +1,5 @@
 <#-- Template for generating SpringRestDeleteController class -->
-package ${basePackage()}.useCases.crud.delete.api.application;
+package ${aggregate().basePackage()}.useCases.crud.delete.api.application;
 
 import de.gupta.clean.crud.template.useCases.crud.delete.api.application.AbstractDeleteApplicationController;
 import de.gupta.clean.crud.template.useCases.crud.delete.api.application.DeleteApplicationController;
@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}DeleteApplicationController extends AbstractDeleteApplicationController${"<"}Long${">"}
+final class ${aggregate().baseName()}DeleteApplicationController extends AbstractDeleteApplicationController${"<"}Long${">"}
 		implements DeleteApplicationController${"<"}Long${">"}
 {
-	${modelBaseName()}DeleteApplicationController(
-			@Qualifier("${beanNamePrefix()}DeleteServiceFacade") final DeleteServiceFacade${"<"}Long${">"} service)
+	${aggregate().baseName()}DeleteApplicationController(
+			@Qualifier("${aggregate().beanNamePrefix()}DeleteServiceFacade") final DeleteServiceFacade${"<"}Long${">"} service)
 	{
 		super(service);
 	}

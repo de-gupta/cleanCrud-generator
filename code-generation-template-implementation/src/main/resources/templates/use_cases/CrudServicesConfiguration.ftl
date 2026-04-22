@@ -1,9 +1,9 @@
-package ${basePackage()}.useCases.crud.configuration;
+package ${aggregate().basePackage()}.useCases.crud.configuration;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelCreate;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelResponse;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelUpdatePatch;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelCreate;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelResponse;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelUpdatePatch;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.AggregateCrudDefinition;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.engine.AggregateLifecycleEngine;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.service.AggregateCrudServices;
@@ -16,36 +16,36 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-class ${modelBaseName()}CrudServicesConfiguration
+class ${aggregate().baseName()}CrudServicesConfiguration
 {
 	@Bean
-	SaveService<${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelResponse, Long> ${beanNamePrefix()}SaveService(
-			@Qualifier("${beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse> definition,
+	SaveService<${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelResponse, Long> ${aggregate().beanNamePrefix()}SaveService(
+			@Qualifier("${aggregate().beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse> definition,
 			final AggregateLifecycleEngine aggregateLifecycleEngine)
 	{
 		return AggregateCrudServices.saveService(definition, aggregateLifecycleEngine);
 	}
 
 	@Bean
-	FetchService<${modelBaseName()}DomainModel, Long> ${beanNamePrefix()}FetchService(
-			@Qualifier("${beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse> definition,
+	FetchService<${aggregate().baseName()}DomainModel, Long> ${aggregate().beanNamePrefix()}FetchService(
+			@Qualifier("${aggregate().beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse> definition,
 			final AggregateLifecycleEngine aggregateLifecycleEngine)
 	{
 		return AggregateCrudServices.fetchService(definition, aggregateLifecycleEngine);
 	}
 
 	@Bean
-	UpdateService<${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse, Long> ${beanNamePrefix()}UpdateService(
-			@Qualifier("${beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse> definition,
+	UpdateService<${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse, Long> ${aggregate().beanNamePrefix()}UpdateService(
+			@Qualifier("${aggregate().beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse> definition,
 			final AggregateLifecycleEngine aggregateLifecycleEngine)
 	{
 		return AggregateCrudServices.updateService(definition, aggregateLifecycleEngine);
 	}
 
 	@Bean
-	@Qualifier("${beanNamePrefix()}DeleteService")
-	DeleteService<Long> ${beanNamePrefix()}DeleteService(
-			@Qualifier("${beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse> definition,
+	@Qualifier("${aggregate().beanNamePrefix()}DeleteService")
+	DeleteService<Long> ${aggregate().beanNamePrefix()}DeleteService(
+			@Qualifier("${aggregate().beanNamePrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse> definition,
 			final AggregateLifecycleEngine aggregateLifecycleEngine)
 	{
 		return AggregateCrudServices.deleteService(definition, aggregateLifecycleEngine);

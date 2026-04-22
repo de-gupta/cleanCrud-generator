@@ -1,51 +1,51 @@
 <#-- Template for generating APIModelUpdatePatch DTO -->
-package ${basePackage()}.useCases.crud.common.dto;
+package ${aggregate().basePackage()}.useCases.crud.common.dto;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-<#assign hasOwnedRelationships = relationships()?filter(relationship -> relationship.owned())?size gt 0>
+<#assign hasOwnedRelationships = composition().relationships()?filter(relationship -> relationship.owned())?size gt 0>
 <#if hasOwnedRelationships>
 import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.standard.SatelliteUpdatePatchItem;
 </#if>
-<#if apiModelImports()?has_content>
-<#list apiModelImports() as import>
+<#if api().imports()?has_content>
+<#list api().imports() as import>
 <#if import != "java.util.Optional" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>
 </#list>
 </#if>
 
-public record ${modelBaseName()}APIModelUpdatePatch(
-<#list standaloneProperties() as property>
-    Optional<${boxedApiResolvedType(property.baseType())}> ${property.name()}<#if property_has_next || relationships()?has_content>,</#if>
+public record ${aggregate().baseName()}APIModelUpdatePatch(
+<#list composition().standaloneProperties() as property>
+    Optional<${api().boxedResolvedType(property.baseType())}> ${property.name()}<#if property_has_next || composition().relationships()?has_content>,</#if>
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
     ${relationship.apiUpdateFieldType()} ${relationship.propertyName()},
     ${relationship.removeFieldType()} ${relationship.removeFieldName()}<#if relationship_has_next>,</#if>
 </#list>
 )
 {
-	public static ${modelBaseName()}APIModelUpdatePatch of(
-<#list standaloneProperties() as property>
-		final Optional<${boxedApiResolvedType(property.baseType())}> ${property.name()}<#if property_has_next || relationships()?has_content>,</#if>
+	public static ${aggregate().baseName()}APIModelUpdatePatch of(
+<#list composition().standaloneProperties() as property>
+		final Optional<${api().boxedResolvedType(property.baseType())}> ${property.name()}<#if property_has_next || composition().relationships()?has_content>,</#if>
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 		final ${relationship.apiUpdateFieldType()} ${relationship.propertyName()},
 		final ${relationship.removeFieldType()} ${relationship.removeFieldName()}<#if relationship_has_next>,</#if>
 </#list>
 	)
 	{
-		return new ${modelBaseName()}APIModelUpdatePatch(
-				<#list standaloneProperties() as property>${property.name()}<#if property_has_next || relationships()?has_content>, </#if></#list><#list relationships() as relationship>${relationship.propertyName()}, ${relationship.removeFieldName()}<#if relationship_has_next>, </#if></#list>);
+		return new ${aggregate().baseName()}APIModelUpdatePatch(
+				<#list composition().standaloneProperties() as property>${property.name()}<#if property_has_next || composition().relationships()?has_content>, </#if></#list><#list composition().relationships() as relationship>${relationship.propertyName()}, ${relationship.removeFieldName()}<#if relationship_has_next>, </#if></#list>);
 	}
 
-	public ${modelBaseName()}APIModelUpdatePatch
+	public ${aggregate().baseName()}APIModelUpdatePatch
 	{
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 		${property.name()} = Optional.ofNullable(${property.name()}).orElse(Optional.empty());
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 		<#if relationship.referenced()>
 		${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty())<#if relationship.many()>.map(List::copyOf)</#if>;
 		<#else>

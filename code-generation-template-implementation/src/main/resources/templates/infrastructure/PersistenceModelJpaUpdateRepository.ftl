@@ -1,11 +1,11 @@
 <#-- Template for generating PersistenceModelJpaUpdateRepository class -->
-package ${basePackage()}.useCases.crud.update.infrastructure.persistence.repository;
+package ${aggregate().basePackage()}.useCases.crud.update.infrastructure.persistence.repository;
 
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}JpaRepository;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceHistorySnapshotFactory;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistory;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}JpaRepository;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}PersistenceHistorySnapshotFactory;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}PersistenceModelHistory;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}PersistenceModelImpl;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.repository.TriTemporalHistoryRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
 import de.gupta.clean.crud.template.useCases.crud.update.infrastructure.persistence.repository.AbstractPersistenceModelJpaUpdateRepository;
@@ -16,16 +16,16 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class ${modelBaseName()}PersistenceModelJpaUpdateRepository
-		extends AbstractPersistenceModelJpaUpdateRepository<${modelBaseName()}PersistenceModel, UUID, ${modelBaseName()}PersistenceModelImpl,
-		${modelBaseName()}PersistenceModelHistory>
-		implements UpdatePersistenceModelRepository<${modelBaseName()}PersistenceModel>
+public class ${aggregate().baseName()}PersistenceModelJpaUpdateRepository
+		extends AbstractPersistenceModelJpaUpdateRepository<${aggregate().baseName()}PersistenceModel, UUID, ${aggregate().baseName()}PersistenceModelImpl,
+		${aggregate().baseName()}PersistenceModelHistory>
+		implements UpdatePersistenceModelRepository<${aggregate().baseName()}PersistenceModel>
 {
-	public ${modelBaseName()}PersistenceModelJpaUpdateRepository(
-			final ${modelBaseName()}JpaRepository jpaRepository,
-			final TriTemporalHistoryRepository<UUID, ${modelBaseName()}PersistenceModelHistory> historyRepository,
-			final ${modelBaseName()}PersistenceHistorySnapshotFactory snapshotFactory,
-			@Qualifier("${beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
+	public ${aggregate().baseName()}PersistenceModelJpaUpdateRepository(
+			final ${aggregate().baseName()}JpaRepository jpaRepository,
+			final TriTemporalHistoryRepository<UUID, ${aggregate().baseName()}PersistenceModelHistory> historyRepository,
+			final ${aggregate().baseName()}PersistenceHistorySnapshotFactory snapshotFactory,
+			@Qualifier("${aggregate().beanNamePrefix()}AuditActorSupplier") final AuditActorSupplier auditActorSupplier)
 	{
 		super(jpaRepository, historyRepository, snapshotFactory, auditActorSupplier);
 	}

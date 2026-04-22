@@ -1,8 +1,8 @@
 <#-- Template for generating SavePersistenceService class -->
-package ${basePackage()}.useCases.crud.save.infrastructure.persistence.service;
+package ${aggregate().basePackage()}.useCases.crud.save.infrastructure.persistence.service;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.model.DomainPersistenceModelAdapter;
 import de.gupta.clean.crud.template.useCases.crud.save.application.service.SavePersistenceService;
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-final class ${modelBaseName()}SavePersistenceService extends
-		AbstractSavePersistenceService<Long, ${modelBaseName()}DomainModel, UUID, ${modelBaseName()}PersistenceModel>
-		implements SavePersistenceService<Long, ${modelBaseName()}DomainModel>
+final class ${aggregate().baseName()}SavePersistenceService extends
+		AbstractSavePersistenceService<Long, ${aggregate().baseName()}DomainModel, UUID, ${aggregate().baseName()}PersistenceModel>
+		implements SavePersistenceService<Long, ${aggregate().baseName()}DomainModel>
 {
-	${modelBaseName()}SavePersistenceService(
-			final SavePersistenceModelRepository<${modelBaseName()}PersistenceModel> repository,
-			final DomainPersistenceModelAdapter<${modelBaseName()}DomainModel, ${modelBaseName()}PersistenceModel> modelAdapter,
-			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement)
+	${aggregate().baseName()}SavePersistenceService(
+			final SavePersistenceModelRepository<${aggregate().baseName()}PersistenceModel> repository,
+			final DomainPersistenceModelAdapter<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}PersistenceModel> modelAdapter,
+			@Qualifier("${aggregate().beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement)
 	{
 		super(repository, modelAdapter, idManagement);
 	}

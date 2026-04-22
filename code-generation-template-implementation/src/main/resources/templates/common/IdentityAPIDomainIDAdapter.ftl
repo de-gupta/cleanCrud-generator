@@ -1,4 +1,4 @@
-<#assign parentPackage = basePackage()?keep_before_last(".")>
+<#assign parentPackage = aggregate().basePackage()?keep_before_last(".")>
 package ${parentPackage}.common.adapter.id;
 
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.id.APIDomainIDAdapter;

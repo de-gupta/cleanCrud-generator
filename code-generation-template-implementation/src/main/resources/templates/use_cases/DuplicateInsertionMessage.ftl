@@ -1,17 +1,17 @@
 <#-- Template for generating DuplicateInsertionMessage class -->
-package ${basePackage()}.domain.service.crud;
+package ${aggregate().basePackage()}.domain.service.crud;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
 import de.gupta.clean.crud.template.domain.service.equality.DuplicateInsertionMessage;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}DuplicateInsertionMessage implements DuplicateInsertionMessage${"<"}${modelBaseName()}DomainModel${">"}
+final class ${aggregate().baseName()}DuplicateInsertionMessage implements DuplicateInsertionMessage${"<"}${aggregate().baseName()}DomainModel${">"}
 {
 	@Override
-	public String messageIfModelAlreadyExists(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
+	public String messageIfModelAlreadyExists(final ${aggregate().baseName()}DomainModel ${aggregate().beanNamePrefix()}DomainModel)
 	{
 		// TODO from Template: customize this duplicate message for the business key your API should expose.
-		return "The ${modelBaseName()?lower_case} with ${properties()[0].name()} `" + ${beanNamePrefix()}DomainModel.${properties()[0].getter()}() + "` already exists";
+		return "The ${aggregate().baseName()?lower_case} with ${composition().properties()[0].name()} `" + ${aggregate().beanNamePrefix()}DomainModel.${composition().properties()[0].getter()}() + "` already exists";
 	}
 }
