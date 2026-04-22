@@ -1,18 +1,18 @@
 <#-- Template for generating DomainResponseBuilder class -->
-package ${basePackage()}.domain.mapping.fetch;
+package ${aggregate().basePackage()}.domain.mapping.fetch;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelResponse;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelResponse;
 import de.gupta.clean.crud.template.domain.mapping.fetch.DomainResponseBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}DomainResponseBuilder implements
-DomainResponseBuilder${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelResponse${">"}
+final class ${aggregate().baseName()}DomainResponseBuilder implements
+DomainResponseBuilder${"<"}${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelResponse${">"}
 {
 @Override
-public ${modelBaseName()}DomainModelResponse toResponse(final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel)
+public ${aggregate().baseName()}DomainModelResponse toResponse(final ${aggregate().baseName()}DomainModel ${aggregate().beanNamePrefix()}DomainModel)
 {
-return ${modelBaseName()}DomainModelResponse.fromDomainModel(${beanNamePrefix()}DomainModel);
+return ${aggregate().baseName()}DomainModelResponse.fromDomainModel(${aggregate().beanNamePrefix()}DomainModel);
 }
 }

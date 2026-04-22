@@ -1,7 +1,7 @@
 <#-- Template for generating PatchPolicy class -->
-package ${basePackage()}.domain.service.crud;
+package ${aggregate().basePackage()}.domain.service.crud;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
 import de.gupta.clean.crud.template.domain.service.constraints.DomainConstraintService;
 import de.gupta.clean.crud.template.domain.service.crud.policy.AbstractPatchPolicy;
 import de.gupta.clean.crud.template.domain.service.crud.policy.ChangePolicy;
@@ -9,12 +9,12 @@ import de.gupta.clean.crud.template.domain.service.crud.policy.PatchPolicy;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}PatchPolicy extends AbstractPatchPolicy<${modelBaseName()}DomainModel>
-		implements PatchPolicy<${modelBaseName()}DomainModel>
+final class ${aggregate().baseName()}PatchPolicy extends AbstractPatchPolicy<${aggregate().baseName()}DomainModel>
+		implements PatchPolicy<${aggregate().baseName()}DomainModel>
 {
-	${modelBaseName()}PatchPolicy(
-			final ChangePolicy<${modelBaseName()}DomainModel> changePolicy,
-			final DomainConstraintService<${modelBaseName()}DomainModel> domainConstraintService)
+	${aggregate().baseName()}PatchPolicy(
+			final ChangePolicy<${aggregate().baseName()}DomainModel> changePolicy,
+			final DomainConstraintService<${aggregate().baseName()}DomainModel> domainConstraintService)
 	{
 		super(changePolicy, domainConstraintService);
 	}

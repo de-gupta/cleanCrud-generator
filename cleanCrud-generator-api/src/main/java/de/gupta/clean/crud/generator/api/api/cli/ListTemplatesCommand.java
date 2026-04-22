@@ -1,6 +1,6 @@
 package de.gupta.clean.crud.generator.api.api.cli;
 
-import de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.configuration.TemplateMetadataRegistry;
+import de.gupta.clean.crud.generator.code.generation.template.api.useCases.processing.api.application.TemplateCatalog;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 
@@ -16,17 +16,24 @@ import java.util.concurrent.Callable;
 )
 public final class ListTemplatesCommand implements Callable<Integer>
 {
+	private final TemplateCatalog templateCatalog;
+
 	@CommandLine.Spec
 	private CommandLine.Model.CommandSpec commandSpec;
 
 	@Override
 	public Integer call()
 	{
-		TemplateMetadataRegistry.getAllTemplateMetadata()
-		                        .keySet()
+		templateCatalog.allTemplates()
 		                        .stream()
+		                        .map(template -> template.templateName())
 		                        .sorted(Comparator.naturalOrder())
 		                        .forEach(commandSpec.commandLine().getOut()::println);
 		return 0;
+	}
+
+	ListTemplatesCommand(final TemplateCatalog templateCatalog)
+	{
+		this.templateCatalog = templateCatalog;
 	}
 }

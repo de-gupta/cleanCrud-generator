@@ -1,4 +1,4 @@
-<#assign parentPackage = basePackage()?keep_before_last(".")>
+<#assign parentPackage = aggregate().basePackage()?keep_before_last(".")>
 package ${parentPackage}.common.persistence;
 
 import de.gupta.clean.crud.template.infrastructure.persistence.transaction.PersistenceTransactionRunner;

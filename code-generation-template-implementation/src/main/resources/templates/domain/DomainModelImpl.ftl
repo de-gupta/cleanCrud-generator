@@ -1,36 +1,36 @@
 <#-- Template for generating DomainModelImpl class -->
-package ${basePackage()}.domain.model;
+package ${aggregate().basePackage()}.domain.model;
 
 import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-<#if domainModelImports()?has_content>
-<#list domainModelImports() as import>
+<#if domain().imports()?has_content>
+<#list domain().imports() as import>
 <#if import != "java.util.Optional" && import != "java.util.List">
 import ${import};
 </#if>
 </#list>
 </#if>
 
-final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}DomainModel
+final class ${aggregate().baseName()}DomainModelImpl implements ${aggregate().baseName()}DomainModel
 {
-<#list standaloneProperties() as property>
-	private ${domainResolvedType(property.baseType())} ${property.name()};
+<#list composition().standaloneProperties() as property>
+	private ${domain().resolvedType(property.baseType())} ${property.name()};
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 	private ${relationship.responseFieldType()} ${relationship.propertyName()};
 </#list>
 
-	static ${modelBaseName()}DomainModelBuilder builder()
+	static ${aggregate().baseName()}DomainModelBuilder builder()
 	{
 		return new BuilderImpl();
 	}
 
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 	@Override
-	public ${domainPropertyType(property)} ${property.getter()}()
+	public ${domain().propertyType(property)} ${property.getter()}()
 	{
 	<#if property.optional()>
 		return Optional.ofNullable(${property.name()});
@@ -40,7 +40,7 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 	}
 
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 	@Override
 	public ${relationship.responseFieldType()} ${relationship.propertyName()}()
 	{
@@ -52,12 +52,12 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 	public int hashCode()
 	{
 		int result = 1;
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 	<#if !property.optional()>
 		result = 31 * result + Objects.hashCode(${property.name()});
 	</#if>
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 		result = 31 * result + Objects.hashCode(${relationship.propertyName()});
 </#list>
 		return result;
@@ -67,30 +67,30 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 	public boolean equals(final Object o)
 	{
 		return o == this ||
-				(o instanceof ${modelBaseName()}DomainModel that
-<#list standaloneProperties() as property>
+				(o instanceof ${aggregate().baseName()}DomainModel that
+<#list composition().standaloneProperties() as property>
 				<#if !property.optional()>
 					&& Objects.equals(${property.name()}, that.${property.name()}())
 				</#if>
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 					&& Objects.equals(${relationship.propertyName()}, that.${relationship.propertyName()}())
 </#list>
 				);
 	}
 
-	private ${modelBaseName()}DomainModelImpl()
+	private ${aggregate().baseName()}DomainModelImpl()
 	{
 	}
 
-	private static final class BuilderImpl extends AbstractModelBuilder<${modelBaseName()}DomainModel>
-			implements ${modelBaseName()}DomainModelBuilder
+	private static final class BuilderImpl extends AbstractModelBuilder<${aggregate().baseName()}DomainModel>
+			implements ${aggregate().baseName()}DomainModelBuilder
 	{
-		private final ${modelBaseName()}DomainModelImpl model;
+		private final ${aggregate().baseName()}DomainModelImpl model;
 
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 		@Override
-		public ${modelBaseName()}DomainModelBuilder with${property.capitalizedName()}(final ${domainBuilderPropertyType(property)} ${property.name()})
+		public ${aggregate().baseName()}DomainModelBuilder with${property.capitalizedName()}(final ${domain().builderPropertyType(property)} ${property.name()})
 		{
 			<#if property.optional()>
 			model.${property.name()} = ${property.name()}.orElse(null);
@@ -101,9 +101,9 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 		}
 
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 		@Override
-		public ${modelBaseName()}DomainModelBuilder with${relationship.propertyCapitalizedName()}(final ${relationship.responseFieldType()} ${relationship.propertyName()})
+		public ${aggregate().baseName()}DomainModelBuilder with${relationship.propertyCapitalizedName()}(final ${relationship.responseFieldType()} ${relationship.propertyName()})
 		{
 			<#if relationship.many()>
 			model.${relationship.propertyName()} = ${relationship.propertyName()} == null ? List.of() : List.copyOf(${relationship.propertyName()});
@@ -117,14 +117,14 @@ final class ${modelBaseName()}DomainModelImpl implements ${modelBaseName()}Domai
 
 </#list>
 		@Override
-		protected ${modelBaseName()}DomainModel doBuild()
+		protected ${aggregate().baseName()}DomainModel doBuild()
 		{
 			return model;
 		}
 
 		private BuilderImpl()
 		{
-			this.model = new ${modelBaseName()}DomainModelImpl();
+			this.model = new ${aggregate().baseName()}DomainModelImpl();
 		}
 	}
 }

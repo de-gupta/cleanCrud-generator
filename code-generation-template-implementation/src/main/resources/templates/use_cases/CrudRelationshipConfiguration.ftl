@@ -1,13 +1,13 @@
-package ${basePackage()}.useCases.crud.configuration;
+package ${aggregate().basePackage()}.useCases.crud.configuration;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelCreate;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelUpdatePatch;
-<#list relationships() as relationship>
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelCreate;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelUpdatePatch;
+<#list composition().relationships() as relationship>
 import ${relationship.responseImport()?replace('.useCases.crud.common.dto.', '.domain.model.')?replace('APIModelResponse', 'DomainModel')};
-import ${relationship.domainCreateImport(basePackage())};
-import ${relationship.domainResponseImport(basePackage())};
-import ${relationship.domainUpdatePatchImport(basePackage())};
+import ${relationship.domainCreateImport(aggregate().basePackage())};
+import ${relationship.domainResponseImport(aggregate().basePackage())};
+import ${relationship.domainUpdatePatchImport(aggregate().basePackage())};
 import ${relationship.createImport()};
 import ${relationship.updatePatchImport()};
 import ${relationship.responseImport()};
@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Configuration
-class ${modelBaseName()}CrudRelationshipConfiguration
+class ${aggregate().baseName()}CrudRelationshipConfiguration
 {
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 	@Bean
 	@Qualifier("${relationship.relationshipBeanNamePrefix()}LifecycleSemantics")
 	LifecycleSemantics ${relationship.relationshipBeanNamePrefix()}LifecycleSemantics()
@@ -52,8 +52,8 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 
 	@Bean
 	@Qualifier("${relationship.relationshipBeanNamePrefix()}RelationshipDefinition")
-	AggregateRelationshipDefinition<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition(
-			final ModelBuilderFactory<${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder> ${beanNamePrefix()}DomainModelBuilderFactory,
+	AggregateRelationshipDefinition<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition(
+			final ModelBuilderFactory<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder> ${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
 			@Qualifier("${relationship.relationshipBeanNamePrefix()}LifecycleSemantics") final LifecycleSemantics lifecycleSemantics,
 			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition<#if relationship.owned()>,
 			@Qualifier("${relationship.satelliteQualifierPrefix()}APIToDomainCreateAdapter") final APIToDomainCreateAdapter<${relationship.createType()}, ${relationship.domainCreateType()}> ${relationship.relationshipVariablePrefix()}APIToDomainCreateAdapter,
@@ -66,16 +66,16 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 		// TODO: Review whether master update should be allowed to relink `${relationship.propertyName()}`.
 		</#if>
 		return AggregateRelationshipDefinitions
-				.<Long, ${modelBaseName()}DomainModel, ${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}<#if relationship.owned()>, ${relationship.createType()}, ${relationship.updatePatchType()}</#if>, ${relationship.responseType()}>${relationship.builderMethodName()}("${relationship.propertyName()}", ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
+				.<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}<#if relationship.owned()>, ${relationship.createType()}, ${relationship.updatePatchType()}</#if>, ${relationship.responseType()}>${relationship.builderMethodName()}("${relationship.propertyName()}", ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
 				.lifecycleSemantics(lifecycleSemantics)
 				<#if relationship.owned()>
-				.createExtractor(<#if !relationship.generateNestedCreate()>ignored -> <#if relationship.many()>List.of()<#else>Optional.empty()</#if><#elseif relationship.many()>${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#elseif relationship.optional()>${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
+				.createExtractor(<#if !relationship.generateNestedCreate()>ignored -> <#if relationship.many()>List.of()<#else>Optional.empty()</#if><#elseif relationship.many()>${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#elseif relationship.optional()>${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${aggregate().beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
 				.createMapper(${relationship.relationshipVariablePrefix()}APIToDomainCreateAdapter::mapToDomainModelCreate)
-				.patchExtractor(<#if relationship.many()><#if relationship.generateNestedUpdate()>${beanNamePrefix()}DomainModelUpdatePatch -> ${beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of())<#else>ignored -> List.of()</#if><#else><#if relationship.generateNestedUpdate()>${beanNamePrefix()}DomainModelUpdatePatch -> ${beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().map(${relationship.propertyName()} ->
+				.patchExtractor(<#if relationship.many()><#if relationship.generateNestedUpdate()>${aggregate().beanNamePrefix()}DomainModelUpdatePatch -> ${aggregate().beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of())<#else>ignored -> List.of()</#if><#else><#if relationship.generateNestedUpdate()>${aggregate().beanNamePrefix()}DomainModelUpdatePatch -> ${aggregate().beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().map(${relationship.propertyName()} ->
 				{
 					if (${relationship.propertyName()}.size() > 1)
 					{
-						throw InvalidRequestException.withMessage("${modelBaseName()} ${relationship.propertyName()} updates allow at most one nested ${relationship.propertyName()} mutation");
+						throw InvalidRequestException.withMessage("${aggregate().baseName()} ${relationship.propertyName()} updates allow at most one nested ${relationship.propertyName()} mutation");
 					}
 					return ${relationship.propertyName()}.stream().findFirst();
 				}).orElse(Optional.empty())<#else>ignored -> Optional.empty()</#if></#if>)
@@ -83,30 +83,30 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 				.patchCreateMapper(${relationship.updatePatchType()?uncap_first} -> ${relationship.domainCreateType()}.fromUpdatePatch(${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter.mapToDomainModelUpdatePatch(${relationship.updatePatchType()?uncap_first})))
 				<#else>
 				<#if relationship.many()>
-				.createReferenceIdsExtractor(${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())
-				.patchReferenceIdsExtractor(${beanNamePrefix()}DomainModelUpdatePatch -> ${beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of()))
+				.createReferenceIdsExtractor(${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())
+				.patchReferenceIdsExtractor(${aggregate().beanNamePrefix()}DomainModelUpdatePatch -> ${aggregate().beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of()))
 				<#else>
-				.createReferenceIdExtractor(<#if relationship.optional()>${beanNamePrefix()}DomainModelCreate -> ${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
-				.patchReferenceIdExtractor(${modelBaseName()}DomainModelUpdatePatch::${relationship.propertyName()})
+				.createReferenceIdExtractor(<#if relationship.optional()>${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${aggregate().beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
+				.patchReferenceIdExtractor(${aggregate().baseName()}DomainModelUpdatePatch::${relationship.propertyName()})
 				</#if>
 				</#if>
-				.removeIdExtractor(${modelBaseName()}DomainModelUpdatePatch::${relationship.removeFieldName()})
+				.removeIdExtractor(${aggregate().baseName()}DomainModelUpdatePatch::${relationship.removeFieldName()})
 				<#if relationship.many()>
-				.currentSatellites(${modelBaseName()}DomainModel::${relationship.propertyName()})
-				.replaceSatellites((${beanNamePrefix()}DomainModel, ${relationship.propertyName()}) -> rebuild${modelBaseName()}DomainModel(
-						${beanNamePrefix()}DomainModelBuilderFactory,
-						${beanNamePrefix()}DomainModel,
-<#list relationships() as rebuildRelationship>
-						<#if rebuildRelationship.propertyName() == relationship.propertyName()>${relationship.propertyName()}<#else>${beanNamePrefix()}DomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
+				.currentSatellites(${aggregate().baseName()}DomainModel::${relationship.propertyName()})
+				.replaceSatellites((${aggregate().beanNamePrefix()}DomainModel, ${relationship.propertyName()}) -> rebuild${aggregate().baseName()}DomainModel(
+						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+						${aggregate().beanNamePrefix()}DomainModel,
+<#list composition().relationships() as rebuildRelationship>
+						<#if rebuildRelationship.propertyName() == relationship.propertyName()>${relationship.propertyName()}<#else>${aggregate().beanNamePrefix()}DomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
 </#list>
 				))
 				<#else>
-				.currentSatellite(<#if relationship.optional()>${modelBaseName()}DomainModel::${relationship.propertyName()}<#else>${beanNamePrefix()}DomainModel -> Optional.ofNullable(${beanNamePrefix()}DomainModel.${relationship.propertyName()}())</#if>)
-				.replaceSatellite((${beanNamePrefix()}DomainModel, ${relationship.propertyName()}) -> rebuild${modelBaseName()}DomainModel(
-						${beanNamePrefix()}DomainModelBuilderFactory,
-						${beanNamePrefix()}DomainModel,
-<#list relationships() as rebuildRelationship>
-						<#if rebuildRelationship.propertyName() == relationship.propertyName()><#if relationship.optional()>${relationship.propertyName()}<#else>${relationship.propertyName()}.orElse(null)</#if><#else>${beanNamePrefix()}DomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
+				.currentSatellite(<#if relationship.optional()>${aggregate().baseName()}DomainModel::${relationship.propertyName()}<#else>${aggregate().beanNamePrefix()}DomainModel -> Optional.ofNullable(${aggregate().beanNamePrefix()}DomainModel.${relationship.propertyName()}())</#if>)
+				.replaceSatellite((${aggregate().beanNamePrefix()}DomainModel, ${relationship.propertyName()}) -> rebuild${aggregate().baseName()}DomainModel(
+						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+						${aggregate().beanNamePrefix()}DomainModel,
+<#list composition().relationships() as rebuildRelationship>
+						<#if rebuildRelationship.propertyName() == relationship.propertyName()><#if relationship.optional()>${relationship.propertyName()}<#else>${relationship.propertyName()}.orElse(null)</#if><#else>${aggregate().beanNamePrefix()}DomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
 </#list>
 				))
 				</#if>
@@ -116,18 +116,18 @@ class ${modelBaseName()}CrudRelationshipConfiguration
 	}
 
 </#list>
-	private ${modelBaseName()}DomainModel rebuild${modelBaseName()}DomainModel(
-			final ModelBuilderFactory<${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder> ${beanNamePrefix()}DomainModelBuilderFactory,
-			final ${modelBaseName()}DomainModel ${beanNamePrefix()}DomainModel,
-<#list relationships() as relationship>
+	private ${aggregate().baseName()}DomainModel rebuild${aggregate().baseName()}DomainModel(
+			final ModelBuilderFactory<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder> ${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+			final ${aggregate().baseName()}DomainModel ${aggregate().beanNamePrefix()}DomainModel,
+<#list composition().relationships() as relationship>
 			final ${relationship.responseFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
 </#list>)
 	{
-		return ${beanNamePrefix()}DomainModelBuilderFactory.builder()
-<#list standaloneProperties() as property>
-				.with${property.capitalizedName()}(${beanNamePrefix()}DomainModel.${property.getter()}())
+		return ${aggregate().beanNamePrefix()}DomainModelBuilderFactory.builder()
+<#list composition().standaloneProperties() as property>
+				.with${property.capitalizedName()}(${aggregate().beanNamePrefix()}DomainModel.${property.getter()}())
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 				.with${relationship.propertyCapitalizedName()}(${relationship.propertyName()})
 </#list>
 				.build();

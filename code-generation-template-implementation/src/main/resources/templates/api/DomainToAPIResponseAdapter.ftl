@@ -1,10 +1,10 @@
 <#-- Template for generating DomainToAPIResponseAdapter class -->
-package ${basePackage()}.useCases.crud.common.adapter;
+package ${aggregate().basePackage()}.useCases.crud.common.adapter;
 
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelResponse;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
-<#if apiDomainDifferingGenericTypeParameters()?has_content>
-import ${basePackage()}.useCases.crud.common.adapter.converter.*;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelResponse;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
+<#if types().apiDomainDifferingParameters()?has_content>
+import ${aggregate().basePackage()}.useCases.crud.common.adapter.converter.*;
 </#if>
 import de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel;
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.id.APIDomainIDAdapter;
@@ -13,16 +13,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
-<#if isGeneric() && domainGenericImports()?has_content>
-<#list domainGenericImports() as import>
+<#if types().isGeneric() && domain().genericImports()?has_content>
+<#list domain().genericImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
 </#list>
 </#if>
 
-<#if isGeneric() && apiGenericImports()?has_content>
-<#list apiGenericImports() as import>
+<#if types().isGeneric() && api().genericImports()?has_content>
+<#list api().genericImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
@@ -30,24 +30,24 @@ import ${import};
 </#if>
 
 @Component
-final class ${modelBaseName()}DomainToAPIResponseAdapter
-		implements DomainToAPIResponseAdapter${"<"}${modelBaseName()}APIModelResponse,
-		Long, ${modelBaseName()}DomainModelResponse${">"}
+final class ${aggregate().baseName()}DomainToAPIResponseAdapter
+		implements DomainToAPIResponseAdapter${"<"}${aggregate().baseName()}APIModelResponse,
+		Long, ${aggregate().baseName()}DomainModelResponse${">"}
 {
 	private final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter;
-<#list apiDomainDifferingGenericTypeParameters() as param>
-	private final Function<${domainConcreteType(param)}, ${apiConcreteType(param)}> ${param?lower_case}DomainToAPIConverter;
+<#list types().apiDomainDifferingParameters() as param>
+	private final Function<${domain().concreteType(param)}, ${api().concreteType(param)}> ${param?lower_case}DomainToAPIConverter;
 </#list>
 
 	@Override
-	public ${modelBaseName()}APIModelResponse mapToAPIModelResponse(
+	public ${aggregate().baseName()}APIModelResponse mapToAPIModelResponse(
 			final IdentifiedModel${"<"}Long,
-			${modelBaseName()}DomainModelResponse${">"} domainModel)
+			${aggregate().baseName()}DomainModelResponse${">"} domainModel)
 	{
-		return ${modelBaseName()}APIModelResponse.of(
+		return ${aggregate().baseName()}APIModelResponse.of(
 				idAdapter.mapToAPIModelID(domainModel.id()),
-<#list properties() as property>
-<#if apiAndDomainTypesDiffer(property.baseType())>
+<#list composition().properties() as property>
+<#if types().apiDomainDifferingParameters()?seq_contains(property.baseType())>
 				<#if property.optional()>
 				domainModel.model().${property.getter()}().map(${property.baseType()?lower_case}DomainToAPIConverter)<#if property_has_next>,</#if>
 				<#else>
@@ -60,15 +60,15 @@ final class ${modelBaseName()}DomainToAPIResponseAdapter
 		);
 	}
 
-	${modelBaseName()}DomainToAPIResponseAdapter(
-			final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter<#if apiDomainDifferingGenericTypeParameters()?has_content>,
-<#list apiDomainDifferingGenericTypeParameters() as param>
-			@Qualifier("${beanNamePrefix()}${param}DomainToAPIConverter") final Function<${domainConcreteType(param)}, ${apiConcreteType(param)}> ${param?lower_case}DomainToAPIConverter<#if param_has_next>,</#if>
+	${aggregate().baseName()}DomainToAPIResponseAdapter(
+			final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter<#if types().apiDomainDifferingParameters()?has_content>,
+<#list types().apiDomainDifferingParameters() as param>
+			@Qualifier("${aggregate().beanNamePrefix()}${param}DomainToAPIConverter") final Function<${domain().concreteType(param)}, ${api().concreteType(param)}> ${param?lower_case}DomainToAPIConverter<#if param_has_next>,</#if>
 </#list>
 </#if>)
 	{
 		this.idAdapter = idAdapter;
-<#list apiDomainDifferingGenericTypeParameters() as param>
+<#list types().apiDomainDifferingParameters() as param>
 		this.${param?lower_case}DomainToAPIConverter = ${param?lower_case}DomainToAPIConverter;
 </#list>
 	}

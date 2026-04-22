@@ -1,10 +1,10 @@
 <#-- Template for generating SaveServiceFacade class -->
-package ${basePackage()}.useCases.crud.save.facade;
+package ${aggregate().basePackage()}.useCases.crud.save.facade;
 
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelCreate;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelResponse;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelCreate;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelCreate;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelResponse;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelCreate;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.APIToDomainCreateAdapter;
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.DomainToAPIResponseAdapter;
 import de.gupta.clean.crud.template.useCases.crud.save.application.service.SaveService;
@@ -13,15 +13,15 @@ import de.gupta.clean.crud.template.useCases.crud.save.facade.SaveServiceFacade;
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}SaveServiceFacade extends
-AbstractSaveServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse,
-${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelResponse, Long${">"}
-implements SaveServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelResponse${">"}
+final class ${aggregate().baseName()}SaveServiceFacade extends
+AbstractSaveServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelResponse,
+${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelResponse, Long${">"}
+implements SaveServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelResponse${">"}
 {
-${modelBaseName()}SaveServiceFacade(
-final SaveService${"<"}${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelResponse, Long${">"} service,
-final APIToDomainCreateAdapter${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}DomainModelCreate${">"} createMapper,
-final DomainToAPIResponseAdapter${"<"}${modelBaseName()}APIModelResponse, Long, ${modelBaseName()}DomainModelResponse${">"} responseMapper)
+${aggregate().baseName()}SaveServiceFacade(
+final SaveService${"<"}${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelResponse, Long${">"} service,
+final APIToDomainCreateAdapter${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}DomainModelCreate${">"} createMapper,
+final DomainToAPIResponseAdapter${"<"}${aggregate().baseName()}APIModelResponse, Long, ${aggregate().baseName()}DomainModelResponse${">"} responseMapper)
 {
 super(service, createMapper, responseMapper);
 }

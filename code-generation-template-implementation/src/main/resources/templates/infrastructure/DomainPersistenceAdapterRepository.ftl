@@ -1,5 +1,5 @@
 <#-- Template for generating DomainPersistenceAdapterRepository class -->
-package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
+package ${aggregate().basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
 
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.repository.AbstractDomainPersistenceAdapterJpaRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.repository.DomainPersistenceAdapterRepository;
@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@Qualifier("${beanNamePrefix()}DomainPersistenceAdapterRepository")
-final class ${modelBaseName()}DomainPersistenceAdapterRepository
-		extends AbstractDomainPersistenceAdapterJpaRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>
-		implements DomainPersistenceAdapterRepository<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>
+@Qualifier("${aggregate().beanNamePrefix()}DomainPersistenceAdapterRepository")
+final class ${aggregate().baseName()}DomainPersistenceAdapterRepository
+		extends AbstractDomainPersistenceAdapterJpaRepository<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterModel>
+		implements DomainPersistenceAdapterRepository<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterModel>
 {
-	private final ${modelBaseName()}DomainPersistenceAdapterJpaRepository jpaRepository;
+	private final ${aggregate().baseName()}DomainPersistenceAdapterJpaRepository jpaRepository;
 
 	@Override
 	public boolean existsByDomainID(final Long domainID)
@@ -31,24 +31,24 @@ final class ${modelBaseName()}DomainPersistenceAdapterRepository
 	}
 
 	@Override
-	protected Optional<${modelBaseName()}DomainPersistenceAdapterModel> findOneByPersistenceID(final UUID uuid)
+	protected Optional<${aggregate().baseName()}DomainPersistenceAdapterModel> findOneByPersistenceID(final UUID uuid)
 	{
 		return jpaRepository.findOneByPersistenceID(uuid);
 	}
 
 	@Override
-	protected Optional<${modelBaseName()}DomainPersistenceAdapterModel> findOneByDomainID(final Long domainID)
+	protected Optional<${aggregate().baseName()}DomainPersistenceAdapterModel> findOneByDomainID(final Long domainID)
 	{
 		return jpaRepository.findOneByDomainID(domainID);
 	}
 
 	@Override
-	protected Collection<${modelBaseName()}DomainPersistenceAdapterModel> findAllByDomainIDIn(final Collection<Long> domainIDs)
+	protected Collection<${aggregate().baseName()}DomainPersistenceAdapterModel> findAllByDomainIDIn(final Collection<Long> domainIDs)
 	{
 		return jpaRepository.findAllByDomainIDIn(domainIDs);
 	}
 
-	${modelBaseName()}DomainPersistenceAdapterRepository(final ${modelBaseName()}DomainPersistenceAdapterJpaRepository jpaRepository)
+	${aggregate().baseName()}DomainPersistenceAdapterRepository(final ${aggregate().baseName()}DomainPersistenceAdapterJpaRepository jpaRepository)
 	{
 		super(jpaRepository);
 		this.jpaRepository = jpaRepository;

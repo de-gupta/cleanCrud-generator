@@ -2,6 +2,8 @@ package de.gupta.clean.crud.generator.api.api.cli;
 
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.*;
 import de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orchestration.api.application.CodeGenerationOrchestrator;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine;
 
@@ -15,10 +17,12 @@ import java.util.concurrent.Callable;
 		description = "Generate Clean Architecture CRUD code from a model file or configuration file",
 		mixinStandardHelpOptions = true
 )
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public final class GenerateCommand implements Callable<Integer>
 {
 	private final CodeGenerationOrchestrator orchestrator;
 	private final CodeGenerationConfigurationFileLoader configurationFileLoader;
+	private final DirectCliConfigurationAssembler directCliConfigurationAssembler;
 
 	@CommandLine.Spec
 	private CommandLine.Model.CommandSpec spec;
@@ -111,204 +115,63 @@ public final class GenerateCommand implements Callable<Integer>
 	@Override
 	public Integer call()
 	{
-		try
-		{
-			return orchestrator.generateCode(configuration());
-		}
-		finally
-		{
-			resetState();
-		}
+		return orchestrator.generateCode(configuration());
 	}
 
 	private CodeGenerationConfiguration configuration()
 	{
+		var directCliOptions = directCliOptions();
 		if (configurationFilePath != null)
 		{
-			if (hasDirectOptions())
+			if (directCliOptions.hasDirectOptions())
 			{
 				throw new CommandLine.ParameterException(spec.commandLine(),
 						"`--config` cannot be combined with direct generation options");
 			}
 			return configurationFileLoader.load(configurationFilePath);
 		}
-
-		var resolvedBaseModel = firstNonBlank(baseModelPath, positionalBaseModelPath);
-		if (resolvedBaseModel == null)
-		{
-			throw new CommandLine.ParameterException(spec.commandLine(),
-					"Please provide either `--config <file>` or a base model via positional path / `--base-model`");
-		}
-
-		return new CodeGenerationConfiguration(
-				new GenerationInputs(resolvedBaseModel, domainModelPath, persistenceModelPath, apiModelPath),
-				new LayerConcreteTypes(parseAssignments(domainTypes), parseAssignments(persistenceTypes),
-						parseAssignments(apiTypes)),
-				new GenerationSelection(includeGroups, includeTemplates, includeTags, excludeGroups, excludeTemplates,
-						excludeTags),
-				List.of(),
-				new OwnershipConfiguration(baseModelOwnership, domainModelOwnership, persistenceModelOwnership,
-						apiModelOwnership, parseOwnershipAssignments(ownershipGroupRules),
-						parseOwnershipAssignments(ownershipTemplateRules),
-						parseOwnershipAssignments(ownershipTagRules)),
-				new OverwriteConfiguration(
-						Boolean.TRUE.equals(overwriteDefault),
-						parseBooleanAssignments(overwriteGroupRules),
-						parseBooleanAssignments(overwriteTemplateRules),
-						parseBooleanAssignments(overwriteTagRules),
-						parseBooleanAssignments(overwriteFileRules)
-				),
-				historized
-		);
+		return directCliConfigurationAssembler.assemble(directCliOptions, spec);
 	}
 
-	private boolean hasDirectOptions()
+	private DirectCliGenerationOptions directCliOptions()
 	{
-		return firstNonBlank(positionalBaseModelPath, baseModelPath, domainModelPath, persistenceModelPath,
-				apiModelPath) != null
-				|| historized
-				|| !domainTypes.isEmpty()
-				|| !persistenceTypes.isEmpty()
-				|| !apiTypes.isEmpty()
-				|| !includeGroups.isEmpty()
-				|| !includeTemplates.isEmpty()
-				|| !includeTags.isEmpty()
-				|| !excludeGroups.isEmpty()
-				|| !excludeTemplates.isEmpty()
-				|| !excludeTags.isEmpty()
-				|| baseModelOwnership != null
-				|| domainModelOwnership != null
-				|| persistenceModelOwnership != null
-				|| apiModelOwnership != null
-				|| !ownershipGroupRules.isEmpty()
-				|| !ownershipTemplateRules.isEmpty()
-				|| !ownershipTagRules.isEmpty()
-				|| overwriteDefault != null
-				|| !overwriteGroupRules.isEmpty()
-				|| !overwriteTemplateRules.isEmpty()
-				|| !overwriteTagRules.isEmpty()
-				|| !overwriteFileRules.isEmpty();
-	}
-
-	private String firstNonBlank(final String... values)
-	{
-		return Arrays.stream(values)
-		             .filter(Objects::nonNull)
-		             .map(String::trim)
-		             .filter(value -> !value.isBlank())
-		             .findFirst()
-		             .orElse(null);
-	}
-
-	private Map<String, String> parseAssignments(final List<String> assignments)
-	{
-		if (assignments == null || assignments.isEmpty())
-		{
-			return Map.of();
-		}
-		var result = new LinkedHashMap<String, String>();
-		assignments.stream()
-		           .filter(Objects::nonNull)
-		           .map(String::trim)
-		           .filter(value -> !value.isBlank())
-		           .forEach(assignment ->
-				   {
-					   var split = assignment.split("=", 2);
-					   if (split.length != 2 || split[0].isBlank() || split[1].isBlank())
-					   {
-						   throw new CommandLine.ParameterException(spec.commandLine(),
-								   "Invalid assignment `" + assignment + "`. Expected KEY=VALUE.");
-					   }
-					   result.put(split[0].trim(), split[1].trim());
-				   });
-		return Map.copyOf(result);
-	}
-
-	private Map<String, GeneratedArtifactOwnership> parseOwnershipAssignments(final List<String> assignments)
-	{
-		if (assignments == null || assignments.isEmpty())
-		{
-			return Map.of();
-		}
-		var result = new LinkedHashMap<String, GeneratedArtifactOwnership>();
-		assignments.stream()
-		           .filter(Objects::nonNull)
-		           .map(String::trim)
-		           .filter(value -> !value.isBlank())
-		           .forEach(assignment ->
-				   {
-					   var split = assignment.split("=", 2);
-					   if (split.length != 2 || split[0].isBlank() || split[1].isBlank())
-					   {
-						   throw new CommandLine.ParameterException(spec.commandLine(),
-								   "Invalid ownership rule `" + assignment + "`. Expected KEY=USER|GENERATED.");
-					   }
-					   result.put(split[0].trim(), GeneratedArtifactOwnership.valueOf(split[1].trim().toUpperCase()));
-				   });
-		return Map.copyOf(result);
-	}
-
-	private Map<String, Boolean> parseBooleanAssignments(final List<String> assignments)
-	{
-		if (assignments == null || assignments.isEmpty())
-		{
-			return Map.of();
-		}
-		var result = new LinkedHashMap<String, Boolean>();
-		assignments.stream()
-		           .filter(Objects::nonNull)
-		           .map(String::trim)
-		           .filter(value -> !value.isBlank())
-		           .forEach(assignment ->
-				   {
-					   var split = assignment.split("=", 2);
-					   if (split.length != 2 || split[0].isBlank() || split[1].isBlank())
-					   {
-						   throw new CommandLine.ParameterException(spec.commandLine(),
-								   "Invalid overwrite rule `" + assignment + "`. Expected KEY=true|false.");
-					   }
-					   result.put(split[0].trim(), Boolean.parseBoolean(split[1].trim()));
-				   });
-		return Map.copyOf(result);
-	}
-
-	private void resetState()
-	{
-		positionalBaseModelPath = null;
-		configurationFilePath = null;
-		baseModelPath = null;
-		domainModelPath = null;
-		persistenceModelPath = null;
-		apiModelPath = null;
-		domainTypes = new ArrayList<>();
-		persistenceTypes = new ArrayList<>();
-		apiTypes = new ArrayList<>();
-		includeGroups = new LinkedHashSet<>();
-		includeTemplates = new LinkedHashSet<>();
-		includeTags = new LinkedHashSet<>();
-		excludeGroups = new LinkedHashSet<>();
-		excludeTemplates = new LinkedHashSet<>();
-		excludeTags = new LinkedHashSet<>();
-		baseModelOwnership = null;
-		domainModelOwnership = null;
-		persistenceModelOwnership = null;
-		apiModelOwnership = null;
-		ownershipGroupRules = new ArrayList<>();
-		ownershipTemplateRules = new ArrayList<>();
-		ownershipTagRules = new ArrayList<>();
-		overwriteDefault = null;
-		overwriteGroupRules = new ArrayList<>();
-		overwriteTemplateRules = new ArrayList<>();
-		overwriteTagRules = new ArrayList<>();
-		overwriteFileRules = new ArrayList<>();
-		historized = false;
+		return new DirectCliGenerationOptions(
+				positionalBaseModelPath,
+				baseModelPath,
+				domainModelPath,
+				persistenceModelPath,
+				apiModelPath,
+				List.copyOf(domainTypes),
+				List.copyOf(persistenceTypes),
+				List.copyOf(apiTypes),
+				Set.copyOf(includeGroups),
+				Set.copyOf(includeTemplates),
+				Set.copyOf(includeTags),
+				Set.copyOf(excludeGroups),
+				Set.copyOf(excludeTemplates),
+				Set.copyOf(excludeTags),
+				baseModelOwnership,
+				domainModelOwnership,
+				persistenceModelOwnership,
+				apiModelOwnership,
+				List.copyOf(ownershipGroupRules),
+				List.copyOf(ownershipTemplateRules),
+				List.copyOf(ownershipTagRules),
+				overwriteDefault,
+				List.copyOf(overwriteGroupRules),
+				List.copyOf(overwriteTemplateRules),
+				List.copyOf(overwriteTagRules),
+				List.copyOf(overwriteFileRules),
+				historized);
 	}
 
 	GenerateCommand(
 			final CodeGenerationOrchestrator orchestrator,
-			final CodeGenerationConfigurationFileLoader configurationFileLoader)
+			final CodeGenerationConfigurationFileLoader configurationFileLoader,
+			final DirectCliConfigurationAssembler directCliConfigurationAssembler)
 	{
 		this.orchestrator = orchestrator;
 		this.configurationFileLoader = configurationFileLoader;
+		this.directCliConfigurationAssembler = directCliConfigurationAssembler;
 	}
 }

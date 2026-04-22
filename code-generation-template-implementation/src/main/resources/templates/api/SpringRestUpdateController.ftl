@@ -1,10 +1,10 @@
 <#-- Template for generating SpringRestUpdateController class -->
-package ${basePackage()}.useCases.crud.update.api.web;
+package ${aggregate().basePackage()}.useCases.crud.update.api.web;
 
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelCreate;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelUpdatePatch;
-import ${basePackage()}.useCases.crud.common.security.${modelBaseName()}EndpointSecurityPolicy;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelCreate;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelUpdatePatch;
+import ${aggregate().basePackage()}.useCases.crud.common.security.${aggregate().baseName()}EndpointSecurityPolicy;
 import de.gupta.clean.crud.template.useCases.crud.common.security.EndpointSecurityConfiguration;
 import de.gupta.clean.crud.template.useCases.crud.update.api.web.AbstractSpringRestUpdateController;
 import de.gupta.clean.crud.template.useCases.crud.update.api.web.SpringRestUpdateController;
@@ -13,15 +13,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "${modelBaseName()} Update" , description = "Update Operations pertaining to ${modelBaseName()}")
+@Tag(name = "${aggregate().baseName()} Update" , description = "Update Operations pertaining to ${aggregate().baseName()}")
 @RestController
-@RequestMapping("/${modelBaseName()?lower_case}/update")
-@EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${modelBaseName()}EndpointSecurityPolicy.class)
-class ${modelBaseName()}SpringRestUpdateController extends
-AbstractSpringRestUpdateController${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}APIModelResponse, Long${">"}
-		implements SpringRestUpdateController${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}APIModelResponse, Long${">"}
+@RequestMapping("/${aggregate().baseName()?lower_case}/update")
+@EndpointSecurityConfiguration(enabled = true, endpointPolicy = ${aggregate().baseName()}EndpointSecurityPolicy.class)
+class ${aggregate().baseName()}SpringRestUpdateController extends
+AbstractSpringRestUpdateController${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}APIModelResponse, Long${">"}
+		implements SpringRestUpdateController${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}APIModelResponse, Long${">"}
 {
-	${modelBaseName()}SpringRestUpdateController(final UpdateServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}APIModelResponse, Long${">"} service)
+	${aggregate().baseName()}SpringRestUpdateController(final UpdateServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}APIModelResponse, Long${">"} service)
 	{
 		super(service);
 	}

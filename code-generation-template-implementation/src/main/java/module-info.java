@@ -5,7 +5,6 @@ module code.generation.template.implementation
 	exports de.gupta.clean.crud.generator.code.generation.template.api.domain.model.template;
 	exports de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model;
 	exports de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection;
-	exports de.gupta.clean.crud.generator.code.generation.template.implementation.useCases.processing.infrastructure.configuration;
 
 	requires code.generation.model.implementation;
 	requires freemarker;

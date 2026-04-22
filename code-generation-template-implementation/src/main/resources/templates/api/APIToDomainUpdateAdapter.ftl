@@ -1,26 +1,26 @@
 <#-- Template for generating APIToDomainUpdateAdapter class -->
-package ${basePackage()}.useCases.crud.common.adapter;
+package ${aggregate().basePackage()}.useCases.crud.common.adapter;
 
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelUpdatePatch;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelUpdatePatch;
-<#if apiDomainDifferingGenericTypeParameters()?has_content>
-import ${basePackage()}.useCases.crud.common.adapter.converter.*;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelUpdatePatch;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelUpdatePatch;
+<#if types().apiDomainDifferingParameters()?has_content>
+import ${aggregate().basePackage()}.useCases.crud.common.adapter.converter.*;
 </#if>
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.APIToDomainUpdateAdapter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
-<#if isGeneric() && domainGenericImports()?has_content>
-<#list domainGenericImports() as import>
+<#if types().isGeneric() && domain().genericImports()?has_content>
+<#list domain().genericImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
 </#list>
 </#if>
 
-<#if isGeneric() && apiGenericImports()?has_content>
-<#list apiGenericImports() as import>
+<#if types().isGeneric() && api().genericImports()?has_content>
+<#list api().genericImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
@@ -28,36 +28,36 @@ import ${import};
 </#if>
 
 @Component
-final class ${modelBaseName()}APIToDomainUpdateAdapter
-		implements APIToDomainUpdateAdapter${"<"}${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}DomainModelUpdatePatch${">"}
+final class ${aggregate().baseName()}APIToDomainUpdateAdapter
+		implements APIToDomainUpdateAdapter${"<"}${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}DomainModelUpdatePatch${">"}
 {
-<#list apiDomainDifferingGenericTypeParameters() as param>
-	private final Function<${apiConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}APIToDomainConverter;
+<#list types().apiDomainDifferingParameters() as param>
+	private final Function<${api().concreteType(param)}, ${domain().concreteType(param)}> ${param?lower_case}APIToDomainConverter;
 </#list>
 
 	@Override
-	public ${modelBaseName()}DomainModelUpdatePatch mapToDomainModelUpdatePatch(final ${modelBaseName()}APIModelUpdatePatch apiModel)
+	public ${aggregate().baseName()}DomainModelUpdatePatch mapToDomainModelUpdatePatch(final ${aggregate().baseName()}APIModelUpdatePatch apiModel)
 	{
-		return new ${modelBaseName()}DomainModelUpdatePatch(
-<#list standaloneProperties() as property>
-<#if apiAndDomainTypesDiffer(property.baseType())>
-			apiModel.${property.name()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next || relationships()?has_content>,</#if>
+		return new ${aggregate().baseName()}DomainModelUpdatePatch(
+<#list composition().standaloneProperties() as property>
+<#if types().apiDomainDifferingParameters()?seq_contains(property.baseType())>
+			apiModel.${property.name()}().map(${property.baseType()?lower_case}APIToDomainConverter)<#if property_has_next || composition().relationships()?has_content>,</#if>
 <#else>
-			apiModel.${property.name()}()<#if property_has_next || relationships()?has_content>,</#if>
+			apiModel.${property.name()}()<#if property_has_next || composition().relationships()?has_content>,</#if>
 </#if>
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 			apiModel.${relationship.propertyName()}(),
 			apiModel.${relationship.removeFieldName()}()<#if relationship_has_next>,</#if>
 </#list>
 		);
 	}
 
-	${modelBaseName()}APIToDomainUpdateAdapter(<#list apiDomainDifferingGenericTypeParameters() as param>
-			@Qualifier("${beanNamePrefix()}${param}APIToDomainConverter") final Function<${apiConcreteType(param)}, ${domainConcreteType(param)}> ${param?lower_case}APIToDomainConverter<#if param_has_next>,</#if>
+	${aggregate().baseName()}APIToDomainUpdateAdapter(<#list types().apiDomainDifferingParameters() as param>
+			@Qualifier("${aggregate().beanNamePrefix()}${param}APIToDomainConverter") final Function<${api().concreteType(param)}, ${domain().concreteType(param)}> ${param?lower_case}APIToDomainConverter<#if param_has_next>,</#if>
 </#list>)
 	{
-<#list apiDomainDifferingGenericTypeParameters() as param>
+<#list types().apiDomainDifferingParameters() as param>
 		this.${param?lower_case}APIToDomainConverter = ${param?lower_case}APIToDomainConverter;
 </#list>
 	}

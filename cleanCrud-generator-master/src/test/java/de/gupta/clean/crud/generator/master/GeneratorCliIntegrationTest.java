@@ -111,7 +111,8 @@ class GeneratorCliIntegrationTest
 		commandLine.setErr(new PrintWriter(standardErr, true));
 
 		assertEquals(0, commandLine.execute("list-templates"));
-		var templateNames = Set.of(standardOut.toString().split("\\R"));
+		var templateNames = standardOut.toString().lines().filter(line -> !line.isBlank()).toList();
+		assertEquals(templateNames.stream().sorted().toList(), templateNames);
 		assertTrue(templateNames.contains("CrudPortsConfiguration"));
 		assertTrue(templateNames.contains("CrudDefinitionConfiguration"));
 		assertTrue(templateNames.contains("CrudServicesConfiguration"));
@@ -159,6 +160,28 @@ class GeneratorCliIntegrationTest
 				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/configuration/PersonCrudDefinitionConfiguration.java")));
 		assertFalse(Files.exists(contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/save/application/service/PersonSaveService.java")));
+	}
+
+	@Test
+	void generateSubcommandDoesNotLeakStateBetweenExecutions(@TempDir final Path tempDir)
+			throws IOException
+	{
+		Path repoRoot = tempDir.resolve("cleanCrud-sampleImplementation-copy");
+		Path contentRoot = repoRoot.resolve("src/main/java");
+		Path modelPath =
+				contentRoot.resolve("de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java");
+		Path configPath = repoRoot.resolve(".run/person-generator-config.json");
+		Files.createDirectories(modelPath.getParent());
+		Files.createDirectories(configPath.getParent());
+		Files.writeString(modelPath, PERSON_MODEL_SOURCE);
+		Files.writeString(configPath, configJson());
+
+		assertEquals(0, commandLine().execute(
+				"generate",
+				"--base-model", modelPath.toString(),
+				"--group", "COMMON",
+				"--overwrite-default"));
+		assertEquals(0, commandLine().execute("generate", "--config", configPath.toString()));
 	}
 
 	private CommandLine commandLine()

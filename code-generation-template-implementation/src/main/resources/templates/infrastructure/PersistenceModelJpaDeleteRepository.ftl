@@ -1,10 +1,10 @@
 <#-- Template for generating PersistenceModelJpaDeleteRepository class -->
-package ${basePackage()}.useCases.crud.delete.infrastructure.persistence.repository;
+package ${aggregate().basePackage()}.useCases.crud.delete.infrastructure.persistence.repository;
 
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}JpaRepository;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelHistory;
-import ${basePackage()}.infrastructure.persistence.repository.${modelBaseName()}PersistenceModelImpl;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}JpaRepository;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}PersistenceModelHistory;
+import ${aggregate().basePackage()}.infrastructure.persistence.repository.${aggregate().baseName()}PersistenceModelImpl;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.adapter.TriTemporalHistorySnapshotFactory;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.repository.TriTemporalHistoryRepository;
 import de.gupta.clean.crud.template.infrastructure.persistence.history.service.AuditActorSupplier;
@@ -16,17 +16,17 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Qualifier("${beanNamePrefix()}DeletePersistenceModelRepository")
-class ${modelBaseName()}PersistenceModelJpaDeleteRepository
-		extends AbstractPersistenceModelJpaDeleteRepository<${modelBaseName()}PersistenceModel, UUID, ${modelBaseName()}PersistenceModelImpl,
-		${modelBaseName()}PersistenceModelHistory>
+@Qualifier("${aggregate().beanNamePrefix()}DeletePersistenceModelRepository")
+class ${aggregate().baseName()}PersistenceModelJpaDeleteRepository
+		extends AbstractPersistenceModelJpaDeleteRepository<${aggregate().baseName()}PersistenceModel, UUID, ${aggregate().baseName()}PersistenceModelImpl,
+		${aggregate().baseName()}PersistenceModelHistory>
 		implements DeletePersistenceModelRepository<UUID>
 {
-	${modelBaseName()}PersistenceModelJpaDeleteRepository(
-			final ${modelBaseName()}JpaRepository jpaRepository,
-			final TriTemporalHistoryRepository<UUID, ${modelBaseName()}PersistenceModelHistory> historyRepository,
-			final TriTemporalHistorySnapshotFactory<UUID, ${modelBaseName()}PersistenceModel, ${modelBaseName()}PersistenceModelHistory> snapshotFactory,
-			final @Qualifier("${beanNamePrefix()}AuditActorSupplier") AuditActorSupplier auditActorSupplier)
+	${aggregate().baseName()}PersistenceModelJpaDeleteRepository(
+			final ${aggregate().baseName()}JpaRepository jpaRepository,
+			final TriTemporalHistoryRepository<UUID, ${aggregate().baseName()}PersistenceModelHistory> historyRepository,
+			final TriTemporalHistorySnapshotFactory<UUID, ${aggregate().baseName()}PersistenceModel, ${aggregate().baseName()}PersistenceModelHistory> snapshotFactory,
+			final @Qualifier("${aggregate().beanNamePrefix()}AuditActorSupplier") AuditActorSupplier auditActorSupplier)
 	{
 		super(jpaRepository, historyRepository, snapshotFactory, auditActorSupplier);
 	}

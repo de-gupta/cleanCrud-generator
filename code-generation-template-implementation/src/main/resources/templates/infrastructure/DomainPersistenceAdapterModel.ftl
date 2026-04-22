@@ -1,5 +1,5 @@
 <#-- Template for generating DomainPersistenceAdapterModel class -->
-package ${basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
+package ${aggregate().basePackage()}.infrastructure.persistence.adapter.persistence.domain.id.model;
 
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.model.AbstractDomainPersistenceAdapterModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.model.DomainPersistenceAdapterModel;
@@ -11,41 +11,41 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 
 @Entity
-@Table(name = "${domainPersistenceAdapterTableName()}",
+@Table(name = "${persistence().adapterTableName()}",
 		uniqueConstraints = {
 				@UniqueConstraint(columnNames = "domain_id"),
 				@UniqueConstraint(columnNames = "persistence_id")
 		},
 		indexes = {
-				@Index(name = "${modelBaseName()?lower_case}_idx_domain_id", columnList = "domain_id"),
-				@Index(name = "${modelBaseName()?lower_case}_idx_persistence_id", columnList = "persistence_id")
+				@Index(name = "${aggregate().baseName()?lower_case}_idx_domain_id", columnList = "domain_id"),
+				@Index(name = "${aggregate().baseName()?lower_case}_idx_persistence_id", columnList = "persistence_id")
 		})
-public class ${modelBaseName()}DomainPersistenceAdapterModel extends AbstractDomainPersistenceAdapterModel<Long, UUID>
+public class ${aggregate().baseName()}DomainPersistenceAdapterModel extends AbstractDomainPersistenceAdapterModel<Long, UUID>
 		implements DomainPersistenceAdapterModel<Long, UUID>
 {
-	public static DomainPersistenceAdapterModel.Builder<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel> builder()
+	public static DomainPersistenceAdapterModel.Builder<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterModel> builder()
 	{
 		return new Builder();
 	}
 
-	protected ${modelBaseName()}DomainPersistenceAdapterModel()
+	protected ${aggregate().baseName()}DomainPersistenceAdapterModel()
 	{
 		super();
 	}
 
-	private static final class Builder extends AbstractBuilder<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>
-			implements DomainPersistenceAdapterModel.Builder<Long, UUID, ${modelBaseName()}DomainPersistenceAdapterModel>,
-			de.gupta.clean.crud.template.domain.model.builder.ModelBuilder<${modelBaseName()}DomainPersistenceAdapterModel>
+	private static final class Builder extends AbstractBuilder<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterModel>
+			implements DomainPersistenceAdapterModel.Builder<Long, UUID, ${aggregate().baseName()}DomainPersistenceAdapterModel>,
+			de.gupta.clean.crud.template.domain.model.builder.ModelBuilder<${aggregate().baseName()}DomainPersistenceAdapterModel>
 	{
 		@Override
-		protected ${modelBaseName()}DomainPersistenceAdapterModel doBuild()
+		protected ${aggregate().baseName()}DomainPersistenceAdapterModel doBuild()
 		{
-			return (${modelBaseName()}DomainPersistenceAdapterModel) model;
+			return (${aggregate().baseName()}DomainPersistenceAdapterModel) model;
 		}
 
 		private Builder()
 		{
-			super(new ${modelBaseName()}DomainPersistenceAdapterModel());
+			super(new ${aggregate().baseName()}DomainPersistenceAdapterModel());
 		}
 	}
 }

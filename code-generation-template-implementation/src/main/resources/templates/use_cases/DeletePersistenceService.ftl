@@ -1,7 +1,7 @@
 <#-- Template for generating DeletePersistenceService class -->
-package ${basePackage()}.useCases.crud.delete.infrastructure.persistence.service;
+package ${aggregate().basePackage()}.useCases.crud.delete.infrastructure.persistence.service;
 
-import ${basePackage()}.infrastructure.persistence.model.${modelBaseName()}PersistenceModel;
+import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate().baseName()}PersistenceModel;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDAdapter;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDManagement;
 import de.gupta.clean.crud.template.useCases.crud.delete.application.service.DeletePersistenceService;
@@ -14,15 +14,15 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-@Qualifier("${beanNamePrefix()}DeletePersistenceService")
-final class ${modelBaseName()}DeletePersistenceService extends AbstractDeletePersistenceService<Long, UUID, ${modelBaseName()}PersistenceModel>
+@Qualifier("${aggregate().beanNamePrefix()}DeletePersistenceService")
+final class ${aggregate().baseName()}DeletePersistenceService extends AbstractDeletePersistenceService<Long, UUID, ${aggregate().baseName()}PersistenceModel>
 		implements DeletePersistenceService<Long>
 {
-	${modelBaseName()}DeletePersistenceService(
-			final FetchPersistenceModelRepository<${modelBaseName()}PersistenceModel, UUID> fetchRepository,
-			@Qualifier("${beanNamePrefix()}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
-			@Qualifier("${beanNamePrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
-			@Qualifier("${beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement)
+	${aggregate().baseName()}DeletePersistenceService(
+			final FetchPersistenceModelRepository<${aggregate().baseName()}PersistenceModel, UUID> fetchRepository,
+			@Qualifier("${aggregate().beanNamePrefix()}DeletePersistenceModelRepository") final DeletePersistenceModelRepository<UUID> deleteRepository,
+			@Qualifier("${aggregate().beanNamePrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<Long, UUID> idAdapter,
+			@Qualifier("${aggregate().beanNamePrefix()}DomainPersistenceIDManagement") final DomainPersistenceIDManagement<Long, UUID> idManagement)
 	{
 		super(fetchRepository, deleteRepository, idAdapter, idManagement);
 	}

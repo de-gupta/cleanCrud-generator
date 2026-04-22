@@ -1,7 +1,7 @@
 <#-- Template for generating DomainConstraintService class -->
-package ${basePackage()}.infrastructure.persistence.service;
+package ${aggregate().basePackage()}.infrastructure.persistence.service;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
 import de.gupta.clean.crud.template.domain.service.constraints.AbstractDomainConstraintService;
 import de.gupta.clean.crud.template.domain.service.constraints.ConstraintResult;
 import de.gupta.clean.crud.template.domain.service.constraints.DomainConstraintService;
@@ -14,15 +14,15 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 @Component
-final class ${modelBaseName()}DomainConstraintService
-		extends AbstractDomainConstraintService<${modelBaseName()}DomainModel>
-		implements DomainConstraintService${"<"}${modelBaseName()}DomainModel${">"}
+final class ${aggregate().baseName()}DomainConstraintService
+		extends AbstractDomainConstraintService<${aggregate().baseName()}DomainModel>
+		implements DomainConstraintService${"<"}${aggregate().baseName()}DomainModel${">"}
 {
-	${modelBaseName()}DomainConstraintService(
-			final DuplicateDefinition<${modelBaseName()}DomainModel> duplicateDefinition,
-			final DuplicateInsertionMessage<${modelBaseName()}DomainModel> duplicateInsertionMessage,
-			final ExistingModelsConstraintService<${modelBaseName()}DomainModel> existingModelsConstraintService,
-			final Supplier<Collection<${modelBaseName()}DomainModel>> existingModelsSupplier)
+	${aggregate().baseName()}DomainConstraintService(
+			final DuplicateDefinition<${aggregate().baseName()}DomainModel> duplicateDefinition,
+			final DuplicateInsertionMessage<${aggregate().baseName()}DomainModel> duplicateInsertionMessage,
+			final ExistingModelsConstraintService<${aggregate().baseName()}DomainModel> existingModelsConstraintService,
+			final Supplier<Collection<${aggregate().baseName()}DomainModel>> existingModelsSupplier)
 	{
 		super(duplicateDefinition, duplicateInsertionMessage, existingModelsConstraintService, existingModelsSupplier);
 	}

@@ -1,12 +1,12 @@
 <#-- Template for generating UpdateServiceFacade class -->
-package ${basePackage()}.useCases.crud.update.facade;
+package ${aggregate().basePackage()}.useCases.crud.update.facade;
 
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelCreate;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelResponse;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelUpdatePatch;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelCreate;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelResponse;
-import ${basePackage()}.useCases.crud.common.dto.${modelBaseName()}APIModelUpdatePatch;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelCreate;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelResponse;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelUpdatePatch;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelCreate;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
+import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelUpdatePatch;
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.id.APIDomainIDAdapter;
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.APIToDomainCreateAdapter;
 import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.APIToDomainUpdateAdapter;
@@ -17,18 +17,18 @@ import de.gupta.clean.crud.template.useCases.crud.update.facade.UpdateServiceFac
 import org.springframework.stereotype.Component;
 
 @Component
-final class ${modelBaseName()}UpdateServiceFacade extends
-AbstractUpdateServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}APIModelResponse, Long,
-${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse, Long${">"}
-		implements UpdateServiceFacade${"<"}${modelBaseName()}APIModelCreate, ${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}APIModelResponse, Long${">"}
+final class ${aggregate().baseName()}UpdateServiceFacade extends
+AbstractUpdateServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}APIModelResponse, Long,
+${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse, Long${">"}
+		implements UpdateServiceFacade${"<"}${aggregate().baseName()}APIModelCreate, ${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}APIModelResponse, Long${">"}
 {
-${modelBaseName()}UpdateServiceFacade(
-		final UpdateService${"<"}${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModelUpdatePatch, ${modelBaseName()}DomainModelResponse, Long${">"} service,
-		final APIToDomainCreateAdapter${"<"}${modelBaseName()}APIModelCreate,
-        ${modelBaseName()}DomainModelCreate${">"} createAdapter,
-		final APIToDomainUpdateAdapter${"<"}${modelBaseName()}APIModelUpdatePatch, ${modelBaseName()}DomainModelUpdatePatch${">"} updateAdapter,
-		final DomainToAPIResponseAdapter${"<"}${modelBaseName()}APIModelResponse, Long,
-        ${modelBaseName()}DomainModelResponse${">"} responseAdapter,
+${aggregate().baseName()}UpdateServiceFacade(
+		final UpdateService${"<"}${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${aggregate().baseName()}DomainModelResponse, Long${">"} service,
+		final APIToDomainCreateAdapter${"<"}${aggregate().baseName()}APIModelCreate,
+        ${aggregate().baseName()}DomainModelCreate${">"} createAdapter,
+		final APIToDomainUpdateAdapter${"<"}${aggregate().baseName()}APIModelUpdatePatch, ${aggregate().baseName()}DomainModelUpdatePatch${">"} updateAdapter,
+		final DomainToAPIResponseAdapter${"<"}${aggregate().baseName()}APIModelResponse, Long,
+        ${aggregate().baseName()}DomainModelResponse${">"} responseAdapter,
 final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter)
 {
 super(service, createAdapter, updateAdapter, responseAdapter, idAdapter);

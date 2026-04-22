@@ -1,21 +1,21 @@
 <#-- Template for enriching the user-provided base Model interface -->
-package ${basePackage()}.domain.model;
+package ${aggregate().basePackage()}.domain.model;
 
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilder;
 import de.gupta.clean.crud.template.domain.model.validation.Validatable;
 
 import java.util.Optional;
-<#if domainModelImports()?has_content>
-<#list domainModelImports() as import>
+<#if domain().imports()?has_content>
+<#list domain().imports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
 </#list>
 </#if>
 
-public interface ${modelName()}<#if isGeneric()><<#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>></#if> extends Validatable
+public interface ${aggregate().modelName()}<#if types().isGeneric()><<#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>></#if> extends Validatable
 {
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
     ${property.returnType()} ${property.name()}();
 
 </#list>
@@ -24,10 +24,10 @@ public interface ${modelName()}<#if isGeneric()><<#list genericTypeParameters() 
 	{
 	}
 
-	interface ${modelName()}Builder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M extends ${modelName()}<#if isGeneric()><<#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>></#if>, B extends ${modelName()}Builder${"<"}<#if isGeneric()><#list genericTypeParameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M, B${">"}${">"} extends ModelBuilder${"<"}M${">"}
+	interface ${aggregate().modelName()}Builder${"<"}<#if types().isGeneric()><#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M extends ${aggregate().modelName()}<#if types().isGeneric()><<#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>></#if>, B extends ${aggregate().modelName()}Builder${"<"}<#if types().isGeneric()><#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M, B${">"}${">"} extends ModelBuilder${"<"}M${">"}
 	{
-    <#list standaloneProperties() as property>
-		B with${property.capitalizedName()}(final ${baseBuilderPropertyType(property)} ${property.name()});
+    <#list composition().standaloneProperties() as property>
+		B with${property.capitalizedName()}(final ${composition().declaredBuilderPropertyType(property)} ${property.name()});
     </#list>
 	}
 }

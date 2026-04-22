@@ -1,8 +1,8 @@
 <#-- Template for generating DomainModelBuilder class -->
-package ${basePackage()}.domain.mapping.save;
+package ${aggregate().basePackage()}.domain.mapping.save;
 
-import ${basePackage()}.domain.model.${modelBaseName()}DomainModel;
-import ${basePackage()}.domain.model.dto.${modelBaseName()}DomainModelCreate;
+import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
+import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelCreate;
 import de.gupta.clean.crud.template.domain.mapping.save.DomainModelBuilder;
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilderFactory;
 import org.springframework.stereotype.Component;
@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-final class ${modelBaseName()}DomainModelBuilder implements DomainModelBuilder${"<"}${modelBaseName()}DomainModelCreate, ${modelBaseName()}DomainModel${">"}
+final class ${aggregate().baseName()}DomainModelBuilder implements DomainModelBuilder${"<"}${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModel${">"}
 {
-private final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder${">"} modelBuilderFactory;
+private final ModelBuilderFactory${"<"}${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder${">"} modelBuilderFactory;
 
 @Override
-public ${modelBaseName()}DomainModel toModel(final ${modelBaseName()}DomainModelCreate domainModelCreate)
+public ${aggregate().baseName()}DomainModel toModel(final ${aggregate().baseName()}DomainModelCreate domainModelCreate)
 {
 return modelBuilderFactory.builder()
-<#list standaloneProperties() as property>
+<#list composition().standaloneProperties() as property>
 .with${property.capitalizedName()}(domainModelCreate.${property.getter()}())
 </#list>
-<#list relationships() as relationship>
+<#list composition().relationships() as relationship>
 	<#if relationship.many()>
 .with${relationship.propertyCapitalizedName()}(List.of())
 	<#elseif relationship.optional()>
@@ -34,8 +34,8 @@ return modelBuilderFactory.builder()
 .build();
 }
 
-${modelBaseName()}DomainModelBuilder(
-final ModelBuilderFactory${"<"}${modelBaseName()}DomainModel, ${modelBaseName()}DomainModel.${modelBaseName()}DomainModelBuilder${">"} modelBuilderFactory)
+${aggregate().baseName()}DomainModelBuilder(
+final ModelBuilderFactory${"<"}${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder${">"} modelBuilderFactory)
 {
 this.modelBuilderFactory = modelBuilderFactory;
 }
