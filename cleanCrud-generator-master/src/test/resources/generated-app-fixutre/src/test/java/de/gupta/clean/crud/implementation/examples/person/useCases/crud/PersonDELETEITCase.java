@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PersonDELETEITCase extends AbstractPersonITCase
@@ -19,9 +20,11 @@ class PersonDELETEITCase extends AbstractPersonITCase
 		var createdPerson = createPerson(requestFor(scenario, currentVersion, lastKnownVersion));
 
 		mockMvc.perform(delete("/person/delete/{id}", createdPerson.id()))
+			   .andDo(print())
 			   .andExpect(status().isNoContent());
 
 		mockMvc.perform(get("/person/fetch/{id}", createdPerson.id()))
+			   .andDo(print())
 			   .andExpect(status().isNotFound());
 	}
 }

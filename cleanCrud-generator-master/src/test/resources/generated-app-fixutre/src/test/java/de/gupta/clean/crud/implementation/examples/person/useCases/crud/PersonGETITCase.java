@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PersonGETITCase extends AbstractPersonITCase
@@ -24,6 +25,7 @@ class PersonGETITCase extends AbstractPersonITCase
 		PersonAPIModelResponse createdPerson = createPerson(requestFor(scenario, currentVersion, lastKnownVersion));
 
 		var result = mockMvc.perform(get("/person/fetch/{id}", createdPerson.id()))
+							.andDo(print())
 							.andExpect(status().isOk())
 							.andReturn();
 

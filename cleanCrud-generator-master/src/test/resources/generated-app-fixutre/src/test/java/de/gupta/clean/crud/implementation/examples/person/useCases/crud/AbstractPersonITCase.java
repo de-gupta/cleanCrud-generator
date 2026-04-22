@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
@@ -57,6 +58,7 @@ abstract class AbstractPersonITCase
 		MvcResult result = mockMvc.perform(post("/person/save")
 										  .contentType(MediaType.APPLICATION_JSON)
 										  .content(objectMapper.writeValueAsString(personToCreate)))
+								  .andDo(print())
 								  .andExpect(status().isCreated())
 								  .andReturn();
 
