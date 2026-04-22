@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>cleanCrud-generator</artifactId>
-    <version>0.5.0</version>
+    <version>0.5.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>code-generation-model-implementation</module>
@@ -54,6 +54,6 @@
         <connection>scm:git:git@github.com:de-gupta/cleanCrud-generator.git</connection>
         <developerConnection>scm:git:git@github.com:de-gupta/cleanCrud-generator.git</developerConnection>
         <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
-        <tag>v0.5.0</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
