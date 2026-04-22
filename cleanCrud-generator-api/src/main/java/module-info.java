@@ -10,4 +10,5 @@ module cleanCrud.generator.api
 	requires com.fasterxml.jackson.dataformat.yaml;
 
 	exports de.gupta.clean.crud.generator.api.api.cli;
+	opens de.gupta.clean.crud.generator.api.api.cli to info.picocli;
 }

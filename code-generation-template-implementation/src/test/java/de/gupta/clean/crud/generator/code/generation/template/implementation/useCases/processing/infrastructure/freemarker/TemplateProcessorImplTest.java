@@ -7,16 +7,19 @@ import de.gupta.clean.crud.generator.code.generation.template.support.TemplateMo
 import freemarker.template.Configuration;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TemplateProcessorImplTest
 {
 	@Test
-	void rendersTemplateUsingSemanticTemplateModelAccessors()
+	void rendersTemplateUsingSemanticTemplateModelAccessors() throws IOException
 	{
 		Configuration configuration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-		configuration.setClassLoaderForTemplateLoading(getClass().getClassLoader(), "templates");
+		configuration.setDirectoryForTemplateLoading(Path.of("src", "main", "resources", "templates").toFile());
 		TemplateProcessorImpl processor = new TemplateProcessorImpl(configuration);
 		SourceCodeTemplate template = new SourceCodeTemplate(
 				"APIModelUpdatePatchDTO",
