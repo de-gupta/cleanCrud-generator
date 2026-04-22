@@ -29,7 +29,7 @@ class GeneratedAppFixtureBootIT
 			var harness = new GeneratedAppFixtureHarness(applicationContext);
 			var project = harness.prepareGeneratedApp(tempDir);
 
-			var result = harness.executeMaven(project.projectRoot(), "-q", "-Dtest=ExampleApplicationTest", "test");
+			var result = harness.executeMaven(project.projectRoot(), "-q", "test");
 			assertEquals(0, result.exitCode(),
 					() -> "Generated app fixture did not boot successfully:\n" + result.output());
 		}
