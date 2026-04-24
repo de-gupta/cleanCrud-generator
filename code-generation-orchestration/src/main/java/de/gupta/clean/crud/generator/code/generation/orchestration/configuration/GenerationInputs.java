@@ -4,12 +4,23 @@ public record GenerationInputs(
 		String baseModelSourceCodeFilePath,
 		String domainModelSourceCodeFilePath,
 		String persistenceModelSourceCodeFilePath,
-		String apiModelSourceCodeFilePath
+		String apiModelSourceCodeFilePath,
+		String generationSpecSourceCodeFilePath
 )
 {
 	public static GenerationInputs empty()
 	{
-		return new GenerationInputs(null, null, null, null);
+		return new GenerationInputs(null, null, null, null, null);
+	}
+
+	public GenerationInputs(
+			final String baseModelSourceCodeFilePath,
+			final String domainModelSourceCodeFilePath,
+			final String persistenceModelSourceCodeFilePath,
+			final String apiModelSourceCodeFilePath)
+	{
+		this(baseModelSourceCodeFilePath, domainModelSourceCodeFilePath, persistenceModelSourceCodeFilePath,
+				apiModelSourceCodeFilePath, null);
 	}
 
 	public GenerationInputs normalized()
@@ -18,7 +29,8 @@ public record GenerationInputs(
 				normalize(baseModelSourceCodeFilePath),
 				normalize(domainModelSourceCodeFilePath),
 				normalize(persistenceModelSourceCodeFilePath),
-				normalize(apiModelSourceCodeFilePath)
+				normalize(apiModelSourceCodeFilePath),
+				normalize(generationSpecSourceCodeFilePath)
 		);
 	}
 

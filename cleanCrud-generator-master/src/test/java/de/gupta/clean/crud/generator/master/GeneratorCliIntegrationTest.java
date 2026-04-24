@@ -16,7 +16,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,16 +28,10 @@ class GeneratorCliIntegrationTest
 			
 			import java.util.Optional;
 			
-			public interface PersonModel<U, V>
+			public interface PersonModel
 			{
-				U user();
-			
-				Optional<V> something();
-			
 				Optional<String> title();
-			
 				String firstName();
-			
 				Optional<String> lastName();
 			}
 			""";
@@ -137,9 +130,6 @@ class GeneratorCliIntegrationTest
 		int exitCode = commandLine().execute(
 				"generate",
 				"--base-model", modelPath.toString(),
-				"--domain-type", "U=String", "--domain-type", "V=Integer",
-				"--persistence-type", "U=String", "--persistence-type", "V=Integer",
-				"--api-type", "U=String", "--api-type", "V=Integer",
 				"--group", "COMMON",
 				"--group", "CONFIGURATION",
 				"--group", "DOMAIN_MODELS",
@@ -201,18 +191,9 @@ class GeneratorCliIntegrationTest
 						    "baseModelSourceCodeFilePath": "../src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java"
 						  },
 						  "genericTypes": {
-						    "domain": {
-						      "U": "String",
-						      "V": "Integer"
-						    },
-						    "persistence": {
-						      "U": "String",
-						      "V": "Integer"
-						    },
-						    "api": {
-						      "U": "String",
-						      "V": "Integer"
-						    }
+						    "domain": {},
+						    "persistence": {},
+						    "api": {}
 						  },
 						  "generation": {},
 						  "ownership": {},
@@ -228,12 +209,6 @@ class GeneratorCliIntegrationTest
 	{
 		return """
 				inputs.baseModelSourceCodeFilePath=../src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java
-				genericTypes.domain.U=String
-				genericTypes.domain.V=Integer
-				genericTypes.persistence.U=String
-				genericTypes.persistence.V=Integer
-				genericTypes.api.U=String
-				genericTypes.api.V=Integer
 				overwrite.defaultOverwrite=true
 				historized=true
 				""";

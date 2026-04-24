@@ -44,6 +44,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>io.github.de-gupta</groupId>
+            <artifactId>cleanCrud</artifactId>
+            <version>${clean.crud.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
             <version>1.4.1</version>

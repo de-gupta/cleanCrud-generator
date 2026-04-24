@@ -24,6 +24,15 @@ record AggregateCompositionImpl(Set<Property> properties, List<GeneratedRelation
 	}
 
 	@Override
+	public GeneratedRelationship relationship(final Property property)
+	{
+		return relationships.stream()
+		                    .filter(relationship -> relationship.propertyName().equals(property.name()))
+		                    .findFirst()
+		                    .orElseThrow();
+	}
+
+	@Override
 	public java.util.SequencedCollection<Property> standaloneProperties()
 	{
 		return properties.stream().filter(property -> !relationshipPropertyNames().contains(property.name())).toList();

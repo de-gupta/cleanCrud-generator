@@ -3,7 +3,9 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orc
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCodeFile;
 import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.LayerConcreteTypes;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteResolver;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.GeneratedRelationship;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModelFactory;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateSelector;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -44,27 +48,34 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	private final GeneratedRelationshipFactory generatedRelationshipFactory;
 	private final GenerationExclusionPolicy generationExclusionPolicy;
 	private final SourceCodeTargetPathResolver sourceCodeTargetPathResolver;
+	private final JavaGenerationSpecificationLoader generationSpecificationLoader;
+	private final GenerationSpecificationConfigurationAssembler generationSpecificationConfigurationAssembler;
 
 	@Override
 	public int generateCode(final CodeGenerationConfiguration configuration)
 	{
 		var model = modelParser.parseDomainModel(configuration.inputs().baseModelSourceCodeFilePath());
-		relationshipConfigurationValidator.validate(model, configuration.relationships());
-		var relationships = generatedRelationshipFactory.create(model, configuration.relationships());
+		var effectiveConfiguration = effectiveConfiguration(configuration, model);
+		relationshipConfigurationValidator.validate(model, effectiveConfiguration.relationships());
+		var relationships = generatedRelationshipFactory.create(model, effectiveConfiguration.relationships());
+		var layerTypes = mergeRelationshipConcreteTypes(effectiveConfiguration.genericTypes(), relationships);
 		var templateModel = TemplateModelFactory.create(model.packageName(), model.modelName(),
-				model.genericTypeParameters(), model.properties(), configuration.genericTypes().domain(),
-				configuration.genericTypes().persistence(), configuration.genericTypes().api(), Set.of(),
-				configuration.historized(), relationships);
-		var overwriteResolver = OverwriteResolver.with(configuration.overwrite());
+				model.genericTypeParameters(), model.properties(), layerTypes.domain(),
+				layerTypes.persistence(), layerTypes.api(), Set.of(),
+				effectiveConfiguration.historized(), relationships,
+				effectiveConfiguration.rootAggregateIds().apiIdType(),
+				effectiveConfiguration.rootAggregateIds().domainIdType(),
+				effectiveConfiguration.rootAggregateIds().persistenceIdType());
+		var overwriteResolver = OverwriteResolver.with(effectiveConfiguration.overwrite());
 
 		var files = templateProcessor.generateSourceCode(templateModel,
 				TemplateSelector.with(
-						resolveTemplateGroups(configuration),
-						resolveTemplates(configuration),
-						resolveTags(configuration),
-						configuration.generation().excludeGroups(),
-						generationExclusionPolicy.excludedTemplates(configuration),
-						resolveExcludedTags(configuration)));
+						resolveTemplateGroups(effectiveConfiguration),
+						resolveTemplates(effectiveConfiguration),
+						resolveTags(effectiveConfiguration),
+						effectiveConfiguration.generation().excludeGroups(),
+						generationExclusionPolicy.excludedTemplates(effectiveConfiguration),
+						resolveExcludedTags(effectiveConfiguration)));
 
 		files.forEach((template, sourceCodeFile) ->
 		{
@@ -81,6 +92,47 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 		});
 
 		return 0;
+	}
+
+	private CodeGenerationConfiguration effectiveConfiguration(
+			final CodeGenerationConfiguration configuration,
+			final de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Model model)
+	{
+		String specSourcePath = configuration.inputs().generationSpecSourceCodeFilePath();
+		if (specSourcePath == null || specSourcePath.isBlank())
+		{
+			return configuration;
+		}
+		var specification = generationSpecificationLoader.load(
+				Path.of(configuration.inputs().baseModelSourceCodeFilePath()),
+				Path.of(specSourcePath));
+		var loaded = generationSpecificationConfigurationAssembler.assemble(model, specification);
+		return new CodeGenerationConfiguration(
+				configuration.inputs(),
+				configuration.genericTypes(),
+				configuration.generation(),
+				loaded.relationships(),
+				loaded.rootAggregateIds(),
+				configuration.ownership(),
+				configuration.overwrite(),
+				configuration.historized());
+	}
+
+	private LayerConcreteTypes mergeRelationshipConcreteTypes(
+			final LayerConcreteTypes configuredTypes,
+			final java.util.List<GeneratedRelationship> relationships)
+	{
+		Map<String, String> domain = new LinkedHashMap<>(configuredTypes.domain());
+		Map<String, String> persistence = new LinkedHashMap<>(configuredTypes.persistence());
+		Map<String, String> api = new LinkedHashMap<>(configuredTypes.api());
+		for (GeneratedRelationship relationship : relationships)
+		{
+			domain.put(relationship.genericPlaceholder(),
+					"de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel<" + relationship.satelliteDomainIdType() + ", " + relationship.domainModelType() + ">");
+			persistence.put(relationship.genericPlaceholder(), relationship.satellitePersistenceIdType());
+			api.put(relationship.genericPlaceholder(), relationship.responseType());
+		}
+		return new LayerConcreteTypes(Map.copyOf(domain), Map.copyOf(persistence), Map.copyOf(api));
 	}
 
 	private Set<String> resolveTemplateGroups(final CodeGenerationConfiguration configuration)
@@ -121,7 +173,9 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 			final RelationshipGenerationConfigurationValidator relationshipConfigurationValidator,
 			final GeneratedRelationshipFactory generatedRelationshipFactory,
 			final GenerationExclusionPolicy generationExclusionPolicy,
-			final SourceCodeTargetPathResolver sourceCodeTargetPathResolver)
+			final SourceCodeTargetPathResolver sourceCodeTargetPathResolver,
+			final JavaGenerationSpecificationLoader generationSpecificationLoader,
+			final GenerationSpecificationConfigurationAssembler generationSpecificationConfigurationAssembler)
 	{
 		this.modelParser = modelParser;
 		this.templateProcessor = templateProcessor;
@@ -130,5 +184,7 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 		this.generatedRelationshipFactory = generatedRelationshipFactory;
 		this.generationExclusionPolicy = generationExclusionPolicy;
 		this.sourceCodeTargetPathResolver = sourceCodeTargetPathResolver;
+		this.generationSpecificationLoader = generationSpecificationLoader;
+		this.generationSpecificationConfigurationAssembler = generationSpecificationConfigurationAssembler;
 	}
 }

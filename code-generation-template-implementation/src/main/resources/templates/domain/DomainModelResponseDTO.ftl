@@ -3,8 +3,8 @@ package ${aggregate().basePackage()}.domain.model.dto;
 import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}DomainModel;
 
 import java.util.Optional;
-<#if domain().imports()?has_content>
-<#list domain().imports() as import>
+<#if domain().responseImports()?has_content>
+<#list domain().responseImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>

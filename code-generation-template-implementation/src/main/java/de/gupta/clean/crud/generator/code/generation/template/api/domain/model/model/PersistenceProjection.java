@@ -11,6 +11,8 @@ public interface PersistenceProjection
 
 	Set<String> imports();
 
+	Set<String> interfaceImports();
+
 	String concreteType(String genericType);
 
 	String resolvedType(String declaredType);

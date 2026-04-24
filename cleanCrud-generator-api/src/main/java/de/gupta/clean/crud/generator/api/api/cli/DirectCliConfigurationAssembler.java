@@ -28,7 +28,8 @@ final class DirectCliConfigurationAssembler
 						resolvedBaseModel,
 						options.domainModelPath(),
 						options.persistenceModelPath(),
-						options.apiModelPath()),
+						options.apiModelPath(),
+						options.generationSpecPath()),
 				new LayerConcreteTypes(
 						parseAssignments(options.domainTypes(), spec),
 						parseAssignments(options.persistenceTypes(), spec),
@@ -41,6 +42,7 @@ final class DirectCliConfigurationAssembler
 						options.excludeTemplates(),
 						options.excludeTags()),
 				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				new OwnershipConfiguration(
 						options.baseModelOwnership(),
 						options.domainModelOwnership(),

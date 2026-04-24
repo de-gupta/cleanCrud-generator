@@ -37,21 +37,50 @@ class TaskRelationshipGenerationSmokeTest
 	private static final String TASK_MODEL_SOURCE = """
 			package de.gupta.clean.crud.implementation.examples.task.domain.model;
 			
-			import de.gupta.clean.crud.implementation.examples.note.useCases.crud.common.dto.NoteAPIModelResponse;
-			import de.gupta.clean.crud.implementation.examples.version.useCases.crud.common.dto.VersionAPIModelResponse;
-			
 			import java.util.Collection;
 			import java.util.Optional;
 			
-			public interface TaskModel
+			public interface TaskModel<V, N>
 			{
 				String title();
-			
 				Optional<String> description();
+				Optional<V> version();
+				Collection<N> notes();
+			}
+			""";
+	private static final String TASK_GENERATION_SPEC_SOURCE = """
+			package de.gupta.clean.crud.implementation.examples.task.domain.model;
 			
-				Optional<VersionAPIModelResponse> version();
+			import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.ReconciliationStrategy;
+			import de.gupta.clean.crud.template.generation.specification.AggregateGenerationSpec;
+			import de.gupta.clean.crud.template.generation.specification.AggregateGenerationSpecs;
+			import de.gupta.clean.crud.template.generation.specification.CodeGenerationSpecification;
+			import de.gupta.clean.crud.template.generation.specification.Relationship;
+			import de.gupta.clean.crud.implementation.examples.note.domain.model.NoteModel;
+			import de.gupta.clean.crud.implementation.examples.version.domain.model.VersionModel;
 			
-				Collection<NoteAPIModelResponse> notes();
+			import java.util.UUID;
+			
+			public final class TaskGenerationSpec implements CodeGenerationSpecification
+			{
+				@Override
+				public AggregateGenerationSpec specification()
+				{
+					return AggregateGenerationSpecs.aggregate(TaskModel.class)
+							.rootApiIdType(Long.class)
+							.rootDomainIdType(Long.class)
+							.rootPersistenceIdType(UUID.class)
+							.relationship(Relationship.owned("version", VersionModel.class)
+									.apiIdType(Long.class)
+									.domainIdType(Long.class)
+									.persistenceIdType(UUID.class))
+							.relationship(Relationship.owned("notes", NoteModel.class)
+									.apiIdType(Long.class)
+									.domainIdType(Long.class)
+									.persistenceIdType(UUID.class)
+									.reconciliationStrategy(ReconciliationStrategy.MERGE_BY_ID))
+							.build();
+				}
 			}
 			""";
 	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.1-SNAPSHOT");
@@ -70,16 +99,20 @@ class TaskRelationshipGenerationSmokeTest
 				contentRoot.resolve("de/gupta/clean/crud/implementation/examples/note/domain/model/NoteModel.java");
 		Path taskModelPath =
 				contentRoot.resolve("de/gupta/clean/crud/implementation/examples/task/domain/model/TaskModel.java");
+		Path taskSpecPath =
+				contentRoot.resolve(
+						"de/gupta/clean/crud/implementation/examples/task/domain/model/TaskGenerationSpec.java");
 		Files.createDirectories(versionModelPath.getParent());
 		Files.createDirectories(noteModelPath.getParent());
 		Files.createDirectories(taskModelPath.getParent());
 		Files.writeString(versionModelPath, VERSION_MODEL_SOURCE);
 		Files.writeString(noteModelPath, NOTE_MODEL_SOURCE);
 		Files.writeString(taskModelPath, TASK_MODEL_SOURCE);
+		Files.writeString(taskSpecPath, TASK_GENERATION_SPEC_SOURCE);
 
 		assertEquals(0, orchestrator.generateCode(standaloneConfiguration(versionModelPath)));
 		assertEquals(0, orchestrator.generateCode(standaloneConfiguration(noteModelPath)));
-		assertEquals(0, orchestrator.generateCode(taskConfiguration(taskModelPath)));
+		assertEquals(0, orchestrator.generateCode(specDrivenConfiguration(taskModelPath, taskSpecPath)));
 
 		Path taskRelationshipConfiguration = contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/task/useCases/crud/configuration/TaskCrudRelationshipConfiguration.java");
@@ -87,6 +120,10 @@ class TaskRelationshipGenerationSmokeTest
 				"de/gupta/clean/crud/implementation/examples/task/useCases/crud/configuration/TaskCrudDefinitionConfiguration.java");
 		Path taskApiUpdatePatch = contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/task/useCases/crud/common/dto/TaskAPIModelUpdatePatch.java");
+		Path taskDomainModel = contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/task/domain/model/TaskDomainModel.java");
+		Path taskPersistenceModel = contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/task/infrastructure/persistence/model/TaskPersistenceModel.java");
 		Path noteApiUpdatePatch = contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/note/useCases/crud/common/dto/NoteAPIModelUpdatePatch.java");
 		Path versionApiUpdatePatch = contentRoot.resolve(
@@ -97,16 +134,27 @@ class TaskRelationshipGenerationSmokeTest
 		                .contains("relationshipDefinition(versionRelationshipDefinition)"));
 		assertTrue(Files.readString(taskCrudDefinitionConfiguration)
 		                .contains("relationshipDefinition(notesRelationshipDefinition)"));
-		assertTrue(Files.readString(taskRelationshipConfiguration).contains("oneToOneSatellite(\"version\""));
-		assertTrue(Files.readString(taskRelationshipConfiguration).contains("oneToManySatellite(\"notes\""));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains("aggregateRelationshipDefinition()"));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains(".name(\"version\")"));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains(".cardinality(Cardinality.ONE)"));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains(".name(\"notes\")"));
+		assertTrue(Files.readString(taskRelationshipConfiguration).contains(".cardinality(Cardinality.MANY)"));
+		assertTrue(Files.readString(taskRelationshipConfiguration)
+		                .contains(".reconciliationStrategy(ReconciliationStrategy.MERGE_BY_ID)"));
 		assertTrue(Files.readString(taskApiUpdatePatch)
-		                .contains("SatelliteUpdatePatchItem<Long, VersionAPIModelUpdatePatch>"));
+		                .contains("Optional<VersionAPIModelUpdatePatch> version"));
 		assertTrue(Files.readString(taskApiUpdatePatch)
 		                .contains("SatelliteUpdatePatchItem<Long, NoteAPIModelUpdatePatch>"));
-		assertFalse(Files.readString(taskApiUpdatePatch).contains("record VersionItem("));
-		assertFalse(Files.readString(taskApiUpdatePatch).contains("record NotesItem("));
+		assertTrue(Files.readString(taskDomainModel)
+		                .contains("IdentifiedModel<Long, VersionDomainModel>"));
+		assertTrue(Files.readString(taskDomainModel)
+		                .contains("Collection<IdentifiedModel<Long, NoteDomainModel>>"));
+		assertTrue(Files.readString(taskPersistenceModel).contains("TaskModel<UUID, UUID>"));
+		assertTrue(Files.readString(taskPersistenceModel).contains("void setVersion(final UUID version);"));
+		assertTrue(Files.readString(taskPersistenceModel).contains("void setNotes(final Collection<UUID> notes);"));
 		assertFalse(Files.readString(noteApiUpdatePatch).contains("Optional<Long> id"));
 		assertFalse(Files.readString(versionApiUpdatePatch).contains("Optional<Long> id"));
+		Files.deleteIfExists(taskSpecPath);
 
 		Files.writeString(tempDir.resolve("pom.xml"), pomXml(CLEANCRUD_VERSION));
 		assertEquals(0, compileGeneratedProject(tempDir));
@@ -115,44 +163,24 @@ class TaskRelationshipGenerationSmokeTest
 	private CodeGenerationConfiguration standaloneConfiguration(final Path modelPath)
 	{
 		return new CodeGenerationConfiguration(
-				new GenerationInputs(modelPath.toString(), null, null, null),
+				new GenerationInputs(modelPath.toString(), null, null, null, null),
 				new LayerConcreteTypes(Map.of(), Map.of(), Map.of()),
 				GenerationSelection.defaults(),
 				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
 				true);
 	}
 
-	private CodeGenerationConfiguration taskConfiguration(final Path modelPath)
+	private CodeGenerationConfiguration specDrivenConfiguration(final Path modelPath, final Path specPath)
 	{
 		return new CodeGenerationConfiguration(
-				new GenerationInputs(modelPath.toString(), null, null, null),
+				new GenerationInputs(modelPath.toString(), null, null, null, specPath.toString()),
 				new LayerConcreteTypes(Map.of(), Map.of(), Map.of()),
 				GenerationSelection.defaults(),
-				List.of(
-						new RelationshipGenerationConfiguration("version", "Version", RelationshipKind.OWNED,
-								RelationshipCardinality.ONE,
-								RelationshipReconciliationStrategy.REPLACE,
-								"Long",
-								true,
-								true,
-								false,
-								false,
-								true,
-								true,
-								true),
-						new RelationshipGenerationConfiguration("notes", "Note", RelationshipKind.OWNED,
-								RelationshipCardinality.MANY,
-								RelationshipReconciliationStrategy.MERGE_BY_ID,
-								"Long",
-								true,
-								true,
-								false,
-								false,
-								true,
-								true,
-								true)),
+				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
 				true);

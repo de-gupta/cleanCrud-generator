@@ -16,6 +16,8 @@ public interface AggregateComposition
 
 	Set<String> relationshipPropertyNames();
 
+	GeneratedRelationship relationship(Property property);
+
 	SequencedCollection<Property> standaloneProperties();
 
 	SequencedCollection<Property> requiredProperties();

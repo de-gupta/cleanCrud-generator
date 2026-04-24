@@ -24,6 +24,7 @@ class GenerationExclusionPolicyTest
 				LayerConcreteTypes.defaults(),
 				GenerationSelection.defaults(),
 				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
 				false
@@ -43,15 +44,16 @@ class GenerationExclusionPolicyTest
 		);
 		var policy = new GenerationExclusionPolicy(templateCatalog, new DefaultOwnershipPolicy());
 		var configuration = new CodeGenerationConfiguration(
-				new GenerationInputs("TaskModel.java", null, null, null),
+				new GenerationInputs("TaskModel.java", null, null, null, null),
 				LayerConcreteTypes.defaults(),
 				GenerationSelection.defaults(),
 				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				new OwnershipConfiguration(
-						de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership.USER,
-						de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership.GENERATED,
-						de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership.GENERATED,
-						de.gupta.clean.crud.generator.code.generation.orchestration.configuration.GeneratedArtifactOwnership.GENERATED,
+						GeneratedArtifactOwnership.USER,
+						GeneratedArtifactOwnership.GENERATED,
+						GeneratedArtifactOwnership.GENERATED,
+						GeneratedArtifactOwnership.GENERATED,
 						Map.of(),
 						Map.of(),
 						Map.of()

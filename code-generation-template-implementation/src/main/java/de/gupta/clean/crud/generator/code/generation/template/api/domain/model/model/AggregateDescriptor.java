@@ -16,5 +16,15 @@ public interface AggregateDescriptor
 
 	String duplicateKeyTypeName();
 
+	String rootApiIdType();
+
+	String rootDomainIdType();
+
+	String rootPersistenceIdType();
+
+	boolean rootApiDomainIdentity();
+
+	boolean rootDomainLong();
+
 	boolean historized();
 }

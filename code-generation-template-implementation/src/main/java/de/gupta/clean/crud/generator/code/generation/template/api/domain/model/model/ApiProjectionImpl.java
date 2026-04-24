@@ -24,9 +24,28 @@ record ApiProjectionImpl(
 	{
 		return ProjectionSupport.combineImports(
 				genericImports(),
-				ProjectionSupport.combineImports(
-						ProjectionSupport.propertyImports(composition.properties()),
-						ProjectionSupport.relationshipImports(composition.relationships())));
+				ProjectionSupport.propertyImports(composition.properties()));
+	}
+
+	@Override
+	public Set<String> createImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.apiCreateRelationshipImports(composition.relationships()));
+	}
+
+	@Override
+	public Set<String> updateImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.apiUpdateRelationshipImports(composition.relationships()));
+	}
+
+	@Override
+	public Set<String> responseImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.apiResponseRelationshipImports(composition.relationships()));
 	}
 
 	@Override

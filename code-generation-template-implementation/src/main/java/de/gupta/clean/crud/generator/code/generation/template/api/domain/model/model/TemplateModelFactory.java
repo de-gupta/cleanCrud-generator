@@ -12,7 +12,7 @@ public final class TemplateModelFactory
 	public static TemplateModel create(final String packageName, final String modelName)
 	{
 		return create(packageName, modelName, List.of(), Set.of(), Map.of(), Map.of(), Map.of(), Set.of(), false,
-				List.of());
+				List.of(), "java.lang.Long", "java.lang.Long", "java.util.UUID");
 	}
 
 	public static TemplateModel create(
@@ -25,12 +25,22 @@ public final class TemplateModelFactory
 			final Map<String, String> apiGenericTypes,
 			final Set<String> domainGenericImports,
 			final boolean historized,
-			final java.util.List<GeneratedRelationship> relationships)
+			final java.util.List<GeneratedRelationship> relationships,
+			final String rootApiIdType,
+			final String rootDomainIdType,
+			final String rootPersistenceIdType)
 	{
-		AggregateDescriptor aggregate = new AggregateDescriptorImpl(packageName, modelName, historized);
+		AggregateDescriptor aggregate = new AggregateDescriptorImpl(
+				packageName,
+				modelName,
+				rootApiIdType,
+				rootDomainIdType,
+				rootPersistenceIdType,
+				historized);
 		AggregateComposition composition = new AggregateCompositionImpl(properties, relationships);
 		TemplateTypeBindings types = new TemplateTypeBindingsImpl(
 				genericTypeParameters,
+				relationships.stream().map(GeneratedRelationship::genericPlaceholder).distinct().toList(),
 				domainGenericTypes,
 				persistenceGenericTypes,
 				apiGenericTypes);

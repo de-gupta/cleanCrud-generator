@@ -3,10 +3,13 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.configuratio
 public record RelationshipGenerationConfiguration(
 		String masterProperty,
 		String satelliteAggregate,
+		String satelliteBaseModelType,
 		RelationshipKind relationshipKind,
 		RelationshipCardinality cardinality,
 		RelationshipReconciliationStrategy reconciliationStrategy,
 		String satelliteApiIdType,
+		String satelliteDomainIdType,
+		String satellitePersistenceIdType,
 		Boolean cascadeCreate,
 		Boolean cascadeUpdate,
 		Boolean cascadeDelete,
@@ -23,6 +26,7 @@ public record RelationshipGenerationConfiguration(
 		return new RelationshipGenerationConfiguration(
 				normalize(masterProperty),
 				normalizeAggregateName(satelliteAggregate),
+				normalize(satelliteBaseModelType),
 				normalizedRelationshipKind,
 				normalizedCardinality,
 				reconciliationStrategy == null && normalizedCardinality == RelationshipCardinality.ONE
@@ -31,6 +35,8 @@ public record RelationshipGenerationConfiguration(
 						  ? RelationshipReconciliationStrategy.MERGE_BY_ID
 						  : reconciliationStrategy,
 				normalize(satelliteApiIdType),
+				normalize(satelliteDomainIdType),
+				normalize(satellitePersistenceIdType),
 				cascadeCreate != null
 						? cascadeCreate
 						: normalizedRelationshipKind == RelationshipKind.OWNED,

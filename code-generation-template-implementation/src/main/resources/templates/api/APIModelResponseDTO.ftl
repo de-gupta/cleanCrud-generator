@@ -2,8 +2,8 @@
 package ${aggregate().basePackage()}.useCases.crud.common.dto;
 
 import java.util.Optional;
-<#if api().imports()?has_content>
-<#list api().imports() as import>
+<#if api().responseImports()?has_content>
+<#list api().responseImports() as import>
 <#if import != "java.util.Optional">
 import ${import};
 </#if>
@@ -11,14 +11,14 @@ import ${import};
 </#if>
 
 public record ${aggregate().baseName()}APIModelResponse(
-Long id,
+${aggregate().rootApiIdType()} id,
 <#list composition().properties() as property>
     ${api().propertyType(property)} ${property.name()}<#if property_has_next>,</#if>
 </#list>
 )
 {
 	public static ${aggregate().baseName()}APIModelResponse of(
-			final long id, <#list composition().properties() as property>
+			final ${aggregate().rootApiIdType()} id, <#list composition().properties() as property>
 			final ${api().propertyType(property)} ${property.name()}<#if property_has_next>, </#if></#list>)
 	{
 		return new ${aggregate().baseName()}APIModelResponse(

@@ -21,8 +21,8 @@ class ApiProjectionTest
 		assertEquals("String", api.concreteType("EXTERNAL_ID"));
 		assertEquals("Optional<String>", api.propertyType(externalId));
 		assertEquals("String", api.boxedResolvedType("EXTERNAL_ID"));
-		assertTrue(api.imports().contains(
-				"de.gupta.clean.crud.generator.example.person.useCases.crud.common.dto.ManagerAPIModelUpdatePatch"));
+		assertTrue(api.updateImports().contains(
+				"de.gupta.clean.crud.generator.example.address.useCases.crud.common.dto.AddressAPIModelUpdatePatch"));
 		assertTrue(api.imports().contains("java.time.LocalDate"));
 	}
 }

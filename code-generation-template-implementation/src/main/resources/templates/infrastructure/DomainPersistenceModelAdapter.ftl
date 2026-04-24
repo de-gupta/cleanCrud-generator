@@ -6,9 +6,8 @@ import ${aggregate().basePackage()}.infrastructure.persistence.model.${aggregate
 import de.gupta.clean.crud.template.domain.mapping.fetch.DomainResponseBuilder;
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilderFactory;
 import de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel;
+import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.id.adapter.DomainPersistenceIDAdapter;
 import de.gupta.clean.crud.template.infrastructure.persistence.adapter.persistence.domain.model.DomainPersistenceModelAdapter;
-import de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateFetchPort;
-import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.DomainToAPIResponseAdapter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import java.util.function.Function;
@@ -29,9 +28,7 @@ import ${import};
 </#list>
 </#if>
 <#list composition().relationships() as relationship>
-import ${relationship.responseImport()?replace('.useCases.crud.common.dto.', '.domain.model.')?replace('APIModelResponse', 'DomainModel')};
-import ${relationship.domainResponseImport(aggregate().basePackage())};
-import ${relationship.responseImport()};
+import ${relationship.domainModelImport()};
 </#list>
 
 @Component
@@ -50,9 +47,8 @@ final class ${aggregate().baseName()}DomainPersistenceModelAdapter
 	private final Function<${persistence().concreteType(param)}, ${domain().concreteType(param)}> ${param?lower_case}PersistenceToDomainConverter;
 </#list>
 <#list composition().relationships() as relationship>
-	private final AggregateFetchPort<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel> ${relationship.relationshipVariablePrefix()}AggregateFetchPort;
-	private final DomainResponseBuilder<${relationship.satelliteAggregate()}DomainModel, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainResponseBuilder;
-	private final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter;
+	private final de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateFetchPort<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> ${relationship.relationshipVariablePrefix()}AggregateFetchPort;
+	private final DomainPersistenceIDAdapter<${relationship.satelliteDomainIdType()}, ${relationship.satellitePersistenceIdType()}> ${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter;
 </#list>
 
 	@Override
@@ -76,11 +72,11 @@ final class ${aggregate().baseName()}DomainPersistenceModelAdapter
 </#list>
 <#list composition().relationships() as relationship>
 		<#if relationship.many()>
-		.with${relationship.propertyCapitalizedName()}Id(domainModel.${relationship.propertyName()}().stream().map(${relationship.responseType()}::id).toList())
+		.with${relationship.propertyCapitalizedName()}(domainModel.${relationship.propertyName()}().stream().map(IdentifiedModel::id).map(${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter::toPersistenceID).flatMap(java.util.Optional::stream).toList())
 		<#elseif relationship.optional()>
-		.with${relationship.propertyCapitalizedName()}Id(domainModel.${relationship.propertyName()}().map(${relationship.responseType()}::id))
+		.with${relationship.propertyCapitalizedName()}(domainModel.${relationship.propertyName()}().map(IdentifiedModel::id).flatMap(${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter::toPersistenceID))
 		<#else>
-		.with${relationship.propertyCapitalizedName()}Id(domainModel.${relationship.propertyName()}().id())
+		.with${relationship.propertyCapitalizedName()}(${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter.toPersistenceID(domainModel.${relationship.propertyName()}().id()).orElseThrow())
 		</#if>
 </#list>
 		.build();
@@ -142,25 +138,24 @@ final class ${aggregate().baseName()}DomainPersistenceModelAdapter
 </#list>
 <#list composition().relationships() as relationship>
 		<#if relationship.many()>
-		persistenceModel.set${relationship.propertyCapitalizedName()}Id(domainModel.${relationship.propertyName()}().stream().map(${relationship.responseType()}::id).toList());
+		persistenceModel.set${relationship.propertyCapitalizedName()}(domainModel.${relationship.propertyName()}().stream().map(IdentifiedModel::id).map(${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter::toPersistenceID).flatMap(java.util.Optional::stream).toList());
 		<#elseif relationship.optional()>
-		persistenceModel.set${relationship.propertyCapitalizedName()}Id(domainModel.${relationship.propertyName()}().map(${relationship.responseType()}::id).orElse(null));
+		persistenceModel.set${relationship.propertyCapitalizedName()}(domainModel.${relationship.propertyName()}().map(IdentifiedModel::id).flatMap(${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter::toPersistenceID).orElse(null));
 		<#else>
-		persistenceModel.set${relationship.propertyCapitalizedName()}Id(domainModel.${relationship.propertyName()}().id());
+		persistenceModel.set${relationship.propertyCapitalizedName()}(${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter.toPersistenceID(domainModel.${relationship.propertyName()}().id()).orElseThrow());
 		</#if>
 </#list>
 		return persistenceModel;
 	}
 
 <#list composition().relationships() as relationship>
-	private java.util.Optional<${relationship.responseType()}> ${relationship.relationshipVariablePrefix()}(final ${relationship.satelliteApiIdType()} satelliteId)
+	private java.util.Optional<${relationship.identifiedDomainModelType()}> ${relationship.relationshipVariablePrefix()}(final ${relationship.satellitePersistenceIdType()} satelliteId)
 	{
-		return ${relationship.relationshipVariablePrefix()}AggregateFetchPort.findById(satelliteId)
-		                                                         .map(satelliteDomainModel -> IdentifiedModel.of(
-					                                                         satelliteId,
-					                                                         ${relationship.relationshipVariablePrefix()}DomainResponseBuilder.toResponse(
-						                                                         satelliteDomainModel.model())))
-		                                                         .map(${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter::mapToAPIModelResponse);
+		return ${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter.toDomainID(satelliteId)
+		                                                          .flatMap(${relationship.relationshipVariablePrefix()}AggregateFetchPort::findById)
+		                                                          .map(satelliteDomainModel -> IdentifiedModel.of(
+					                                                          satelliteDomainModel.id(),
+					                                                          satelliteDomainModel.model()));
 	}
 
 </#list>
@@ -176,9 +171,8 @@ final class ${aggregate().baseName()}DomainPersistenceModelAdapter
 <#elseif composition().relationships()?has_content>,
 </#if>
 <#list composition().relationships() as relationship>
-			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateFetchPort") final AggregateFetchPort<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel> ${relationship.relationshipVariablePrefix()}AggregateFetchPort,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainResponseBuilder") final DomainResponseBuilder<${relationship.satelliteAggregate()}DomainModel, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainResponseBuilder,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainToAPIResponseAdapter") final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModelResponse> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter<#if relationship_has_next>,</#if>
+			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateFetchPort") final de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateFetchPort<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> ${relationship.relationshipVariablePrefix()}AggregateFetchPort,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainPersistenceIDAdapter") final DomainPersistenceIDAdapter<${relationship.satelliteDomainIdType()}, ${relationship.satellitePersistenceIdType()}> ${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter<#if relationship_has_next>,</#if>
 </#list>)
 	{
 		this.domainModelBuilderFactory = domainModelBuilderFactory;
@@ -189,11 +183,9 @@ final class ${aggregate().baseName()}DomainPersistenceModelAdapter
 </#list>
 <#list composition().relationships() as relationship>
 		this.${relationship.relationshipVariablePrefix()}AggregateFetchPort = ${relationship.relationshipVariablePrefix()}AggregateFetchPort;
-		this.${relationship.relationshipVariablePrefix()}DomainResponseBuilder = ${relationship.relationshipVariablePrefix()}DomainResponseBuilder;
-		this.${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter = ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter;
+		this.${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter = ${relationship.relationshipVariablePrefix()}DomainPersistenceIDAdapter;
 </#list>
 	}
 }
-
 
 

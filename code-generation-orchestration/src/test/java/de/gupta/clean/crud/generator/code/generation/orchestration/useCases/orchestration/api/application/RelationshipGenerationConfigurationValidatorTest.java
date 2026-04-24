@@ -26,27 +26,26 @@ class RelationshipGenerationConfigurationValidatorTest
 				"TaskModel",
 				"de.gupta.clean.crud.implementation.examples.task.domain.model",
 				Path.of("src/main/java"),
-				List.of(),
-				Set.of(Property.of(
-						"version",
-						"Optional<VersionAPIModelResponse>",
-						"java.util.Optional<de.gupta.clean.crud.implementation.examples.version.useCases.crud.common.dto.VersionAPIModelResponse>")));
+				List.of("V"),
+				Set.of(Property.of("version", "Optional<V>", "java.util.Optional<V>")));
 
-		assertDoesNotThrow(() -> validator.validate(model, List.of(new RelationshipGenerationConfiguration(
+		assertDoesNotThrow(() -> validator.validate(model, List.of(relationship(
 				"version",
 				"Version",
+				"de.gupta.clean.crud.implementation.examples.version.domain.model.VersionModel",
 				RelationshipKind.OWNED,
 				RelationshipCardinality.ONE,
 				RelationshipReconciliationStrategy.REPLACE,
-				"Long",
+				"java.lang.Long",
+				"java.lang.Long",
+				"java.util.UUID",
 				true,
 				true,
 				true,
 				true,
 				true,
 				true,
-				true
-		))));
+				true))));
 	}
 
 	@Test
@@ -56,11 +55,8 @@ class RelationshipGenerationConfigurationValidatorTest
 				"TaskModel",
 				"de.gupta.clean.crud.implementation.examples.task.domain.model",
 				Path.of("src/main/java"),
-				List.of(),
-				Set.of(Property.of(
-						"version",
-						"Optional<VersionAPIModelResponse>",
-						"java.util.Optional<de.gupta.clean.crud.implementation.examples.version.useCases.crud.common.dto.VersionAPIModelResponse>")));
+				List.of("V"),
+				Set.of(Property.of("version", "Optional<V>", "java.util.Optional<V>")));
 
 		assertThrows(IllegalArgumentException.class, () -> validator.validate(model, List.of()));
 	}
@@ -72,20 +68,20 @@ class RelationshipGenerationConfigurationValidatorTest
 				"TaskModel",
 				"de.gupta.clean.crud.implementation.examples.task.domain.model",
 				Path.of("src/main/java"),
-				List.of(),
-				Set.of(Property.of(
-						"version",
-						"Optional<VersionAPIModelResponse>",
-						"java.util.Optional<de.gupta.clean.crud.implementation.examples.version.useCases.crud.common.dto.VersionAPIModelResponse>")));
+				List.of("V"),
+				Set.of(Property.of("version", "Optional<V>", "java.util.Optional<V>")));
 
 		assertThrows(IllegalArgumentException.class, () -> validator.validate(model, List.of(
-				new RelationshipGenerationConfiguration(
+				relationship(
 						"version",
 						"Version",
+						"de.gupta.clean.crud.implementation.examples.version.domain.model.VersionModel",
 						null,
 						RelationshipCardinality.ONE,
 						RelationshipReconciliationStrategy.REPLACE,
-						"Long",
+						"java.lang.Long",
+						"java.lang.Long",
+						"java.util.UUID",
 						true,
 						true,
 						true,
@@ -102,28 +98,27 @@ class RelationshipGenerationConfigurationValidatorTest
 				"TaskModel",
 				"de.gupta.clean.crud.implementation.examples.task.domain.model",
 				Path.of("src/main/java"),
-				List.of(),
-				Set.of(Property.of(
-						"notes",
-						"Collection<NoteAPIModelResponse>",
-						"java.util.Collection<de.gupta.clean.crud.implementation.examples.note.useCases.crud.common.dto.NoteAPIModelResponse>")));
+				List.of("N"),
+				Set.of(Property.of("notes", "Collection<N>", "java.util.Collection<N>")));
 
 		assertThrows(IllegalArgumentException.class, () -> validator.validate(model, List.of(
-				new RelationshipGenerationConfiguration(
+				relationship(
 						"notes",
 						"Note",
+						"de.gupta.clean.crud.implementation.examples.note.domain.model.NoteModel",
 						RelationshipKind.OWNED,
 						RelationshipCardinality.ONE,
 						RelationshipReconciliationStrategy.REPLACE,
-						"Long",
+						"java.lang.Long",
+						"java.lang.Long",
+						"java.util.UUID",
 						true,
 						true,
 						true,
 						true,
 						true,
 						true,
-						true
-				))));
+						true))));
 	}
 
 	@Test
@@ -133,40 +128,42 @@ class RelationshipGenerationConfigurationValidatorTest
 				"TaskModel",
 				"de.gupta.clean.crud.implementation.examples.task.domain.model",
 				Path.of("src/main/java"),
-				List.of(),
-				Set.of(Property.of(
-						"version",
-						"VersionAPIModelResponse",
-						"de.gupta.clean.crud.implementation.examples.version.useCases.crud.common.dto.VersionAPIModelResponse")));
+				List.of("V"),
+				Set.of(Property.of("version", "V", "V")));
 
 		assertThrows(IllegalArgumentException.class, () -> validator.validate(model, List.of(
-				new RelationshipGenerationConfiguration(
+				relationship(
 						"version",
 						"Version",
+						"de.gupta.clean.crud.implementation.examples.version.domain.model.VersionModel",
 						RelationshipKind.OWNED,
 						RelationshipCardinality.ONE,
 						RelationshipReconciliationStrategy.MERGE_BY_ID,
-						"Long",
+						"java.lang.Long",
+						"java.lang.Long",
+						"java.util.UUID",
 						true,
 						true,
 						true,
 						true,
 						true,
 						true,
-						true
-				))));
+						true))));
 	}
 
 	@Test
 	void normalizesReferencedDefaults()
 	{
-		var normalized = new RelationshipGenerationConfiguration(
+		var normalized = relationship(
 				"organisation",
 				"Organisation",
+				"de.gupta.clean.crud.implementation.examples.organisation.domain.model.OrganisationModel",
 				RelationshipKind.REFERENCED,
 				RelationshipCardinality.ONE,
 				null,
-				"Long",
+				"java.lang.Long",
+				"java.lang.Long",
+				"java.util.UUID",
 				null,
 				null,
 				null,
@@ -182,5 +179,42 @@ class RelationshipGenerationConfigurationValidatorTest
 		assertFalse(normalized.cascadeDelete());
 		assertFalse(normalized.orphanDelete());
 		assertTrue(normalized.hydrateOnFetch());
+	}
+
+	private static RelationshipGenerationConfiguration relationship(
+			final String masterProperty,
+			final String satelliteAggregate,
+			final String satelliteBaseModelType,
+			final RelationshipKind relationshipKind,
+			final RelationshipCardinality cardinality,
+			final RelationshipReconciliationStrategy reconciliationStrategy,
+			final String satelliteApiIdType,
+			final String satelliteDomainIdType,
+			final String satellitePersistenceIdType,
+			final Boolean cascadeCreate,
+			final Boolean cascadeUpdate,
+			final Boolean cascadeDelete,
+			final Boolean orphanDelete,
+			final Boolean hydrateOnFetch,
+			final Boolean generateNestedCreate,
+			final Boolean generateNestedUpdate)
+	{
+		return new RelationshipGenerationConfiguration(
+				masterProperty,
+				satelliteAggregate,
+				satelliteBaseModelType,
+				relationshipKind,
+				cardinality,
+				reconciliationStrategy,
+				satelliteApiIdType,
+				satelliteDomainIdType,
+				satellitePersistenceIdType,
+				cascadeCreate,
+				cascadeUpdate,
+				cascadeDelete,
+				orphanDelete,
+				hydrateOnFetch,
+				generateNestedCreate,
+				generateNestedUpdate);
 	}
 }

@@ -15,10 +15,11 @@ class DefaultOwnershipPolicyTest
 	void resolvesLayerSpecificOwnershipDefaults()
 	{
 		var configuration = new CodeGenerationConfiguration(
-				new GenerationInputs("TaskModel.java", null, null, null),
+				new GenerationInputs("TaskModel.java", null, null, null, null),
 				LayerConcreteTypes.defaults(),
 				GenerationSelection.defaults(),
 				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				new OwnershipConfiguration(
 						GeneratedArtifactOwnership.USER,
 						GeneratedArtifactOwnership.GENERATED,

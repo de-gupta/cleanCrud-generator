@@ -10,6 +10,14 @@ public interface DomainProjection
 
 	Set<String> imports();
 
+	Set<String> modelImports();
+
+	Set<String> createImports();
+
+	Set<String> updateImports();
+
+	Set<String> responseImports();
+
 	String concreteType(String genericType);
 
 	String resolvedType(String declaredType);

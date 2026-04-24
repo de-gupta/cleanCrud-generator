@@ -4,29 +4,33 @@ import ${aggregate().basePackage()}.domain.model.${aggregate().baseName()}Domain
 import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelCreate;
 import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelUpdatePatch;
 <#list composition().relationships() as relationship>
-import ${relationship.responseImport()?replace('.useCases.crud.common.dto.', '.domain.model.')?replace('APIModelResponse', 'DomainModel')};
+import ${relationship.domainModelImport()};
 import ${relationship.domainCreateImport(aggregate().basePackage())};
-import ${relationship.domainResponseImport(aggregate().basePackage())};
 import ${relationship.domainUpdatePatchImport(aggregate().basePackage())};
-import ${relationship.createImport()};
-import ${relationship.updatePatchImport()};
-import ${relationship.responseImport()};
 </#list>
 import de.gupta.clean.crud.template.domain.model.builder.ModelBuilderFactory;
 import de.gupta.clean.crud.template.domain.model.exceptions.operation.InvalidRequestException;
+import de.gupta.clean.crud.template.domain.model.exceptions.resource.ResourceNotFoundException;
+import de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.builder.AggregateRelationshipDefinitions;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.builder.LifecycleSemanticsBuilder;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.AggregateCrudDefinition;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.intent.SatelliteCreateIntent;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.intent.SatelliteMutationIntent;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.lifecycle.LifecycleSemantics;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateFetchPort;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.AggregateRelationshipDefinition;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.Cardinality;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.ReconciliationStrategy;
-import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.APIToDomainCreateAdapter;
-import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.APIToDomainUpdateAdapter;
-import de.gupta.clean.crud.template.useCases.crud.common.adapter.model.DomainToAPIResponseAdapter;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.SatelliteHydrationStrategy;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.SatelliteIdentityResolver;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.SatelliteLinkStrategy;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.SatellitePersistenceOrder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +43,7 @@ class ${aggregate().baseName()}CrudRelationshipConfiguration
 	@Qualifier("${relationship.relationshipBeanNamePrefix()}LifecycleSemantics")
 	LifecycleSemantics ${relationship.relationshipBeanNamePrefix()}LifecycleSemantics()
 	{
-		// TODO: Review the generated lifecycle defaults for `${relationship.propertyName()}` and change them if your ownership semantics differ.
-		// TODO: For REFERENCED relationships, cascadeUpdate means relinking participation during master update, not mutation of the satellite aggregate.
+		// TODO: Review the generated lifecycle defaults for `${relationship.propertyName()}` and change them if your semantics differ.
 		return LifecycleSemanticsBuilder.lifecycleSemantics()
 				<#if relationship.cascadeCreate()>.cascadeCreate()
 				</#if><#if relationship.cascadeUpdate()>.cascadeUpdate()
@@ -51,67 +54,219 @@ class ${aggregate().baseName()}CrudRelationshipConfiguration
 	}
 
 	@Bean
-	@Qualifier("${relationship.relationshipBeanNamePrefix()}RelationshipDefinition")
-	AggregateRelationshipDefinition<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition(
-			final ModelBuilderFactory<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder> ${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
-			@Qualifier("${relationship.relationshipBeanNamePrefix()}LifecycleSemantics") final LifecycleSemantics lifecycleSemantics,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition<#if relationship.owned()>,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}APIToDomainCreateAdapter") final APIToDomainCreateAdapter<${relationship.createType()}, ${relationship.domainCreateType()}> ${relationship.relationshipVariablePrefix()}APIToDomainCreateAdapter,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}APIToDomainUpdateAdapter") final APIToDomainUpdateAdapter<${relationship.updatePatchType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter</#if>,
-			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainToAPIResponseAdapter") final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter)
+	@Qualifier("${relationship.relationshipBeanNamePrefix()}IdentityResolver")
+	SatelliteIdentityResolver<${aggregate().baseName()}DomainModel, ${relationship.domainModelType()}, ${relationship.satelliteDomainIdType()}> ${relationship.relationshipBeanNamePrefix()}IdentityResolver()
 	{
-		// TODO: Review reconciliation and lifecycle semantics for `${relationship.propertyName()}` before using this generated relationship in production.
-		<#if relationship.referenced()>
-		// TODO: Review whether `${relationship.propertyName()}` should remain reference-only or should become lifecycle-owned.
-		// TODO: Review whether master update should be allowed to relink `${relationship.propertyName()}`.
-		</#if>
-		return AggregateRelationshipDefinitions
-				.<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${relationship.satelliteApiIdType()}, ${relationship.satelliteAggregate()}DomainModel, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ${relationship.domainResponseType()}<#if relationship.owned()>, ${relationship.createType()}, ${relationship.updatePatchType()}</#if>, ${relationship.responseType()}>${relationship.builderMethodName()}("${relationship.propertyName()}", ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
-				.lifecycleSemantics(lifecycleSemantics)
-				<#if relationship.owned()>
-				.createExtractor(<#if !relationship.generateNestedCreate()>ignored -> <#if relationship.many()>List.of()<#else>Optional.empty()</#if><#elseif relationship.many()>${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#elseif relationship.optional()>${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${aggregate().beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
-				.createMapper(${relationship.relationshipVariablePrefix()}APIToDomainCreateAdapter::mapToDomainModelCreate)
-				.patchExtractor(<#if relationship.many()><#if relationship.generateNestedUpdate()>${aggregate().beanNamePrefix()}DomainModelUpdatePatch -> ${aggregate().beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of())<#else>ignored -> List.of()</#if><#else><#if relationship.generateNestedUpdate()>${aggregate().beanNamePrefix()}DomainModelUpdatePatch -> ${aggregate().beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().map(${relationship.propertyName()} ->
+		return (masterDomainModel, satelliteDomainModel) ->
+		{
+			<#if relationship.many()>
+			return masterDomainModel.${relationship.propertyName()}().stream()
+					.filter(candidate -> candidate.model().equals(satelliteDomainModel))
+					.map(IdentifiedModel::id)
+					.findFirst();
+			<#elseif relationship.optional()>
+			return masterDomainModel.${relationship.propertyName()}()
+					.filter(candidate -> candidate.model().equals(satelliteDomainModel))
+					.map(IdentifiedModel::id);
+			<#else>
+			return Optional.ofNullable(masterDomainModel.${relationship.propertyName()}())
+					.filter(candidate -> candidate.model().equals(satelliteDomainModel))
+					.map(IdentifiedModel::id);
+			</#if>
+		};
+	}
+
+	@Bean
+	@Qualifier("${relationship.relationshipBeanNamePrefix()}LinkStrategy")
+	SatelliteLinkStrategy<${aggregate().rootDomainIdType()}, ${aggregate().baseName()}DomainModel, ${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> ${relationship.relationshipBeanNamePrefix()}LinkStrategy(
+			final ModelBuilderFactory<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder> ${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateFetchPort") final AggregateFetchPort<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> ${relationship.relationshipVariablePrefix()}AggregateFetchPort)
+	{
+		return new SatelliteLinkStrategy<>()
+		{
+			@Override
+			public SatellitePersistenceOrder persistenceOrder()
+			{
+				return SatellitePersistenceOrder.SATELLITE_BEFORE_MASTER;
+			}
+
+			@Override
+			public Optional<${relationship.satelliteDomainIdType()}> currentLinkedSatelliteDomainId(
+					final ${aggregate().baseName()}DomainModel masterDomainModel)
+			{
+				return currentLinkedSatelliteDomainIds(masterDomainModel).stream().findFirst();
+			}
+
+			@Override
+			public Collection<${relationship.satelliteDomainIdType()}> currentLinkedSatelliteDomainIds(
+					final ${aggregate().baseName()}DomainModel masterDomainModel)
+			{
+				<#if relationship.many()>
+				return masterDomainModel.${relationship.propertyName()}().stream().map(IdentifiedModel::id).toList();
+				<#elseif relationship.optional()>
+				return masterDomainModel.${relationship.propertyName()}().stream().map(IdentifiedModel::id).toList();
+				<#else>
+				return Optional.ofNullable(masterDomainModel.${relationship.propertyName()}()).stream().map(IdentifiedModel::id).toList();
+				</#if>
+			}
+
+			@Override
+			public ${aggregate().baseName()}DomainModel replaceLinkedSatelliteDomainIds(
+					final ${aggregate().baseName()}DomainModel masterDomainModel,
+					final Collection<${relationship.satelliteDomainIdType()}> satelliteDomainIds)
+			{
+				return attachHydratedSatellites(
+						masterDomainModel,
+						satelliteDomainIds.stream()
+								.map(satelliteDomainId -> ${relationship.relationshipVariablePrefix()}AggregateFetchPort.findById(satelliteDomainId)
+										.orElseThrow(() -> ResourceNotFoundException.withId(satelliteDomainId)))
+								.toList());
+			}
+
+			@Override
+			public ${aggregate().baseName()}DomainModel attachHydratedSatellites(
+					final ${aggregate().baseName()}DomainModel masterDomainModel,
+					final Collection<IdentifiedModel<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}>> satellites)
+			{
+				<#if relationship.many()>
+				return rebuild${aggregate().baseName()}DomainModel(
+						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+						masterDomainModel,
+<#list composition().relationships() as rebuildRelationship>
+						<#if rebuildRelationship.propertyName() == relationship.propertyName()>satellites<#else>masterDomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
+</#list>
+				);
+				<#elseif relationship.optional()>
+				if (satellites.size() > 1)
 				{
-					if (${relationship.propertyName()}.size() > 1)
+					throw InvalidRequestException.withMessage("${aggregate().baseName()} ${relationship.propertyName()} can hold at most one satellite");
+				}
+				return rebuild${aggregate().baseName()}DomainModel(
+						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+						masterDomainModel,
+<#list composition().relationships() as rebuildRelationship>
+						<#if rebuildRelationship.propertyName() == relationship.propertyName()>satellites.stream().findFirst()<#else>masterDomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
+</#list>
+				);
+				<#else>
+				if (satellites.size() > 1)
+				{
+					throw InvalidRequestException.withMessage("${aggregate().baseName()} ${relationship.propertyName()} can hold at most one satellite");
+				}
+				return rebuild${aggregate().baseName()}DomainModel(
+						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
+						masterDomainModel,
+<#list composition().relationships() as rebuildRelationship>
+						<#if rebuildRelationship.propertyName() == relationship.propertyName()>satellites.stream().findFirst().orElse(null)<#else>masterDomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
+</#list>
+				);
+				</#if>
+			}
+		};
+	}
+
+	@Bean
+	@Qualifier("${relationship.relationshipBeanNamePrefix()}HydrationStrategy")
+	SatelliteHydrationStrategy<${aggregate().rootDomainIdType()}, ${aggregate().baseName()}DomainModel, ${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> ${relationship.relationshipBeanNamePrefix()}HydrationStrategy()
+	{
+		return (master, satelliteFetchPort, satelliteLinkStrategy) ->
+		{
+			var hydratedSatellites = new ArrayList<IdentifiedModel<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}>>();
+			for (var satelliteDomainId : satelliteLinkStrategy.currentLinkedSatelliteDomainIds(master.model()))
+			{
+				satelliteFetchPort.findById(satelliteDomainId).ifPresent(hydratedSatellites::add);
+			}
+			return satelliteLinkStrategy.attachHydratedSatellites(master.model(), hydratedSatellites);
+		};
+	}
+
+	@Bean
+	@Qualifier("${relationship.relationshipBeanNamePrefix()}RelationshipDefinition")
+	AggregateRelationshipDefinition<${aggregate().rootDomainIdType()}, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition(
+			@Qualifier("${relationship.relationshipBeanNamePrefix()}LifecycleSemantics") final LifecycleSemantics lifecycleSemantics,
+			@Qualifier("${relationship.relationshipBeanNamePrefix()}IdentityResolver") final SatelliteIdentityResolver<${aggregate().baseName()}DomainModel, ${relationship.domainModelType()}, ${relationship.satelliteDomainIdType()}> identityResolver,
+			@Qualifier("${relationship.relationshipBeanNamePrefix()}LinkStrategy") final SatelliteLinkStrategy<${aggregate().rootDomainIdType()}, ${aggregate().baseName()}DomainModel, ${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> linkStrategy,
+			@Qualifier("${relationship.relationshipBeanNamePrefix()}HydrationStrategy") final SatelliteHydrationStrategy<${aggregate().rootDomainIdType()}, ${aggregate().baseName()}DomainModel, ${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> hydrationStrategy,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}AggregateCrudDefinition") final AggregateCrudDefinition<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}, ?> ${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
+	{
+		return AggregateRelationshipDefinitions
+				.<${aggregate().rootDomainIdType()}, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch, ${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}>aggregateRelationshipDefinition()
+				.name("${relationship.propertyName()}")
+				.cardinality(Cardinality.${relationship.cardinality()})
+				.lifecycleSemantics(lifecycleSemantics)
+				.satelliteDefinition(${relationship.relationshipVariablePrefix()}AggregateCrudDefinition)
+				.createInputResolver(masterCreate ->
+				{
+					<#if relationship.referenced()>
+					<#if relationship.many()>
+					return masterCreate.${relationship.propertyName()}().stream()
+							.<SatelliteCreateIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}>>map(SatelliteCreateIntent.ReferenceSatelliteCreateIntent::new)
+							.toList();
+					<#elseif relationship.optional()>
+					return masterCreate.${relationship.propertyName()}().stream()
+							.<SatelliteCreateIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}>>map(SatelliteCreateIntent.ReferenceSatelliteCreateIntent::new)
+							.toList();
+					<#else>
+					return List.<SatelliteCreateIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}>>of(
+							new SatelliteCreateIntent.ReferenceSatelliteCreateIntent<>(masterCreate.${relationship.propertyName()}()));
+					</#if>
+					<#else>
+					<#if relationship.many()>
+					return masterCreate.${relationship.propertyName()}().stream()
+							.<SatelliteCreateIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}>>map(SatelliteCreateIntent.InlineSatelliteCreateIntent::new)
+							.toList();
+					<#elseif relationship.optional()>
+					return masterCreate.${relationship.propertyName()}().stream()
+							.<SatelliteCreateIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}>>map(SatelliteCreateIntent.InlineSatelliteCreateIntent::new)
+							.toList();
+					<#else>
+					return List.<SatelliteCreateIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}>>of(
+							new SatelliteCreateIntent.InlineSatelliteCreateIntent<>(masterCreate.${relationship.propertyName()}()));
+					</#if>
+					</#if>
+				})
+				.patchInputResolver(masterPatch ->
+				{
+					var mutationIntents = new ArrayList<SatelliteMutationIntent<${relationship.satelliteDomainIdType()}, ${relationship.domainCreateType()}, ${relationship.domainUpdatePatchType()}>>();
+					<#if relationship.referenced()>
+					<#if relationship.many()>
+					masterPatch.${relationship.propertyName()}().orElse(List.of()).forEach(satelliteDomainId ->
+							mutationIntents.add(new SatelliteMutationIntent.ReferenceSatelliteMutationIntent<>(satelliteDomainId)));
+					<#else>
+					masterPatch.${relationship.propertyName()}().ifPresent(satelliteDomainId ->
+							mutationIntents.add(new SatelliteMutationIntent.ReferenceSatelliteMutationIntent<>(satelliteDomainId)));
+					</#if>
+					<#else>
+					<#if relationship.many()>
+					masterPatch.${relationship.propertyName()}().orElse(List.of()).forEach(item ->
 					{
-						throw InvalidRequestException.withMessage("${aggregate().baseName()} ${relationship.propertyName()} updates allow at most one nested ${relationship.propertyName()} mutation");
-					}
-					return ${relationship.propertyName()}.stream().findFirst();
-				}).orElse(Optional.empty())<#else>ignored -> Optional.empty()</#if></#if>)
-				.patchMapper(${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter::mapToDomainModelUpdatePatch)
-				.patchCreateMapper(${relationship.updatePatchType()?uncap_first} -> ${relationship.domainCreateType()}.fromUpdatePatch(${relationship.relationshipVariablePrefix()}APIToDomainUpdateAdapter.mapToDomainModelUpdatePatch(${relationship.updatePatchType()?uncap_first})))
-				<#else>
-				<#if relationship.many()>
-				.createReferenceIdsExtractor(${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())
-				.patchReferenceIdsExtractor(${aggregate().beanNamePrefix()}DomainModelUpdatePatch -> ${aggregate().beanNamePrefix()}DomainModelUpdatePatch.${relationship.propertyName()}().orElse(List.of()))
-				<#else>
-				.createReferenceIdExtractor(<#if relationship.optional()>${aggregate().beanNamePrefix()}DomainModelCreate -> ${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}()<#else>${aggregate().beanNamePrefix()}DomainModelCreate -> Optional.ofNullable(${aggregate().beanNamePrefix()}DomainModelCreate.${relationship.propertyName()}())</#if>)
-				.patchReferenceIdExtractor(${aggregate().baseName()}DomainModelUpdatePatch::${relationship.propertyName()})
-				</#if>
-				</#if>
-				.removeIdExtractor(${aggregate().baseName()}DomainModelUpdatePatch::${relationship.removeFieldName()})
-				<#if relationship.many()>
-				.currentSatellites(${aggregate().baseName()}DomainModel::${relationship.propertyName()})
-				.replaceSatellites((${aggregate().beanNamePrefix()}DomainModel, ${relationship.propertyName()}) -> rebuild${aggregate().baseName()}DomainModel(
-						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
-						${aggregate().beanNamePrefix()}DomainModel,
-<#list composition().relationships() as rebuildRelationship>
-						<#if rebuildRelationship.propertyName() == relationship.propertyName()>${relationship.propertyName()}<#else>${aggregate().beanNamePrefix()}DomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
-</#list>
-				))
-				<#else>
-				.currentSatellite(<#if relationship.optional()>${aggregate().baseName()}DomainModel::${relationship.propertyName()}<#else>${aggregate().beanNamePrefix()}DomainModel -> Optional.ofNullable(${aggregate().beanNamePrefix()}DomainModel.${relationship.propertyName()}())</#if>)
-				.replaceSatellite((${aggregate().beanNamePrefix()}DomainModel, ${relationship.propertyName()}) -> rebuild${aggregate().baseName()}DomainModel(
-						${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
-						${aggregate().beanNamePrefix()}DomainModel,
-<#list composition().relationships() as rebuildRelationship>
-						<#if rebuildRelationship.propertyName() == relationship.propertyName()><#if relationship.optional()>${relationship.propertyName()}<#else>${relationship.propertyName()}.orElse(null)</#if><#else>${aggregate().beanNamePrefix()}DomainModel.${rebuildRelationship.propertyName()}()</#if><#if rebuildRelationship_has_next>,</#if>
-</#list>
-				))
-				</#if>
-				.publicResponseMapper(${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter::mapToAPIModelResponse)
-				<#if relationship.many() && relationship.reconciliationStrategy() == "REPLACE">.reconciliationStrategy(ReconciliationStrategy.REPLACE)</#if>
+						if (item.id().isPresent())
+						{
+							mutationIntents.add(new SatelliteMutationIntent.UpdateSatelliteMutationIntent<>(
+									item.id().orElseThrow(),
+									item.patch()));
+						}
+						else
+						{
+							mutationIntents.add(new SatelliteMutationIntent.CreateSatelliteMutationIntent<>(
+									${relationship.domainCreateType()}.fromUpdatePatch(item.patch())));
+						}
+					});
+					<#else>
+					masterPatch.${relationship.propertyName()}().ifPresent(satelliteDomainModelUpdatePatch ->
+							mutationIntents.add(new SatelliteMutationIntent.UpsertCurrentSatelliteMutationIntent<>(
+									${relationship.domainCreateType()}.fromUpdatePatch(satelliteDomainModelUpdatePatch),
+									satelliteDomainModelUpdatePatch)));
+					</#if>
+					</#if>
+					masterPatch.${relationship.removeFieldName()}().forEach(satelliteDomainId ->
+							mutationIntents.add(new SatelliteMutationIntent.RemoveSatelliteMutationIntent<>(satelliteDomainId)));
+					return mutationIntents;
+				})
+				.identityResolver(identityResolver)
+				.reconciliationStrategy(ReconciliationStrategy.${relationship.reconciliationStrategy()})
+				.linkStrategy(linkStrategy)
+				.hydrationStrategy(hydrationStrategy)
 				.build();
 	}
 
@@ -120,7 +275,7 @@ class ${aggregate().baseName()}CrudRelationshipConfiguration
 			final ModelBuilderFactory<${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModel.${aggregate().baseName()}DomainModelBuilder> ${aggregate().beanNamePrefix()}DomainModelBuilderFactory,
 			final ${aggregate().baseName()}DomainModel ${aggregate().beanNamePrefix()}DomainModel,
 <#list composition().relationships() as relationship>
-			final ${relationship.responseFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
+			final ${relationship.domainFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
 </#list>)
 	{
 		return ${aggregate().beanNamePrefix()}DomainModelBuilderFactory.builder()

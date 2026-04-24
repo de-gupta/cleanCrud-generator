@@ -64,7 +64,8 @@ final class CodeGenerationConfigurationFileLoader
 						properties.getProperty("inputs.baseModelSourceCodeFilePath"),
 						properties.getProperty("inputs.domainModelSourceCodeFilePath"),
 						properties.getProperty("inputs.persistenceModelSourceCodeFilePath"),
-						properties.getProperty("inputs.apiModelSourceCodeFilePath")
+						properties.getProperty("inputs.apiModelSourceCodeFilePath"),
+						properties.getProperty("inputs.generationSpecSourceCodeFilePath")
 				),
 				new LayerConcreteTypes(
 						extractPrefixedMap(properties, "genericTypes.domain."),
@@ -80,6 +81,10 @@ final class CodeGenerationConfigurationFileLoader
 						extractCsvSet(properties, "generation.excludeTags")
 				),
 				extractRelationshipConfigurations(properties),
+				new RootAggregateIdConfiguration(
+						properties.getProperty("rootAggregateIds.apiIdType"),
+						properties.getProperty("rootAggregateIds.domainIdType"),
+						properties.getProperty("rootAggregateIds.persistenceIdType")),
 				new OwnershipConfiguration(
 						parseOwnership(properties.getProperty("ownership.baseModel")),
 						parseOwnership(properties.getProperty("ownership.domainModel")),
@@ -110,6 +115,7 @@ final class CodeGenerationConfigurationFileLoader
 				configuration.genericTypes(),
 				configuration.generation(),
 				configuration.relationships(),
+				configuration.rootAggregateIds(),
 				configuration.ownership(),
 				normalizeOverwrite(configuration.overwrite(), configDirectory),
 				configuration.historized());
@@ -122,7 +128,8 @@ final class CodeGenerationConfigurationFileLoader
 				normalizePath(normalized.baseModelSourceCodeFilePath(), configDirectory),
 				normalizePath(normalized.domainModelSourceCodeFilePath(), configDirectory),
 				normalizePath(normalized.persistenceModelSourceCodeFilePath(), configDirectory),
-				normalizePath(normalized.apiModelSourceCodeFilePath(), configDirectory)
+				normalizePath(normalized.apiModelSourceCodeFilePath(), configDirectory),
+				normalizePath(normalized.generationSpecSourceCodeFilePath(), configDirectory)
 		);
 	}
 
@@ -273,11 +280,14 @@ final class CodeGenerationConfigurationFileLoader
 			relationships.add(new RelationshipGenerationConfiguration(
 					properties.getProperty(prefix + "masterProperty"),
 					properties.getProperty(prefix + "satelliteAggregate"),
+					properties.getProperty(prefix + "satelliteBaseModelType"),
 					parseEnum(properties.getProperty(prefix + "relationshipKind"), RelationshipKind.class),
 					parseEnum(properties.getProperty(prefix + "cardinality"), RelationshipCardinality.class),
 					parseEnum(properties.getProperty(prefix + "reconciliationStrategy"),
 							RelationshipReconciliationStrategy.class),
 					properties.getProperty(prefix + "satelliteApiIdType"),
+					properties.getProperty(prefix + "satelliteDomainIdType"),
+					properties.getProperty(prefix + "satellitePersistenceIdType"),
 					parseBooleanObject(properties.getProperty(prefix + "cascadeCreate")),
 					parseBooleanObject(properties.getProperty(prefix + "cascadeUpdate")),
 					parseBooleanObject(properties.getProperty(prefix + "cascadeDelete")),

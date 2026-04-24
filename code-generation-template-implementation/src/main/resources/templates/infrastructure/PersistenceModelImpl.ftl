@@ -13,10 +13,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 <#if persistence().imports()?has_content>
 <#list persistence().imports() as import>
-<#if import != "java.util.Optional" && import != "java.util.UUID" && import != "java.util.Collection" && import != "java.util.List">
+<#if import != "java.util.Optional" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>
 </#list>
@@ -28,7 +27,7 @@ public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregat
 {
 	@Id
 	@GeneratedValue
-	private UUID id;
+	private ${aggregate().rootPersistenceIdType()} id;
 
 <#list composition().standaloneProperties() as property>
 	<#if !property.optional()>
@@ -60,10 +59,10 @@ public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregat
 	@ElementCollection
 	@CollectionTable(name = "${persistence().modelTableName()}_${relationship.persistenceIdPropertyName()?lower_case}", joinColumns = @JoinColumn(name = "${aggregate().baseName()?lower_case}_id"))
 	@Column(name = "${persistence().sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
-	private Collection<${relationship.satelliteApiIdType()}> ${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>();
+	private Collection<${relationship.satellitePersistenceIdType()}> ${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>();
 	<#else>
 	@Column(name = "${persistence().sqlIdentifier(relationship.persistenceIdPropertyName()?lower_case)}")
-	private ${relationship.satelliteApiIdType()} ${relationship.persistenceIdPropertyName()};
+	private ${relationship.satellitePersistenceIdType()} ${relationship.persistenceIdPropertyName()};
 	</#if>
 </#list>
 
@@ -105,8 +104,7 @@ public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregat
 	}
 
 	@Override
-	public void set${relationship.propertyCapitalizedName()}Id(
-			final <#if relationship.many()>Collection<${relationship.satelliteApiIdType()}><#else>${relationship.satelliteApiIdType()}</#if> ${relationship.persistenceIdPropertyName()})
+	public void set${relationship.propertyCapitalizedName()}(final <#if relationship.many()>${relationship.persistenceIdPropertyType()}<#else>${relationship.satellitePersistenceIdType()}</#if> ${relationship.persistenceIdPropertyName()})
 	{
 		<#if relationship.many()>
 		this.${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>(${relationship.persistenceIdPropertyName()});
@@ -118,7 +116,7 @@ public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregat
 
 </#list>
 	@Override
-	public UUID id()
+	public ${aggregate().rootPersistenceIdType()} id()
 	{
 		return id;
 	}
@@ -160,7 +158,7 @@ public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregat
 </#list>
 <#list composition().relationships() as relationship>
 		@Override
-		public ${aggregate().baseName()}PersistenceModelBuilder with${relationship.propertyCapitalizedName()}Id(final ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()})
+		public ${aggregate().baseName()}PersistenceModelBuilder with${relationship.propertyCapitalizedName()}(final ${relationship.persistenceIdPropertyType()} ${relationship.persistenceIdPropertyName()})
 		{
 			<#if relationship.many()>
 			model.${relationship.persistenceIdPropertyName()} = new java.util.ArrayList<>(${relationship.persistenceIdPropertyName()});
@@ -185,4 +183,5 @@ public class ${aggregate().baseName()}PersistenceModelImpl implements ${aggregat
 		}
 	}
 }
+
 

@@ -37,14 +37,18 @@ final class GeneratedRelationshipFactory
 				: relationship.reconciliationStrategy().name();
 		return new GeneratedRelationship(
 				property,
+				property.relationshipGenericPlaceholder(model.genericTypeParameters()),
 				model.modelName().endsWith("Model")
 						? model.modelName().substring(0, model.modelName().length() - "Model".length())
 						: model.modelName(),
 				relationship.satelliteAggregate(),
+				relationship.satelliteBaseModelType(),
 				relationship.relationshipKind().name(),
 				effectiveCardinality,
 				effectiveReconciliationStrategy,
 				relationship.satelliteApiIdType(),
+				relationship.satelliteDomainIdType(),
+				relationship.satellitePersistenceIdType(),
 				relationship.cascadeCreate(),
 				relationship.cascadeUpdate(),
 				relationship.cascadeDelete(),

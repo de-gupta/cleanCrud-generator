@@ -16,9 +16,35 @@ record DomainProjectionImpl(
 	{
 		return ProjectionSupport.combineImports(
 				genericImports(),
-				ProjectionSupport.combineImports(
-						ProjectionSupport.propertyImports(composition.properties()),
-						ProjectionSupport.relationshipImports(composition.relationships())));
+				ProjectionSupport.propertyImports(composition.properties()));
+	}
+
+	@Override
+	public Set<String> modelImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.domainModelRelationshipImports(composition.relationships()));
+	}
+
+	@Override
+	public Set<String> createImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.domainCreateRelationshipImports(composition.relationships()));
+	}
+
+	@Override
+	public Set<String> updateImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.domainUpdateRelationshipImports(composition.relationships()));
+	}
+
+	@Override
+	public Set<String> responseImports()
+	{
+		return ProjectionSupport.combineImports(imports(),
+				ProjectionSupport.domainModelRelationshipImports(composition.relationships()));
 	}
 
 	@Override

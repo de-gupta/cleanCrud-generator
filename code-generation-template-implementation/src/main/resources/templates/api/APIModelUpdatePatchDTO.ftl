@@ -8,8 +8,8 @@ import java.util.Optional;
 <#if hasOwnedRelationships>
 import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.standard.SatelliteUpdatePatchItem;
 </#if>
-<#if api().imports()?has_content>
-<#list api().imports() as import>
+<#if api().updateImports()?has_content>
+<#list api().updateImports() as import>
 <#if import != "java.util.Optional" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>
@@ -22,7 +22,7 @@ public record ${aggregate().baseName()}APIModelUpdatePatch(
 </#list>
 <#list composition().relationships() as relationship>
     ${relationship.apiUpdateFieldType()} ${relationship.propertyName()},
-    ${relationship.removeFieldType()} ${relationship.removeFieldName()}<#if relationship_has_next>,</#if>
+    ${relationship.apiRemoveFieldType()} ${relationship.removeFieldName()}<#if relationship_has_next>,</#if>
 </#list>
 )
 {
@@ -32,7 +32,7 @@ public record ${aggregate().baseName()}APIModelUpdatePatch(
 </#list>
 <#list composition().relationships() as relationship>
 		final ${relationship.apiUpdateFieldType()} ${relationship.propertyName()},
-		final ${relationship.removeFieldType()} ${relationship.removeFieldName()}<#if relationship_has_next>,</#if>
+		final ${relationship.apiRemoveFieldType()} ${relationship.removeFieldName()}<#if relationship_has_next>,</#if>
 </#list>
 	)
 	{
@@ -48,8 +48,10 @@ public record ${aggregate().baseName()}APIModelUpdatePatch(
 <#list composition().relationships() as relationship>
 		<#if relationship.referenced()>
 		${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty())<#if relationship.many()>.map(List::copyOf)</#if>;
-		<#else>
+		<#elseif relationship.many()>
 		${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty()).map(List::copyOf);
+		<#else>
+		${relationship.propertyName()} = Optional.ofNullable(${relationship.propertyName()}).orElse(Optional.empty());
 		</#if>
 		${relationship.removeFieldName()} = Optional.ofNullable(${relationship.removeFieldName()}).map(List::copyOf).orElse(List.of());
 </#list>

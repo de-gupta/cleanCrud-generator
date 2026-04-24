@@ -64,8 +64,10 @@ record PersistenceProjectionImpl(
 		var imports = new LinkedHashSet<>(ProjectionSupport.combineImports(
 				genericImports(),
 				ProjectionSupport.propertyImports(composition.properties())));
+		imports.addAll(ProjectionSupport.importsForResolvedType(aggregate.rootPersistenceIdType()));
 		composition.relationships().forEach(relationship ->
 		{
+			imports.addAll(ProjectionSupport.importsForResolvedType(relationship.satellitePersistenceIdType()));
 			if (relationship.many())
 			{
 				imports.add("java.util.Collection");
@@ -75,6 +77,26 @@ record PersistenceProjectionImpl(
 				imports.add("java.util.Optional");
 			}
 		});
+		return imports;
+	}
+
+	@Override
+	public Set<String> interfaceImports()
+	{
+		var imports = new LinkedHashSet<String>();
+		imports.addAll(genericImports());
+		imports.addAll(ProjectionSupport.importsForResolvedType(aggregate.rootPersistenceIdType()));
+		composition.standaloneProperties().forEach(property -> imports.addAll(
+				ProjectionSupport.importsForResolvedType(resolvedType(property.baseType()))));
+		composition.relationships().forEach(relationship ->
+		{
+			imports.addAll(ProjectionSupport.importsForResolvedType(relationship.satellitePersistenceIdType()));
+			if (relationship.many())
+			{
+				imports.add("java.util.Collection");
+			}
+		});
+		imports.remove("");
 		return imports;
 	}
 

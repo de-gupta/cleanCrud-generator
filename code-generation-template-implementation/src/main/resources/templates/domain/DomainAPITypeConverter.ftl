@@ -21,7 +21,7 @@ import ${import};
 </#list>
 </#if>
 
-<#list types().parameters() as param>
+<#list types().apiDomainDifferingParameters() as param>
 @Component
 @Qualifier("${aggregate().beanNamePrefix()}${param}DomainToAPIConverter")
 final class ${aggregate().baseName()}${param}DomainToAPIConverter implements Function<${domain().concreteType(param)}, ${api().concreteType(param)}>
@@ -57,3 +57,4 @@ final class ${aggregate().baseName()}${param}APIToDomainConverter implements Fun
 }
 
 </#list>
+
