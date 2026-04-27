@@ -2,10 +2,14 @@ package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orc
 
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Model;
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
-import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.*;
-import de.gupta.clean.crud.template.generation.specification.AggregateGenerationSpec;
-import de.gupta.clean.crud.template.generation.specification.RelationshipSpec;
-import de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.ReconciliationStrategy;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipCardinality;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipReconciliationStrategy;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RootAggregateIdConfiguration;
+import de.gupta.clean.crud.template.domain.relationship.ReconciliationStrategy;
+import de.gupta.clean.crud.template.domain.relationship.Relationship;
+import de.gupta.clean.crud.template.domain.relationship.RelationshipKind;
+import de.gupta.clean.crud.template.domain.relationship.Relationships;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
@@ -17,60 +21,59 @@ import java.util.stream.Collectors;
 @Component
 final class GenerationSpecificationConfigurationAssembler
 {
-	LoadedGenerationSpecification assemble(final Model model, final AggregateGenerationSpec specification)
+	LoadedGenerationSpecification assemble(
+			final Model model,
+			final Relationships relationshipsDeclaration,
+			final RootAggregateIdConfiguration rootAggregateIds)
 	{
-		validateBaseModel(model, specification);
-		validateRootIds(specification);
+		validateBaseModel(model, relationshipsDeclaration);
+		validateRootIds(rootAggregateIds);
 		Map<String, Property> propertiesByName = model.properties().stream().collect(Collectors.toMap(
 				Property::name,
 				Function.identity(),
 				(left, _) -> left,
 				LinkedHashMap::new));
-		validateRelationshipCoverage(model, specification, propertiesByName);
-		validatePlaceholderConsistency(model, specification, propertiesByName);
+		validateRelationshipCoverage(model, relationshipsDeclaration, propertiesByName);
+		validatePlaceholderConsistency(model, relationshipsDeclaration, propertiesByName);
 
-		List<RelationshipGenerationConfiguration> relationships = specification.relationships().stream()
-		                                                                       .map(relationship -> toConfiguration(
-																					   propertiesByName.get(
-																							   relationship.propertyName()),
-																					   relationship))
-		                                                                       .toList();
-		return new LoadedGenerationSpecification(
-				new RootAggregateIdConfiguration(
-						specification.rootAggregateIdTypes().apiIdType().getCanonicalName(),
-						specification.rootAggregateIdTypes().domainIdType().getCanonicalName(),
-						specification.rootAggregateIdTypes().persistenceIdType().getCanonicalName()),
-				relationships);
+		List<RelationshipGenerationConfiguration> relationships = relationshipsDeclaration.relationships().stream()
+		                                                                                  .map(relationship -> toConfiguration(
+																								  propertiesByName.get(
+																										  relationship.propertyName()),
+																								  relationship))
+		                                                                                  .toList();
+		return new LoadedGenerationSpecification(relationships);
 	}
 
-	private void validateBaseModel(final Model model, final AggregateGenerationSpec specification)
+	private void validateBaseModel(final Model model, final Relationships relationshipsDeclaration)
 	{
-		String specificationBaseModel = specification.baseModelClass().getSimpleName();
+		String specificationBaseModel = relationshipsDeclaration.baseModelClass().getSimpleName();
 		if (!model.modelName().equals(specificationBaseModel))
 		{
 			throw new IllegalArgumentException(
-					"Generation spec targets base model `" + specificationBaseModel + "` but the configured base model source is `" + model.modelName() + "`");
+					"Relationships declaration targets base model `" + specificationBaseModel + "` but the configured base model source is `" + model.modelName() + "`");
 		}
 	}
 
-	private void validateRootIds(final AggregateGenerationSpec specification)
+	private void validateRootIds(final RootAggregateIdConfiguration rootAggregateIds)
 	{
-		if (specification.rootAggregateIdTypes().apiIdType() == null ||
-				specification.rootAggregateIdTypes().domainIdType() == null ||
-				specification.rootAggregateIdTypes().persistenceIdType() == null)
+		if (rootAggregateIds.apiIdType() == null || rootAggregateIds.apiIdType().isBlank() ||
+				rootAggregateIds.domainIdType() == null || rootAggregateIds.domainIdType().isBlank() ||
+				rootAggregateIds.persistenceIdType() == null || rootAggregateIds.persistenceIdType().isBlank())
 		{
 			throw new IllegalArgumentException(
-					"Generation spec must declare api/domain/persistence id types for the root aggregate");
+					"Generator configuration must declare api/domain/persistence id types for the root aggregate");
 		}
 	}
 
 	private void validateRelationshipCoverage(
 			final Model model,
-			final AggregateGenerationSpec specification,
+			final Relationships relationshipsDeclaration,
 			final Map<String, Property> propertiesByName)
 	{
 		var configuredProperties =
-				specification.relationships().stream().map(RelationshipSpec::propertyName).collect(Collectors.toSet());
+				relationshipsDeclaration.relationships().stream().map(Relationship::propertyName)
+				                        .collect(Collectors.toSet());
 		model.properties().stream()
 		     .filter(property -> property.relationshipEligible(model.genericTypeParameters()))
 		     .filter(property -> !configuredProperties.contains(property.name()))
@@ -81,15 +84,15 @@ final class GenerationSpecificationConfigurationAssembler
 						 "Property `" + property.name() + "` on model `" + model.modelName() +
 								 "` uses generic placeholder `" + property.relationshipGenericPlaceholder(
 								 model.genericTypeParameters()) +
-								 "` and therefore requires an explicit relationship spec");
+								 "` and therefore requires an explicit relationship declaration");
 			 });
-		for (RelationshipSpec relationship : specification.relationships())
+		for (Relationship relationship : relationshipsDeclaration.relationships())
 		{
 			Property property = propertiesByName.get(relationship.propertyName());
 			if (property == null)
 			{
 				throw new IllegalArgumentException(
-						"Relationship spec references unknown property `" + relationship.propertyName() + "` on model `" + model.modelName() + "`");
+						"Relationship declaration references unknown property `" + relationship.propertyName() + "` on model `" + model.modelName() + "`");
 			}
 			if (!property.relationshipEligible(model.genericTypeParameters()))
 			{
@@ -107,15 +110,15 @@ final class GenerationSpecificationConfigurationAssembler
 
 	private void validatePlaceholderConsistency(
 			final Model model,
-			final AggregateGenerationSpec specification,
+			final Relationships relationshipsDeclaration,
 			final Map<String, Property> propertiesByName)
 	{
-		Map<String, RelationshipSpec> byPlaceholder = new LinkedHashMap<>();
-		for (RelationshipSpec relationship : specification.relationships())
+		Map<String, Relationship> byPlaceholder = new LinkedHashMap<>();
+		for (Relationship relationship : relationshipsDeclaration.relationships())
 		{
 			Property property = propertiesByName.get(relationship.propertyName());
 			String placeholder = property.relationshipGenericPlaceholder(model.genericTypeParameters());
-			RelationshipSpec existing = byPlaceholder.putIfAbsent(placeholder, relationship);
+			Relationship existing = byPlaceholder.putIfAbsent(placeholder, relationship);
 			if (existing == null)
 			{
 				continue;
@@ -133,7 +136,7 @@ final class GenerationSpecificationConfigurationAssembler
 	}
 
 	private RelationshipGenerationConfiguration toConfiguration(final Property property,
-	                                                            final RelationshipSpec relationship)
+	                                                            final Relationship relationship)
 	{
 		RelationshipCardinality cardinality =
 				property.collectionValued() ? RelationshipCardinality.MANY : RelationshipCardinality.ONE;
@@ -148,10 +151,13 @@ final class GenerationSpecificationConfigurationAssembler
 		{
 			satelliteAggregate = satelliteAggregate.substring(0, satelliteAggregate.length() - "Model".length());
 		}
-		RelationshipKind relationshipKind =
-				relationship.relationshipKind() == de.gupta.clean.crud.template.generation.specification.RelationshipKind.OWNED
-						? RelationshipKind.OWNED
-						: RelationshipKind.REFERENCED;
+		boolean owned = relationship.relationshipKind() == RelationshipKind.OWNED;
+		de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipKind relationshipKind =
+				relationship.relationshipKind() == RelationshipKind.OWNED
+						?
+						de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipKind.OWNED
+						:
+						de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RelationshipKind.REFERENCED;
 		return new RelationshipGenerationConfiguration(
 				relationship.propertyName(),
 				satelliteAggregate,
@@ -162,12 +168,12 @@ final class GenerationSpecificationConfigurationAssembler
 				relationship.satelliteApiIdType().getCanonicalName(),
 				relationship.satelliteDomainIdType().getCanonicalName(),
 				relationship.satellitePersistenceIdType().getCanonicalName(),
-				relationship.cascadeCreate(),
-				relationship.cascadeUpdate(),
-				relationship.cascadeDelete(),
-				relationship.orphanDelete(),
-				relationship.hydrateOnFetch(),
-				relationshipKind == RelationshipKind.OWNED,
-				relationshipKind == RelationshipKind.OWNED);
+				relationship.lifecycleSemantics().cascadeCreate(),
+				relationship.lifecycleSemantics().cascadeUpdate(),
+				relationship.lifecycleSemantics().cascadeDelete(),
+				relationship.lifecycleSemantics().orphanDelete(),
+				relationship.lifecycleSemantics().hydrateOnFetch(),
+				owned,
+				owned);
 	}
 }

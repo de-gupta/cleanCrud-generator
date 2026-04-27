@@ -1,7 +1,7 @@
 {
   "inputs": {
     "baseModelSourceCodeFilePath": "E:\\Projects\\Professional\\OpenSource\\java\\de-gupta\\crud\\cleanCrud-sampleImplementation\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonModel.java",
-    "generationSpecSourceCodeFilePath": "E:\\Projects\\Professional\\OpenSource\\java\\de-gupta\\crud\\cleanCrud-sampleImplementation\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonRelationshipGenerationSpecification.java"
+    "relationshipsSourceCodeFilePath": "E:\\Projects\\Professional\\OpenSource\\java\\de-gupta\\crud\\cleanCrud-sampleImplementation\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonRelationships.java"
   },
   "generation": {
     "groups": [

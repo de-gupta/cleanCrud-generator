@@ -5,7 +5,7 @@ public record GenerationInputs(
 		String domainModelSourceCodeFilePath,
 		String persistenceModelSourceCodeFilePath,
 		String apiModelSourceCodeFilePath,
-		String generationSpecSourceCodeFilePath
+		String relationshipsSourceCodeFilePath
 )
 {
 	public static GenerationInputs empty()
@@ -30,7 +30,7 @@ public record GenerationInputs(
 				normalize(domainModelSourceCodeFilePath),
 				normalize(persistenceModelSourceCodeFilePath),
 				normalize(apiModelSourceCodeFilePath),
-				normalize(generationSpecSourceCodeFilePath)
+				normalize(relationshipsSourceCodeFilePath)
 		);
 	}
 

@@ -14,66 +14,60 @@ record DomainProjectionImpl(
 	@Override
 	public Set<String> imports()
 	{
-		return ProjectionSupport.combineImports(
-				genericImports(),
-				ProjectionSupport.propertyImports(composition.properties()));
+		return DomainProjectionSupport.imports(composition, genericImports());
 	}
 
 	@Override
 	public Set<String> modelImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.domainModelRelationshipImports(composition.relationships()));
+		return DomainProjectionSupport.modelImports(composition, genericImports());
 	}
 
 	@Override
 	public Set<String> createImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.domainCreateRelationshipImports(composition.relationships()));
+		return DomainProjectionSupport.createImports(composition, genericImports());
 	}
 
 	@Override
 	public Set<String> updateImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.domainUpdateRelationshipImports(composition.relationships()));
+		return DomainProjectionSupport.updateImports(composition, genericImports());
 	}
 
 	@Override
 	public Set<String> responseImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.domainModelRelationshipImports(composition.relationships()));
+		return DomainProjectionSupport.responseImports(composition, genericImports());
 	}
 
 	@Override
 	public String concreteType(final String genericType)
 	{
-		return ProjectionSupport.concreteType(concreteTypes, genericType);
+		return TypeNameSupport.concreteType(concreteTypes, genericType);
 	}
 
 	@Override
 	public String resolvedType(final String declaredType)
 	{
-		return ProjectionSupport.resolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.resolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String boxedResolvedType(final String declaredType)
 	{
-		return ProjectionSupport.boxedResolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.boxedResolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String propertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 
 	@Override
 	public String builderPropertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 }

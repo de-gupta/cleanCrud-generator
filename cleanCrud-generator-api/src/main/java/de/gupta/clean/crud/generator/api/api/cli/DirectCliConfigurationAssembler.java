@@ -29,7 +29,7 @@ final class DirectCliConfigurationAssembler
 						options.domainModelPath(),
 						options.persistenceModelPath(),
 						options.apiModelPath(),
-						options.generationSpecPath()),
+						options.relationshipsPath()),
 				new LayerConcreteTypes(
 						parseAssignments(options.domainTypes(), spec),
 						parseAssignments(options.persistenceTypes(), spec),

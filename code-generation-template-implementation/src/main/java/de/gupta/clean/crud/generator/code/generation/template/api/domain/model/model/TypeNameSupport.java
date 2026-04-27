@@ -3,15 +3,11 @@ package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-final class ProjectionSupport
+final class TypeNameSupport
 {
-	private static final String IDENTIFIED_MODEL_IMPORT =
-			"de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel";
-
 	private static final Map<String, String> SIMPLE_TYPE_IMPORTS = Map.ofEntries(
 			Map.entry("UUID", "java.util.UUID"),
 			Map.entry("LocalDate", "java.time.LocalDate"),
@@ -77,93 +73,6 @@ final class ProjectionSupport
 		          .map(Property::baseType)
 		          .flatMap(type -> importsForResolvedType(type).stream())
 		          .forEach(imports::add);
-		return imports;
-	}
-
-	static Set<String> domainModelRelationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship ->
-		{
-			imports.add(relationship.domainModelImport());
-			imports.add(IDENTIFIED_MODEL_IMPORT);
-			imports.addAll(importsForResolvedType(relationship.satelliteDomainIdType()));
-		});
-		imports.remove("");
-		return imports;
-	}
-
-	static Set<String> domainCreateRelationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship ->
-		{
-			if (relationship.referenced())
-			{
-				imports.addAll(importsForResolvedType(relationship.satelliteDomainIdType()));
-			}
-			else
-			{
-				imports.add(relationship.domainCreateImport(""));
-			}
-		});
-		imports.remove("");
-		return imports;
-	}
-
-	static Set<String> domainUpdateRelationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship ->
-		{
-			imports.addAll(importsForResolvedType(relationship.satelliteDomainIdType()));
-			if (relationship.owned())
-			{
-				imports.add(relationship.domainUpdatePatchImport(""));
-			}
-		});
-		imports.remove("");
-		return imports;
-	}
-
-	static Set<String> apiCreateRelationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship ->
-		{
-			if (relationship.referenced())
-			{
-				imports.addAll(importsForResolvedType(relationship.satelliteApiIdType()));
-			}
-			else
-			{
-				imports.add(relationship.createImport());
-			}
-		});
-		imports.remove("");
-		return imports;
-	}
-
-	static Set<String> apiUpdateRelationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship ->
-		{
-			imports.addAll(importsForResolvedType(relationship.satelliteApiIdType()));
-			if (relationship.owned())
-			{
-				imports.add(relationship.updatePatchImport());
-			}
-		});
-		imports.remove("");
-		return imports;
-	}
-
-	static Set<String> apiResponseRelationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship -> imports.add(relationship.responseImport()));
-		imports.remove("");
 		return imports;
 	}
 
@@ -304,7 +213,7 @@ final class ProjectionSupport
 		return genericStart >= 0 ? typeName.substring(0, genericStart) : typeName;
 	}
 
-	private ProjectionSupport()
+	private TypeNameSupport()
 	{
 	}
 }

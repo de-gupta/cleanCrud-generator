@@ -305,6 +305,6 @@ public record GeneratedRelationship(
 
 	private String normalized(final String declaredType)
 	{
-		return ProjectionSupport.normalizeGeneratedType(declaredType);
+		return TypeNameSupport.normalizeGeneratedType(declaredType);
 	}
 }

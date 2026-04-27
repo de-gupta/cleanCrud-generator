@@ -74,8 +74,8 @@ public final class GenerateCommand implements Callable<Integer>
 	private String persistenceModelPath;
 	@CommandLine.Option(names = "--api-model", description = "Path to an existing API model source file")
 	private String apiModelPath;
-	@CommandLine.Option(names = "--generation-spec", description = "Path to the Java generation specification source file")
-	private String generationSpecPath;
+	@CommandLine.Option(names = "--relationships", description = "Path to the Java relationships declaration source file")
+	private String relationshipsPath;
 	@CommandLine.Option(names = "--own-base-model", description = "Ownership of the base model: ${COMPLETION-CANDIDATES}")
 	private GeneratedArtifactOwnership baseModelOwnership;
 	@CommandLine.Option(names = "--own-domain-model", description = "Ownership of the domain model: ${COMPLETION-CANDIDATES}")
@@ -118,7 +118,7 @@ public final class GenerateCommand implements Callable<Integer>
 				domainModelPath,
 				persistenceModelPath,
 				apiModelPath,
-				generationSpecPath,
+				relationshipsPath,
 				List.copyOf(domainTypes),
 				List.copyOf(persistenceTypes),
 				List.copyOf(apiTypes),

@@ -14,61 +14,54 @@ record ApiProjectionImpl(
 	@Override
 	public Set<String> genericImports()
 	{
-		return ProjectionSupport.combineImports(
-				domainGenericImports,
-				ProjectionSupport.inferredConcreteTypeImports(concreteTypes));
+		return ApiProjectionSupport.genericImports(domainGenericImports, concreteTypes);
 	}
 
 	@Override
 	public Set<String> imports()
 	{
-		return ProjectionSupport.combineImports(
-				genericImports(),
-				ProjectionSupport.propertyImports(composition.properties()));
+		return ApiProjectionSupport.imports(composition, domainGenericImports, concreteTypes);
 	}
 
 	@Override
 	public Set<String> createImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.apiCreateRelationshipImports(composition.relationships()));
+		return ApiProjectionSupport.createImports(composition, domainGenericImports, concreteTypes);
 	}
 
 	@Override
 	public Set<String> updateImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.apiUpdateRelationshipImports(composition.relationships()));
+		return ApiProjectionSupport.updateImports(composition, domainGenericImports, concreteTypes);
 	}
 
 	@Override
 	public Set<String> responseImports()
 	{
-		return ProjectionSupport.combineImports(imports(),
-				ProjectionSupport.apiResponseRelationshipImports(composition.relationships()));
+		return ApiProjectionSupport.responseImports(composition, domainGenericImports, concreteTypes);
 	}
 
 	@Override
 	public String concreteType(final String genericType)
 	{
-		return ProjectionSupport.concreteType(concreteTypes, genericType);
+		return TypeNameSupport.concreteType(concreteTypes, genericType);
 	}
 
 	@Override
 	public String resolvedType(final String declaredType)
 	{
-		return ProjectionSupport.resolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.resolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String boxedResolvedType(final String declaredType)
 	{
-		return ProjectionSupport.boxedResolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.boxedResolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String propertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 }

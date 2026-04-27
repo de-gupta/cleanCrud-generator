@@ -37,7 +37,7 @@ final class RelationshipGenerationConfigurationValidator
 						 "Property `" + property.name() + "` on model `" + model.modelName() +
 								 "` uses generic placeholder `" + property.relationshipGenericPlaceholder(
 								 model.genericTypeParameters()) +
-								 "` and therefore requires an explicit relationship configuration or generation specification.");
+								 "` and therefore requires an explicit relationship configuration or relationships declaration.");
 			 });
 
 		for (RelationshipGenerationConfiguration relationship : relationships)

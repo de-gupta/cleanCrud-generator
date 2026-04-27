@@ -46,19 +46,19 @@ record AggregateDescriptorImpl(
 	@Override
 	public String rootApiIdType()
 	{
-		return ProjectionSupport.normalizeGeneratedType(rootApiIdType);
+		return TypeNameSupport.normalizeGeneratedType(rootApiIdType);
 	}
 
 	@Override
 	public String rootDomainIdType()
 	{
-		return ProjectionSupport.normalizeGeneratedType(rootDomainIdType);
+		return TypeNameSupport.normalizeGeneratedType(rootDomainIdType);
 	}
 
 	@Override
 	public String rootPersistenceIdType()
 	{
-		return ProjectionSupport.normalizeGeneratedType(rootPersistenceIdType);
+		return TypeNameSupport.normalizeGeneratedType(rootPersistenceIdType);
 	}
 
 	@Override

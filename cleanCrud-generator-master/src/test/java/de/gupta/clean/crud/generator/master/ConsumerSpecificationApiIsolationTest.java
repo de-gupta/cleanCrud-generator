@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConsumerSpecificationApiIsolationTest
 {
 	private static final Path SAMPLE_PERSON_SPEC = Path.of(
-			"E:\\Projects\\Professional\\OpenSource\\java\\de-gupta\\crud\\cleanCrud-sampleImplementation\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonRelationshipGenerationSpecification.java");
+			"E:\\Projects\\Professional\\OpenSource\\java\\de-gupta\\crud\\cleanCrud-sampleImplementation\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonRelationships.java");
 	private static final Path DUPLICATE_GENERATOR_SPEC_PACKAGE = Path.of(
 			"E:\\Projects\\Professional\\OpenSource\\java\\de-gupta\\crud\\cleanCrud-generator\\cleanCrud-generator\\code-generation-orchestration\\src\\main\\java\\de\\gupta\\clean\\crud\\generator\\code\\generation\\orchestration\\configuration\\specification");
 
@@ -21,7 +21,7 @@ class ConsumerSpecificationApiIsolationTest
 	{
 		String source = Files.readString(SAMPLE_PERSON_SPEC);
 
-		assertTrue(source.contains("de.gupta.clean.crud.template.generation.specification"));
+		assertTrue(source.contains("de.gupta.clean.crud.template.domain.relationship"));
 		assertFalse(source.contains(
 				"de.gupta.clean.crud.generator.code.generation.orchestration.configuration.specification"));
 	}

@@ -12,7 +12,7 @@ record DirectCliGenerationOptions(
 		String domainModelPath,
 		String persistenceModelPath,
 		String apiModelPath,
-		String generationSpecPath,
+		String relationshipsPath,
 		List<String> domainTypes,
 		List<String> persistenceTypes,
 		List<String> apiTypes,
@@ -39,7 +39,7 @@ record DirectCliGenerationOptions(
 	boolean hasDirectOptions()
 	{
 		return firstNonBlank(positionalBaseModelPath, baseModelPath, domainModelPath, persistenceModelPath,
-				apiModelPath, generationSpecPath) != null
+				apiModelPath, relationshipsPath) != null
 				|| historized
 				|| !domainTypes.isEmpty()
 				|| !persistenceTypes.isEmpty()

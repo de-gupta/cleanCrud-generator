@@ -1,7 +1,7 @@
 {
   "inputs": {
     "baseModelSourceCodeFilePath": "src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java",
-    "generationSpecSourceCodeFilePath": "src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonGenerationSpec.java"
+    "relationshipsSourceCodeFilePath": "src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonRelationships.java"
   },
   "genericTypes": {
     "domain": {},

@@ -65,7 +65,7 @@ final class CodeGenerationConfigurationFileLoader
 						properties.getProperty("inputs.domainModelSourceCodeFilePath"),
 						properties.getProperty("inputs.persistenceModelSourceCodeFilePath"),
 						properties.getProperty("inputs.apiModelSourceCodeFilePath"),
-						properties.getProperty("inputs.generationSpecSourceCodeFilePath")
+						properties.getProperty("inputs.relationshipsSourceCodeFilePath")
 				),
 				new LayerConcreteTypes(
 						extractPrefixedMap(properties, "genericTypes.domain."),
@@ -129,7 +129,7 @@ final class CodeGenerationConfigurationFileLoader
 				normalizePath(normalized.domainModelSourceCodeFilePath(), configDirectory),
 				normalizePath(normalized.persistenceModelSourceCodeFilePath(), configDirectory),
 				normalizePath(normalized.apiModelSourceCodeFilePath(), configDirectory),
-				normalizePath(normalized.generationSpecSourceCodeFilePath(), configDirectory)
+				normalizePath(normalized.relationshipsSourceCodeFilePath(), configDirectory)
 		);
 	}
 
