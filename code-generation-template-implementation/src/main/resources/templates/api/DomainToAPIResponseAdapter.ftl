@@ -3,6 +3,11 @@ package ${aggregate().basePackage()}.useCases.crud.common.adapter;
 
 import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}DomainModelResponse;
 import ${aggregate().basePackage()}.useCases.crud.common.dto.${aggregate().baseName()}APIModelResponse;
+<#list composition().relationships() as relationship>
+import ${relationship.responseImport()};
+import ${relationship.domainResponseImport(aggregate().basePackage())};
+import ${relationship.domainModelImport()};
+</#list>
 <#if types().apiDomainDifferingParameters()?has_content>
 import ${aggregate().basePackage()}.useCases.crud.common.adapter.converter.*;
 </#if>
@@ -32,21 +37,37 @@ import ${import};
 @Component
 final class ${aggregate().baseName()}DomainToAPIResponseAdapter
 		implements DomainToAPIResponseAdapter${"<"}${aggregate().baseName()}APIModelResponse,
-		Long, ${aggregate().baseName()}DomainModelResponse${">"}
+		${aggregate().rootApiIdType()}, ${aggregate().baseName()}DomainModelResponse${">"}
 {
-	private final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter;
+	private final APIDomainIDAdapter${"<"}${aggregate().rootApiIdType()}, ${aggregate().rootDomainIdType()}${">"} idAdapter;
 <#list types().apiDomainDifferingParameters() as param>
 	private final Function<${domain().concreteType(param)}, ${api().concreteType(param)}> ${param?lower_case}DomainToAPIConverter;
+</#list>
+<#list composition().relationships() as relationship>
+	private final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter;
+	private final de.gupta.clean.crud.template.domain.mapping.fetch.DomainResponseBuilder<${relationship.domainModelType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}DomainResponseBuilder;
 </#list>
 
 	@Override
 	public ${aggregate().baseName()}APIModelResponse mapToAPIModelResponse(
-			final IdentifiedModel${"<"}Long,
+			final IdentifiedModel${"<"}${aggregate().rootApiIdType()},
 			${aggregate().baseName()}DomainModelResponse${">"} domainModel)
 	{
 		return ${aggregate().baseName()}APIModelResponse.of(
 				idAdapter.mapToAPIModelID(domainModel.id()),
 <#list composition().properties() as property>
+<#if composition().relationshipPropertyNames()?seq_contains(property.name())>
+	<#assign relationship = composition().relationship(property)>
+				<#if relationship.many()>
+				domainModel.model().${relationship.propertyName()}().stream()
+						.map(this::${relationship.relationshipVariablePrefix()}ToApi)
+						.toList()
+				<#elseif relationship.optional()>
+				domainModel.model().${relationship.propertyName()}().map(this::${relationship.relationshipVariablePrefix()}ToApi)
+				<#else>
+				${relationship.relationshipVariablePrefix()}ToApi(domainModel.model().${relationship.propertyName()}())
+				</#if><#if property_has_next>,</#if>
+<#else>
 <#if types().apiDomainDifferingParameters()?seq_contains(property.baseType())>
 				<#if property.optional()>
 				domainModel.model().${property.getter()}().map(${property.baseType()?lower_case}DomainToAPIConverter)<#if property_has_next>,</#if>
@@ -56,20 +77,41 @@ final class ${aggregate().baseName()}DomainToAPIResponseAdapter
 <#else>
 				domainModel.model().${property.getter()}()<#if property_has_next>,</#if>
 </#if>
+</#if>
 </#list>
 		);
 	}
 
+<#list composition().relationships() as relationship>
+	private ${relationship.responseType()} ${relationship.relationshipVariablePrefix()}ToApi(
+			final de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel<${relationship.satelliteDomainIdType()}, ${relationship.domainModelType()}> satellite)
+	{
+		return ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter.mapToAPIModelResponse(
+				de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel.of(
+						satellite.id(),
+						${relationship.relationshipVariablePrefix()}DomainResponseBuilder.toResponse(satellite.model())));
+	}
+
+</#list>
+
 	${aggregate().baseName()}DomainToAPIResponseAdapter(
-			final APIDomainIDAdapter${"<"}Long, Long${">"} idAdapter<#if types().apiDomainDifferingParameters()?has_content>,
+			final APIDomainIDAdapter${"<"}${aggregate().rootApiIdType()}, ${aggregate().rootDomainIdType()}${">"} idAdapter<#if types().apiDomainDifferingParameters()?has_content || composition().relationships()?has_content>,
 <#list types().apiDomainDifferingParameters() as param>
-			@Qualifier("${aggregate().beanNamePrefix()}${param}DomainToAPIConverter") final Function<${domain().concreteType(param)}, ${api().concreteType(param)}> ${param?lower_case}DomainToAPIConverter<#if param_has_next>,</#if>
+			@Qualifier("${aggregate().beanNamePrefix()}${param}DomainToAPIConverter") final Function<${domain().concreteType(param)}, ${api().concreteType(param)}> ${param?lower_case}DomainToAPIConverter<#if param_has_next || composition().relationships()?has_content>,</#if>
+</#list>
+<#list composition().relationships() as relationship>
+			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainToAPIResponseAdapter") final DomainToAPIResponseAdapter<${relationship.responseType()}, ${relationship.satelliteApiIdType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter,
+			@Qualifier("${relationship.satelliteQualifierPrefix()}DomainResponseBuilder") final de.gupta.clean.crud.template.domain.mapping.fetch.DomainResponseBuilder<${relationship.domainModelType()}, ${relationship.domainResponseType()}> ${relationship.relationshipVariablePrefix()}DomainResponseBuilder<#if relationship_has_next>,</#if>
 </#list>
 </#if>)
 	{
 		this.idAdapter = idAdapter;
 <#list types().apiDomainDifferingParameters() as param>
 		this.${param?lower_case}DomainToAPIConverter = ${param?lower_case}DomainToAPIConverter;
+</#list>
+<#list composition().relationships() as relationship>
+		this.${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter = ${relationship.relationshipVariablePrefix()}DomainToAPIResponseAdapter;
+		this.${relationship.relationshipVariablePrefix()}DomainResponseBuilder = ${relationship.relationshipVariablePrefix()}DomainResponseBuilder;
 </#list>
 	}
 }

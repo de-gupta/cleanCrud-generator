@@ -1,20 +1,12 @@
 {
   "inputs": {
-    "baseModelSourceCodeFilePath": "src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java"
+    "baseModelSourceCodeFilePath": "src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java",
+    "relationshipsSourceCodeFilePath": "src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonRelationships.java"
   },
   "genericTypes": {
-    "domain": {
-      "U": "String",
-      "V": "Integer"
-    },
-    "persistence": {
-      "U": "Integer",
-      "V": "String"
-    },
-    "api": {
-      "U": "String",
-      "V": "Integer"
-    }
+    "domain": {},
+    "persistence": {},
+    "api": {}
   },
   "generation": {
     "groups": [
@@ -36,32 +28,6 @@
       "USE_CASE_DELETE"
     ]
   },
-  "relationships": [
-    {
-      "masterProperty": "notes",
-      "satelliteAggregate": "Note",
-      "cardinality": "MANY",
-      "reconciliationStrategy": "MERGE_BY_ID",
-      "satelliteApiIdType": "Long",
-      "relationshipKind": "OWNED"
-    },
-    {
-      "masterProperty": "currentVersion",
-      "satelliteAggregate": "Version",
-      "cardinality": "ONE",
-      "reconciliationStrategy": "REPLACE",
-      "satelliteApiIdType": "Long",
-      "relationshipKind": "REFERENCED"
-    },
-    {
-      "masterProperty": "lastKnownVersion",
-      "satelliteAggregate": "Version",
-      "cardinality": "ONE",
-      "reconciliationStrategy": "REPLACE",
-      "satelliteApiIdType": "Long",
-      "relationshipKind": "REFERENCED"
-    }
-  ],
   "ownership": {},
   "overwrite": {
     "defaultOverwrite": true

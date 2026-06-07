@@ -1,63 +1,189 @@
 # cleanCrud-generator
 
-Generator for [`cleanCrud`](https://github.com/de-gupta/cleanCrud) modules from existing aggregate model source files.
+`cleanCrud-generator` generates `cleanCrud` modules from an existing Java aggregate model.
 
-This repository contains the generator itself, not a generated sample application. It is intended for teams that already
-model aggregates in Java and want the surrounding clean architecture CRUD module structure generated around those
-models.
+It is designed for teams who:
 
-## Scope
+- already model aggregates in Java
+- want the surrounding CRUD module structure generated for them
+- want relationships between aggregates generated from explicit declarations instead of hand-written boilerplate
 
-The generator starts from an existing base model source file such as:
+This repository contains the generator itself, not a generated application.
 
-- `PersonModel.java`
-- `TaskModel.java`
-- `VersionModel.java`
-- `NoteModel.java`
+## What The Generator Expects From Consumers
 
-From that source model, it generates a layered CRUD module structure around the aggregate, including domain models, API
-DTOs and adapters, persistence models and repositories, security/configuration surfaces, and use-case wiring.
+Consumers do **not** write generator package code.
 
-The generator is designed for:
+Consumers provide:
 
-- aggregate-centric module generation
-- convention-based code generation around an existing Java source model
-- incremental generation into an existing repository
-- explicit relationship generation when the aggregate refers to other aggregates
+1. a base model source file
+2. optionally, a sibling `*Relationships` declaration class
+3. generator config carrying root aggregate generation inputs such as root id types
 
-The generator is not designed as:
+### 1. Base model
 
-- a generic Java scaffolding engine
-- a runtime code generator
-- a schema-first generator
-- a one-shot full application generator
+The base model is the authoritative source for the aggregate shape.
 
-## Repository Layout
+Example:
 
-The repository is split into modules with distinct responsibilities:
+```java
+public interface PersonModel<T, V, N>
+{
+    String firstName();
 
-- `code-generation-model-implementation`
-    - parses and interprets Java model source
-- `code-generation-template-implementation`
-    - builds template-facing semantic models and processes Freemarker templates
-- `code-generation-orchestration`
-    - coordinates model parsing, relationship handling, selection, and writing
-- `code-generation-writing-implementation`
-    - writes generated source files
-- `cleanCrud-generator-api`
-    - CLI adapter and configuration loading
-- `cleanCrud-generator-master`
-    - runnable application assembly and end-to-end integration tests
+    T tag();
+
+    V currentVersion();
+
+    Optional<V> lastKnownVersion();
+
+    Collection<N> notes();
+}
+```
+
+### 2. Relationships declaration
+
+If the aggregate has relationships, consumers place a sibling class next to the base model, typically in the same
+package:
+
+```java
+public final class PersonRelationships implements Relationships
+{
+    @Override
+    public Class<?> baseModelClass()
+    {
+        return PersonModel.class;
+    }
+
+    @Override
+    public Collection<Relationship> relationships()
+    {
+        return List.of(
+                Relationship.referenced("tag", TagModel.class)
+                            .satelliteApiIdType(Long.class)
+                            .satelliteDomainIdType(Long.class)
+                            .satellitePersistenceIdType(UUID.class)
+                            .build(),
+                Relationship.referenced("currentVersion", VersionModel.class)
+                            .satelliteApiIdType(Long.class)
+                            .satelliteDomainIdType(Long.class)
+                            .satellitePersistenceIdType(UUID.class)
+                            .build(),
+                Relationship.referenced("lastKnownVersion", VersionModel.class)
+                            .satelliteApiIdType(Long.class)
+                            .satelliteDomainIdType(Long.class)
+                            .satellitePersistenceIdType(UUID.class)
+                            .build(),
+                Relationship.owned("notes", NoteModel.class)
+                            .satelliteApiIdType(Long.class)
+                            .satelliteDomainIdType(Long.class)
+                            .satellitePersistenceIdType(UUID.class)
+                            .reconciliationStrategy(ReconciliationStrategy.MERGE_BY_ID)
+                            .build());
+    }
+}
+```
+
+Important:
+
+- this class depends only on `cleanCrud`
+- it does **not** import generator packages
+- it is a normal consumer source artifact
+
+### 3. Generator config
+
+The generator config remains responsible for root aggregate generation concerns, not satellite semantics.
+
+That includes:
+
+- root aggregate API id type
+- root aggregate domain id type
+- root aggregate persistence id type
+- template/group selection
+- overwrite behavior
+- historization
+- source paths
+
+So the split is:
+
+- `cleanCrud` relationship declarations describe **satellite relationships**
+- generator config describes **root aggregate generation inputs**
+
+## What The Generator Infers
+
+The generator does **not** require cardinality to be declared separately.
+
+It infers cardinality from the base model property shape:
+
+- `U` -> required `ONE`
+- `Optional<U>` -> optional `ONE`
+- `Collection<U>` -> `MANY`
+
+So the consumer provides:
+
+- property name
+- relationship kind
+- lifecycle / reconciliation
+- satellite id types
+
+and the generator derives:
+
+- cardinality
+- API / domain / persistence relationship projections
+- accessors and replacers
+- runtime relationship configuration
+
+## Relationship Meaning Comes From `cleanCrud`
+
+The generator now consumes the `cleanCrud` domain relationship declarations directly:
+
+- `Relationship`
+- `RelationshipKind`
+- `Relationships`
+- `LifecycleSemantics`
+- `ReconciliationStrategy`
+
+That matters because the generator no longer invents its own parallel relationship meaning model.
+
+Instead:
+
+- `Relationship` is the semantic source of truth
+- the generator derives generated code from it
+
+## What The Generator Emits For Relationships
+
+For relationship-bearing aggregates, the generator now emits:
+
+- the normal CRUD module structure
+- relationship-aware API/domain/persistence projections
+- runtime relationship configuration using the high-level runtime DSL:
+    - `AggregateRelationshipDefinitions.fromRelationship(...)`
+
+So generated relationship configuration is now shorter and more semantic.
+
+It no longer re-declares:
+
+- owned vs referenced
+- lifecycle semantics
+- reconciliation strategy
+
+Those are taken from `Relationship`.
+
+The generator only emits the pieces that are still structural/runtime-specific:
+
+- `current(...)` / `currentMany(...)`
+- `replace(...)` / `replaceMany(...)`
+- generated rebuild helpers
 
 ## Build
 
-From the repository root:
+From the generator repository root:
 
 ```powershell
 mvn clean install
 ```
 
-This builds all modules and produces a runnable jar at:
+The runnable jar is produced at:
 
 ```text
 cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar
@@ -65,7 +191,19 @@ cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar
 
 ## Running The Generator
 
-The runnable entry point is the packaged jar in `cleanCrud-generator-master`.
+There are two normal ways to run it:
+
+- with a config file
+- with direct CLI options
+
+For anything non-trivial, especially relationships, prefer the config file.
+
+### Subcommands
+
+The CLI exposes:
+
+- `list-templates`
+- `generate`
 
 Examples:
 
@@ -77,490 +215,281 @@ java -jar cleanCrud-generator-master\target\cleanCrud-generator-master-<version>
 java -jar cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar generate --config E:\path\to\generator-config.json
 ```
 
-```powershell
-java -jar cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar generate E:\path\to\PersonModel.java --historized --group COMMON --group CONFIGURATION
+## Recommended Consumer Layout
+
+The recommended consumer layout is:
+
+- base model and relationships declaration in the same package
+- generated code written back into the same repository source tree
+
+Typical example:
+
+```text
+src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonModel.java
+src/main/java/de/gupta/clean/crud/implementation/examples/person/domain/model/PersonRelationships.java
 ```
 
-The CLI exposes two subcommands:
+This keeps:
 
-- `list-templates`
-    - prints the currently available template names in sorted order
-- `generate`
-    - generates code from a config file or direct CLI options
+- model shape
+- relationship meaning
+- generated module
 
-## What Consumers Must Provide
+close together.
 
-The generator always requires a base model source file.
+## Config File Example
 
-Consumers must provide:
+Here is the practical shape for a relationship-bearing generation run:
 
-- a real Java source file for the aggregate base model
-- a valid Java package declaration in that file
-- a repository structure where generated code can be written alongside the model source tree
-- any concrete type substitutions required by the model's generic parameters
-- explicit relationship configuration when aggregate properties represent cross-aggregate relationships
+```json
+{
+  "inputs": {
+    "baseModelSourceCodeFilePath": "E:\\repo\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonModel.java",
+    "relationshipsSourceCodeFilePath": "E:\\repo\\src\\main\\java\\de\\gupta\\clean\\crud\\implementation\\examples\\person\\domain\\model\\PersonRelationships.java"
+  },
+  "generation": {
+    "groups": [
+      "COMMON",
+      "CONFIGURATION",
+      "DOMAIN_MODELS",
+      "DOMAIN_SUPPORT",
+      "API_DTOS",
+      "API_ADAPTERS",
+      "API_CONTROLLERS",
+      "PERSISTENCE_MODELS",
+      "PERSISTENCE_ADAPTERS",
+      "PERSISTENCE_REPOSITORIES",
+      "PERSISTENCE_HISTORY",
+      "SECURITY",
+      "USE_CASE_FETCH",
+      "USE_CASE_SAVE",
+      "USE_CASE_UPDATE",
+      "USE_CASE_DELETE"
+    ]
+  },
+  "rootAggregateIdConfiguration": {
+    "apiIdType": "Long",
+    "domainIdType": "Long",
+    "persistenceIdType": "UUID"
+  },
+  "overwrite": {
+    "defaultOverwrite": true
+  },
+  "historized": true
+}
+```
 
-Consumers may also provide:
+### Required fields for a relationship-bearing run
 
-- existing domain model source paths
-- existing persistence model source paths
-- existing API model source paths
-- selection rules for groups, templates, and tags
-- ownership rules
-- overwrite rules
-- historization flag
+At minimum you need:
 
-## What The Generator Assumes
+- `inputs.baseModelSourceCodeFilePath`
+- `inputs.relationshipsSourceCodeFilePath`
+- root aggregate id configuration
 
-The generator makes several important assumptions about the consumer repository.
+If the aggregate is standalone, `relationshipsSourceCodeFilePath` may be omitted.
 
-It assumes:
+## Direct CLI Usage
 
-- the base model file is the authoritative entry point for the aggregate
-- the package structure in the model file reflects the desired generated package neighborhood
-- generated code should be written back into the same repository tree
-- related aggregate contracts already exist when relationship-bearing generation depends on them
-- model property naming and DTO naming follow the conventions expected by the generator templates
+Direct CLI mode is still fine for simpler standalone generation.
 
-It does not assume a fixed monorepo shape or a fixed repository root. It derives the content root and package-relative
-placement from the supplied source file path and package declaration.
+Example:
 
-## Generated Output
+```powershell
+java -jar cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar generate `
+  --base-model E:\repo\src\main\java\de\gupta\clean\crud\implementation\examples\person\domain\model\PersonModel.java `
+  --relationships E:\repo\src\main\java\de\gupta\clean\crud\implementation\examples\person\domain\model\PersonRelationships.java `
+  --root-api-id-type Long `
+  --root-domain-id-type Long `
+  --root-persistence-id-type UUID `
+  --group COMMON `
+  --group CONFIGURATION `
+  --group DOMAIN_MODELS `
+  --group DOMAIN_SUPPORT `
+  --group API_DTOS `
+  --group API_ADAPTERS `
+  --group API_CONTROLLERS `
+  --group PERSISTENCE_MODELS `
+  --group PERSISTENCE_ADAPTERS `
+  --group PERSISTENCE_REPOSITORIES `
+  --group PERSISTENCE_HISTORY `
+  --group SECURITY `
+  --group USE_CASE_FETCH `
+  --group USE_CASE_SAVE `
+  --group USE_CASE_UPDATE `
+  --group USE_CASE_DELETE `
+  --overwrite-default `
+  --historized
+```
 
-For a normal standalone aggregate, the generator typically produces:
+Recommendation:
 
-- aggregate CRUD configuration
-- aggregate port wiring
-- aggregate services wiring
+- use direct CLI for small experiments
+- use config files for real modules and especially for relationship-bearing generation
+
+## What The Generator Produces
+
+For a normal aggregate, the generator typically emits:
+
 - domain model and DTO surfaces
 - API DTOs and adapters
-- persistence models and repositories
-- persistence history support when historization is enabled
-- security/policy scaffolding where applicable
-- shared common persistence support such as `CommonPersistenceConfiguration`
+- persistence models and adapters
+- repositories
+- fetch/save/update/delete persistence services
+- CRUD ports
+- CRUD definition
+- CRUD services
+- module configuration
 
-Current standalone CRUD configuration generation emits:
+The standard configuration classes are:
 
 - `<Aggregate>CrudPortsConfiguration`
 - `<Aggregate>CrudDefinitionConfiguration`
 - `<Aggregate>CrudServicesConfiguration`
 
-When relationships are configured, the generator also emits:
+If relationships are declared, it additionally emits:
 
 - `<Aggregate>CrudRelationshipConfiguration`
 
-## Standalone First, Relationships Second
+That relationship config now uses:
 
-The safest usage pattern is:
+- `AggregateRelationshipDefinitions.fromRelationship(...)`
 
-1. generate standalone aggregates first
-2. generate the owning aggregate with explicit relationship configuration after the referenced or owned aggregates
-   already exist
+instead of emitting the full low-level resolver/link/hydration boilerplate.
 
-Example order:
+## What The Generator Derives Across Layers
 
-1. generate `Version`
-2. generate `Note`
-3. generate `Person` or `Task`
-4. add explicit relationship config for the owning aggregate
-
-This matters because the generated relationship wiring depends on the public contracts of the satellite aggregates.
-
-## Relationship Generation
-
-Relationship generation is opt-in.
-
-The generator can infer that a property looks like a relationship candidate from shapes such as:
-
-- `Optional<VersionAPIModelResponse>`
-- `Collection<NoteAPIModelResponse>`
-
-That inference is intentionally limited. It only gives the generator:
-
-- master property name
-- likely cardinality
-- likely satellite aggregate name
-
-It does not determine:
-
-- relationship kind
-- lifecycle semantics
-- reconciliation behavior
-- satellite ID storage type
-- nested create/update generation policy
-
-Those must be supplied explicitly when relationship generation is desired.
-
-## Relationship Configuration Model
-
-Relationship entries are provided in the `relationships` section of the config file.
-
-Example:
-
-```json
-{
-  "relationships": [
-    {
-      "masterProperty": "notes",
-      "satelliteAggregate": "Note",
-      "cardinality": "MANY",
-      "reconciliationStrategy": "MERGE_BY_ID",
-      "satelliteApiIdType": "Long",
-      "relationshipKind": "OWNED"
-    },
-    {
-      "masterProperty": "currentVersion",
-      "satelliteAggregate": "Version",
-      "cardinality": "ONE",
-      "reconciliationStrategy": "REPLACE",
-      "satelliteApiIdType": "Long",
-      "relationshipKind": "REFERENCED"
-    }
-  ]
-}
-```
-
-Important fields:
-
-- `masterProperty`
-    - the property on the owning aggregate
-- `satelliteAggregate`
-    - the related aggregate name
-- `cardinality`
-    - `ONE` or `MANY`
-- `relationshipKind`
-    - whether the relationship is `OWNED` or `REFERENCED`
-- `reconciliationStrategy`
-    - how nested changes are reconciled
-- `satelliteApiIdType`
-    - the ID type used when persistence stores satellite references by ID
-
-### Why `relationshipKind` Is Required
-
-The base model can imply that a property is relationship-shaped, but it cannot safely decide whether the master
-aggregate owns the lifecycle of the satellite aggregate or merely references it.
-
-That decision affects:
-
-- nested create/update semantics
-- persistence behavior
-- generated patch structure
-- hydration and attachment logic
-
-So relationship generation fails fast when that information is missing.
-
-### Why `satelliteApiIdType` Is Required
-
-Consumer-facing models typically expose relationship state as response objects, while persistence usually stores
-satellite IDs.
-
-Example:
-
-- base model: `Optional<VersionAPIModelResponse>`
-- persistence concern: store `Long` satellite ID
-
-The generator therefore needs an explicit persistence-side ID type once the relationship is declared.
-
-## Default Relationship Semantics
-
-Generated relationship definitions start from these defaults:
-
-- `cascadeCreate = true`
-- `cascadeUpdate = true`
-- `cascadeDelete = false`
-- `orphanDelete = false`
-- `hydrateOnFetch = true`
-
-These are starting points, not a substitute for consumer review. Generated relationship configuration intentionally
-includes review-friendly surfaces so teams can adapt semantics for their domain.
-
-## Configuration File Formats
-
-Supported config formats:
-
-- `.json`
-- `.yaml`
-- `.yml`
-- `.properties`
-
-JSON and properties are the preferred formats for maintainability and explicitness.
-
-## Configuration Model
-
-The top-level configuration model is additive and organized into these sections:
-
-- `inputs`
-- `genericTypes`
-- `generation`
-- `ownership`
-- `overwrite`
-- `historized`
-- `relationships`
-
-### `inputs`
-
-Defines source file paths that already exist.
-
-Relevant inputs include:
-
-- `baseModelSourceCodeFilePath`
-- existing domain model path
-- existing persistence model path
-- existing API model path
-
-### `genericTypes`
-
-Allows different concrete generic substitutions per layer:
-
-- `domain`
-- `persistence`
-- `api`
-
-This matters when a base model is generic but the generated layers need different concrete types.
-
-### `generation`
-
-Controls inclusion and exclusion by:
-
-- group
-- template
-- tag
-
-Supported groups include:
-
-- `COMMON`
-- `CONFIGURATION`
-- `DOMAIN_MODELS`
-- `DOMAIN_SUPPORT`
-- `API_DTOS`
-- `API_ADAPTERS`
-- `API_CONTROLLERS`
-- `PERSISTENCE_MODELS`
-- `PERSISTENCE_ADAPTERS`
-- `PERSISTENCE_REPOSITORIES`
-- `PERSISTENCE_HISTORY`
-- `SECURITY`
-- `USE_CASE_FETCH`
-- `USE_CASE_SAVE`
-- `USE_CASE_UPDATE`
-- `USE_CASE_DELETE`
-
-### `ownership`
-
-Controls whether generated artifacts are treated as generator-owned or user-owned.
-
-Ownership can be declared at different scopes:
+Given:
 
 - base model
-- domain model
-- persistence model
-- API model
-- group rules
-- template rules
-- tag rules
+- `*Relationships`
+- root aggregate id config
 
-### `overwrite`
+the generator derives:
 
-Controls overwrite behavior at multiple levels:
+### Domain model relationship fields
 
-- default overwrite behavior
-- group rules
-- template rules
-- tag rules
-- file-path rules
+- `IdentifiedModel<SatelliteDomainId, SatelliteDomainModel>`
+- optional / collection variants
 
-### `historized`
+### Persistence model relationship fields
 
-Boolean flag enabling historization-aware generation where supported by the templates.
+- `SatellitePersistenceId`
+- optional / collection variants
 
-### `relationships`
+using the **same property names as the base model**
 
-Explicit relationship-generation declarations for the owning aggregate.
+### API create / patch / response
 
-## Direct CLI Options
+These are derived from:
 
-The generator can be run with a config file or with direct CLI options.
-
-Direct CLI mode supports:
-
-- base model path selection
-- existing source file path declarations for domain/persistence/API models
-- generic substitutions by layer
-- include and exclude rules for groups, templates, and tags
-- ownership rules
-- overwrite rules
-- historization flag
+- `OWNED` vs `REFERENCED`
+- inferred cardinality
+- reconciliation strategy
 
 Examples:
 
-```powershell
-java -jar cleanCrud-generator-master\target\cleanCrud-generator-master-<version>.jar generate `
-  --base-model E:\repo\src\main\java\de\gupta\clean\crud\implementation\examples\person\domain\model\PersonModel.java `
-  --domain-type U=String `
-  --domain-type V=Integer `
-  --persistence-type U=Integer `
-  --persistence-type V=String `
-  --api-type U=String `
-  --api-type V=Integer `
-  --group COMMON `
-  --group CONFIGURATION `
-  --group DOMAIN_MODELS `
-  --overwrite-default `
-  --historized
-```
+- referenced one -> API id field
+- owned many merge -> `SatelliteUpdatePatchItem<Id, Patch>` plus remove ids
 
-Current recommendation:
+## What The Generator Does Not Ask The Consumer To Repeat
 
-- use direct CLI options for simpler standalone generation
-- use config files for relationship-bearing generation and anything non-trivial
+The generator should not make consumers restate structural relationship meaning in runtime code.
 
-`--config` cannot be combined with direct generation options.
+So it does **not** ask consumers to manually re-specify:
 
-## Path Resolution, Environment Variables, and Layout Rules
+- owned vs referenced
+- lifecycle semantics
+- reconciliation strategy
+
+Those belong in `Relationship`.
+
+The generator lowers them into generated runtime code automatically.
+
+## Safe Usage Order
+
+The safest workflow remains:
+
+1. generate standalone satellites first
+2. generate the owning aggregate after those satellites exist
+
+For example:
+
+1. generate `Tag`
+2. generate `Version`
+3. generate `Note`
+4. generate `Person`
+
+This matters because the generated relationship-aware module depends on the already-existing satellite aggregate
+contracts.
+
+## Path Resolution
 
 Important behavior:
 
 - relative paths inside config files are resolved relative to the config file location
-- environment variable placeholders use `${NAME}` syntax
-- generated files are written alongside the supplied source tree, based on the base model path and package declaration
+- environment placeholders use `${NAME}`
+- generated files are written alongside the supplied source tree
 
-This means consumers should think in terms of "point the generator at the actual aggregate model source file," not "
-point the generator at the repository root."
+So you point the generator at real source files, not at a repository root.
 
 ## Limitations
 
-Current limitations to keep in mind:
+Current limitations:
 
-- the generator is convention-heavy and depends on expected naming and package shapes
-- relationship generation requires explicit semantics and is not fully inferred from property shape
-- the safest flow still assumes standalone aggregates are generated before owning aggregates with relationships
-- generation quality depends on the base model being a clean, representative aggregate surface
-- the generator is strongest for the architectural style and template conventions embodied by `cleanCrud`
-- it is not intended to support arbitrary project structures or arbitrary domain modeling styles
+- the generator is convention-heavy
+- it assumes the base model is the authoritative aggregate entry point
+- it assumes sibling `*Relationships` classes follow the `cleanCrud` declaration model
+- it is strongest for the architectural style embodied by `cleanCrud`
+- it is not meant to be a general Java scaffolding engine
 
-The repository has been refactored to reduce architectural hotspots, but it is still an evolving generator with strong
-conventions rather than a completely open-ended platform.
+It is a structured accelerator for `cleanCrud` modules, not a substitute for domain review.
 
-## Consumer Responsibilities
+## Consumer Checklist
 
-Consumers are expected to:
+For a standalone aggregate:
 
-- provide a valid base model file
-- review generated code before treating it as final domain behavior
-- review relationship lifecycle defaults
-- supply explicit generic substitutions where needed
-- choose ownership and overwrite policy intentionally
-- regenerate with care when changing naming or relationship conventions
+- provide `BaseModel.java`
+- provide root aggregate id types in generator config
+- run generator
 
-The generator helps create structure quickly, but it does not replace domain design decisions.
+For a relationship-bearing aggregate:
 
-## Development And Testing Of The Generator
+- provide `BaseModel.java`
+- provide sibling `*Relationships.java`
+- provide root aggregate id types in generator config
+- make sure referenced/owned satellite aggregates already exist
+- run generator
 
-The generator repository now has two confidence levels.
+## Testing The Generator
 
-### Fast Confidence
-
-Run:
+From the generator repo root:
 
 ```powershell
 mvn test
 ```
 
-This runs:
+This covers:
 
 - unit tests
-- architectural boundary tests
-- smoke tests
-- CLI integration tests
-- the generated-app compile fixture
+- orchestration tests
+- CLI tests
+- smoke generation tests
+- generated fixture compile tests
 
-The generated-app compile fixture assembles an ephemeral sample application from in-repo test resources, copies stable
-`note` and `version` modules, generates `person`, and verifies that the resulting mixed application compiles.
+The relationship-aware smoke tests now verify:
 
-### Full Confidence
-
-Run:
-
-```powershell
-mvn verify
-```
-
-This runs everything from `test`, plus the generated-app boot integration test through Maven Failsafe.
-
-That full path:
-
-1. assembles an ephemeral sample application from `cleanCrud-generator-master/src/test/resources/generated-app-fixutre`
-2. copies stable `note` and `version` modules
-3. generates the `person` module from the copied `PersonModel`
-4. compiles the assembled application
-5. boots the Spring application context with Testcontainers-backed PostgreSQL
-
-This is the strongest in-repo confidence signal for day-to-day extension work.
-
-## Test Fixture Scope
-
-The generated-app fixture intentionally tests a mixed scenario:
-
-- static copied modules: `note`, `version`
-- generated module during the test run: `person`
-
-That is deliberate. It verifies that newly generated output can coexist with already-existing neighboring modules in a
-realistic application shape, which catches more regressions than isolated single-aggregate smoke generation.
-
-## Requirements For Full Integration Tests
-
-The full `verify` path assumes:
-
-- Docker is available
-- Testcontainers can connect to Docker
-- the local environment can pull and run required test container images if not already cached
-
-If Docker is unavailable, `mvn test` remains the fast compile-level confidence path, but `mvn verify` is the intended
-full validation command.
-
-## Maintainer Guidance
-
-When extending the generator:
-
-- prefer adding behavior behind clear semantic boundaries
-- avoid turning central registry/model/orchestration files back into extension magnets
-- add or update fixture coverage when introducing new generation behavior
-- prefer preserving output compatibility unless a deliberate breaking change is intended
-- validate relationship-bearing scenarios, not just standalone generation
-
-For most changes:
-
-1. run `mvn test`
-2. if generation logic, templates, or wiring changed, run `mvn verify`
-
-## Current State
-
-The repository is architecturally healthier than before, but still convention-driven.
-
-Strengths:
-
-- clearer boundaries between orchestration, CLI assembly, and template-domain composition
-- architectural guardrails
-- semantic `TemplateModel` sub-models
-- stronger in-repo end-to-end confidence via compile and boot fixtures
-
-Remaining long-term stewardship areas:
-
-- convention-heavy relationship modeling
-- centralized template metadata
-- JPMS/module-boundary clarity
+- generated runtime config uses `fromRelationship(...)`
+- repeated target aggregate types still bind by property name
+- generated projects compile against the current `cleanCrud`
 
 ## Summary
 
-Use this generator when you already have an aggregate model and want `cleanCrud`-style module scaffolding generated
-around it.
+The current contract is:
 
-Use:
+- consumers provide **base model + optional `*Relationships`**
+- generator config provides **root aggregate generation inputs**
+- `cleanCrud` provides the semantic relationship model
+- the generator derives the repetitive layer-specific and runtime wiring from those inputs
 
-- `mvn test` for fast repository confidence
-- `mvn verify` for full repository confidence
-
-Use config files for non-trivial generation, especially relationships.
-
-Treat generated code as a strong starting point and structured acceleration mechanism, not as a substitute for domain
-review.
+That is the new baseline for relationship-aware generation.

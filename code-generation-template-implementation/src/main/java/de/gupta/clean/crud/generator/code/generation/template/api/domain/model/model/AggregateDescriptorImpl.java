@@ -1,6 +1,12 @@
 package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model;
 
-record AggregateDescriptorImpl(String packageName, String modelName, boolean historized)
+record AggregateDescriptorImpl(
+		String packageName,
+		String modelName,
+		String rootApiIdType,
+		String rootDomainIdType,
+		String rootPersistenceIdType,
+		boolean historized)
 		implements AggregateDescriptor
 {
 	@Override
@@ -35,5 +41,36 @@ record AggregateDescriptorImpl(String packageName, String modelName, boolean his
 	public String duplicateKeyTypeName()
 	{
 		return baseName() + "DuplicateKey";
+	}
+
+	@Override
+	public String rootApiIdType()
+	{
+		return TypeNameSupport.normalizeGeneratedType(rootApiIdType);
+	}
+
+	@Override
+	public String rootDomainIdType()
+	{
+		return TypeNameSupport.normalizeGeneratedType(rootDomainIdType);
+	}
+
+	@Override
+	public String rootPersistenceIdType()
+	{
+		return TypeNameSupport.normalizeGeneratedType(rootPersistenceIdType);
+	}
+
+	@Override
+	public boolean rootApiDomainIdentity()
+	{
+		return rootApiIdType.equals(rootDomainIdType);
+	}
+
+	@Override
+	public boolean rootDomainLong()
+	{
+		return "java.lang.Long".equals(rootDomainIdType) || "Long".equals(rootDomainIdType) || "long".equals(
+				rootDomainIdType);
 	}
 }

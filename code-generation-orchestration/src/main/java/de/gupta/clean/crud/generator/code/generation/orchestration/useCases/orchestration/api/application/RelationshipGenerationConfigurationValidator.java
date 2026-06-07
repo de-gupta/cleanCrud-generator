@@ -28,15 +28,16 @@ final class RelationshipGenerationConfigurationValidator
 
 		model.properties()
 		     .stream()
-		     .filter(Property::aggregateRelationshipCandidate)
+		     .filter(property -> property.relationshipEligible(model.genericTypeParameters()))
 		     .filter(property -> !configuredProperties.contains(property.name()))
 		     .findFirst()
 		     .ifPresent(property ->
 			 {
 				 throw new IllegalArgumentException(
 						 "Property `" + property.name() + "` on model `" + model.modelName() +
-								 "` looks like a relationship candidate (`" + property.candidateAggregateType() +
-								 "`), but no explicit relationship configuration was provided. Relationship generation requires relationshipKind and satelliteApiIdType.");
+								 "` uses generic placeholder `" + property.relationshipGenericPlaceholder(
+								 model.genericTypeParameters()) +
+								 "` and therefore requires an explicit relationship configuration or relationships declaration.");
 			 });
 
 		for (RelationshipGenerationConfiguration relationship : relationships)
@@ -48,11 +49,11 @@ final class RelationshipGenerationConfigurationValidator
 						"Relationship `" + relationship.masterProperty() + "` does not exist on model `" +
 								model.modelName() + "`");
 			}
-			if (!property.aggregateRelationshipCandidate())
+			if (!property.relationshipEligible(model.genericTypeParameters()))
 			{
 				throw new IllegalArgumentException(
 						"Property `" + relationship.masterProperty() + "` on model `" + model.modelName() +
-								"` is not a supported relationship candidate");
+								"` is not a supported relationship candidate. Relationship properties must use a generic placeholder or Optional/Collection over one.");
 			}
 			RelationshipCardinality inferredCardinality =
 					property.collectionValued() ? RelationshipCardinality.MANY : RelationshipCardinality.ONE;
@@ -70,12 +71,10 @@ final class RelationshipGenerationConfigurationValidator
 				throw new IllegalArgumentException(
 						"Relationship `" + relationship.masterProperty() + "` must declare a satelliteAggregate");
 			}
-			if (!relationship.satelliteAggregate().equals(property.candidateAggregateType()))
+			if (relationship.satelliteBaseModelType() == null || relationship.satelliteBaseModelType().isBlank())
 			{
 				throw new IllegalArgumentException(
-						"Relationship `" + relationship.masterProperty() + "` declares satellite aggregate `" +
-								relationship.satelliteAggregate() + "` but the property type implies `" +
-								property.candidateAggregateType() + "`");
+						"Relationship `" + relationship.masterProperty() + "` must declare a satelliteBaseModelType");
 			}
 			if (relationship.relationshipKind() == null)
 			{
@@ -85,18 +84,18 @@ final class RelationshipGenerationConfigurationValidator
 			if (relationship.satelliteApiIdType() == null || relationship.satelliteApiIdType().isBlank())
 			{
 				throw new IllegalArgumentException(
-						"Relationship `" + relationship.masterProperty() +
-								"` must declare a satelliteApiIdType");
+						"Relationship `" + relationship.masterProperty() + "` must declare a satelliteApiIdType");
 			}
-			String expectedResponseType = relationship.satelliteAggregate() + "APIModelResponse";
-			String actualResponseType =
-					property.collectionValued() ? simpleTypeName(property.collectionElementType()) :
-							simpleTypeName(property.baseType());
-			if (!expectedResponseType.equals(actualResponseType))
+			if (relationship.satelliteDomainIdType() == null || relationship.satelliteDomainIdType().isBlank())
 			{
 				throw new IllegalArgumentException(
-						"Relationship `" + relationship.masterProperty() + "` must use `" + expectedResponseType +
-								"` in the base model, but found `" + actualResponseType + "`");
+						"Relationship `" + relationship.masterProperty() + "` must declare a satelliteDomainIdType");
+			}
+			if (relationship.satellitePersistenceIdType() == null || relationship.satellitePersistenceIdType()
+			                                                                     .isBlank())
+			{
+				throw new IllegalArgumentException(
+						"Relationship `" + relationship.masterProperty() + "` must declare a satellitePersistenceIdType");
 			}
 			if (effectiveCardinality == RelationshipCardinality.ONE &&
 					relationship.reconciliationStrategy() == RelationshipReconciliationStrategy.MERGE_BY_ID)
@@ -106,13 +105,5 @@ final class RelationshipGenerationConfigurationValidator
 								"` cannot use MERGE_BY_ID with cardinality ONE");
 			}
 		}
-	}
-
-	private String simpleTypeName(final String typeName)
-	{
-		int genericStart = typeName.indexOf('<');
-		String rawType = genericStart >= 0 ? typeName.substring(0, genericStart) : typeName;
-		int lastPackageSeparator = rawType.lastIndexOf('.');
-		return lastPackageSeparator >= 0 ? rawType.substring(lastPackageSeparator + 1) : rawType;
 	}
 }

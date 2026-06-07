@@ -10,6 +10,12 @@ public interface ApiProjection
 
 	Set<String> imports();
 
+	Set<String> createImports();
+
+	Set<String> updateImports();
+
+	Set<String> responseImports();
+
 	String concreteType(String genericType);
 
 	String resolvedType(String declaredType);

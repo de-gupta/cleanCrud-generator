@@ -14,40 +14,60 @@ record DomainProjectionImpl(
 	@Override
 	public Set<String> imports()
 	{
-		return ProjectionSupport.combineImports(
-				genericImports(),
-				ProjectionSupport.combineImports(
-						ProjectionSupport.propertyImports(composition.properties()),
-						ProjectionSupport.relationshipImports(composition.relationships())));
+		return DomainProjectionSupport.imports(composition, genericImports());
+	}
+
+	@Override
+	public Set<String> modelImports()
+	{
+		return DomainProjectionSupport.modelImports(composition, genericImports());
+	}
+
+	@Override
+	public Set<String> createImports()
+	{
+		return DomainProjectionSupport.createImports(composition, genericImports());
+	}
+
+	@Override
+	public Set<String> updateImports()
+	{
+		return DomainProjectionSupport.updateImports(composition, genericImports());
+	}
+
+	@Override
+	public Set<String> responseImports()
+	{
+		return DomainProjectionSupport.responseImports(composition, genericImports());
 	}
 
 	@Override
 	public String concreteType(final String genericType)
 	{
-		return ProjectionSupport.concreteType(concreteTypes, genericType);
+		return TypeNameSupport.concreteType(concreteTypes, genericType);
 	}
 
 	@Override
 	public String resolvedType(final String declaredType)
 	{
-		return ProjectionSupport.resolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.resolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String boxedResolvedType(final String declaredType)
 	{
-		return ProjectionSupport.boxedResolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.boxedResolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String propertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 
 	@Override
 	public String builderPropertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 }

@@ -3,6 +3,7 @@ package de.gupta.clean.crud.generator.code.generation.model.api.domain.model;
 import de.gupta.commons.utility.string.StringCaseUtility;
 
 import java.util.LinkedHashSet;
+import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -136,6 +137,17 @@ public record Property(String name, String returnType, String fullyQualifiedType
 		return !candidateAggregateType().isBlank();
 	}
 
+	public boolean relationshipEligible(final SequencedCollection<String> genericTypeParameters)
+	{
+		return relationshipGenericPlaceholder(genericTypeParameters) != null;
+	}
+
+	public String relationshipGenericPlaceholder(final SequencedCollection<String> genericTypeParameters)
+	{
+		String candidate = collectionValued() ? collectionElementType() : baseType();
+		return genericTypeParameters.contains(candidate) ? candidate : null;
+	}
+
 	public String type()
 	{
 		return baseType();
@@ -212,3 +224,4 @@ public record Property(String name, String returnType, String fullyQualifiedType
 		return lastPackageSeparator >= 0 ? rawTypeName.substring(lastPackageSeparator + 1) : rawTypeName;
 	}
 }
+

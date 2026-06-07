@@ -5,8 +5,8 @@ import ${aggregate().basePackage()}.domain.model.dto.${aggregate().baseName()}Do
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-<#if domain().imports()?has_content>
-<#list domain().imports() as import>
+<#if domain().createImports()?has_content>
+<#list domain().createImports() as import>
 <#if import != "java.util.Optional" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>
@@ -18,7 +18,7 @@ public record ${aggregate().baseName()}DomainModelCreate(
     ${domain().propertyType(property)} ${property.name()}<#if property_has_next || composition().relationships()?has_content>,</#if>
 </#list>
 <#list composition().relationships() as relationship>
-    ${relationship.createFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
+    ${relationship.domainCreateFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
 </#list>
 )
 {
@@ -27,7 +27,7 @@ public record ${aggregate().baseName()}DomainModelCreate(
 		final ${domain().propertyType(property)} ${property.name()}<#if property_has_next || composition().relationships()?has_content>,</#if>
 </#list>
 <#list composition().relationships() as relationship>
-		final ${relationship.createFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
+		final ${relationship.domainCreateFieldType()} ${relationship.propertyName()}<#if relationship_has_next>,</#if>
 </#list>
 	)
 	{

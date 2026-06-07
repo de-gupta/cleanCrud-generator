@@ -34,7 +34,7 @@ class GeneratedAppFixtureCompileTest
 		assertTrue(Files.exists(project.sourceRoot().resolve("note/NoteModuleConfiguration.java")));
 		assertTrue(Files.exists(project.sourceRoot().resolve("version/VersionModuleConfiguration.java")));
 
-		var result = harness.executeMaven(project.projectRoot(), "-q", "-DskipTests", "test-compile");
+		var result = harness.executeMaven(project.projectRoot(), "-q", "-Dmaven.test.skip=true", "compile");
 		assertEquals(0, result.exitCode(), () -> "Generated app fixture did not compile:\n" + result.output());
 	}
 }

@@ -1,7 +1,6 @@
 package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orchestration.api.application;
 
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.SourceCodeFile;
-import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.CodeGenerationConfiguration;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.OverwriteResolver;
 import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.model.TemplateModelFactory;
@@ -37,34 +36,41 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 			TemplateGroup.USE_CASE_SAVE.name(),
 			TemplateGroup.USE_CASE_UPDATE.name(),
 			TemplateGroup.USE_CASE_DELETE.name());
-	private final DomainModelParser modelParser;
+	private final GenerationContextResolver generationContextResolver;
 	private final SourceCodeTemplateProcessor templateProcessor;
 	private final SourceCodeFileWriter sourceCodeFileWriter;
 	private final RelationshipGenerationConfigurationValidator relationshipConfigurationValidator;
 	private final GeneratedRelationshipFactory generatedRelationshipFactory;
+	private final RelationshipConcreteTypeResolver relationshipConcreteTypeResolver;
 	private final GenerationExclusionPolicy generationExclusionPolicy;
 	private final SourceCodeTargetPathResolver sourceCodeTargetPathResolver;
 
 	@Override
 	public int generateCode(final CodeGenerationConfiguration configuration)
 	{
-		var model = modelParser.parseDomainModel(configuration.inputs().baseModelSourceCodeFilePath());
-		relationshipConfigurationValidator.validate(model, configuration.relationships());
-		var relationships = generatedRelationshipFactory.create(model, configuration.relationships());
+		var resolvedRequest = generationContextResolver.resolve(configuration);
+		var model = resolvedRequest.model();
+		var effectiveConfiguration = resolvedRequest.configuration();
+		relationshipConfigurationValidator.validate(model, effectiveConfiguration.relationships());
+		var relationships = generatedRelationshipFactory.create(model, effectiveConfiguration.relationships());
+		var layerTypes = relationshipConcreteTypeResolver.merge(effectiveConfiguration.genericTypes(), relationships);
 		var templateModel = TemplateModelFactory.create(model.packageName(), model.modelName(),
-				model.genericTypeParameters(), model.properties(), configuration.genericTypes().domain(),
-				configuration.genericTypes().persistence(), configuration.genericTypes().api(), Set.of(),
-				configuration.historized(), relationships);
-		var overwriteResolver = OverwriteResolver.with(configuration.overwrite());
+				model.genericTypeParameters(), model.properties(), layerTypes.domain(),
+				layerTypes.persistence(), layerTypes.api(), Set.of(),
+				effectiveConfiguration.historized(), relationships,
+				effectiveConfiguration.rootAggregateIds().apiIdType(),
+				effectiveConfiguration.rootAggregateIds().domainIdType(),
+				effectiveConfiguration.rootAggregateIds().persistenceIdType());
+		var overwriteResolver = OverwriteResolver.with(effectiveConfiguration.overwrite());
 
 		var files = templateProcessor.generateSourceCode(templateModel,
 				TemplateSelector.with(
-						resolveTemplateGroups(configuration),
-						resolveTemplates(configuration),
-						resolveTags(configuration),
-						configuration.generation().excludeGroups(),
-						generationExclusionPolicy.excludedTemplates(configuration),
-						resolveExcludedTags(configuration)));
+						resolveTemplateGroups(effectiveConfiguration),
+						resolveTemplates(effectiveConfiguration),
+						resolveTags(effectiveConfiguration),
+						effectiveConfiguration.generation().excludeGroups(),
+						generationExclusionPolicy.excludedTemplates(effectiveConfiguration),
+						resolveExcludedTags(effectiveConfiguration)));
 
 		files.forEach((template, sourceCodeFile) ->
 		{
@@ -115,19 +121,21 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 	}
 
 	CodeGenerationOrchestratorImpl(
-			final DomainModelParser modelParser,
+			final GenerationContextResolver generationContextResolver,
 			final SourceCodeTemplateProcessor templateProcessor,
 			final SourceCodeFileWriter sourceCodeFileWriter,
 			final RelationshipGenerationConfigurationValidator relationshipConfigurationValidator,
 			final GeneratedRelationshipFactory generatedRelationshipFactory,
+			final RelationshipConcreteTypeResolver relationshipConcreteTypeResolver,
 			final GenerationExclusionPolicy generationExclusionPolicy,
 			final SourceCodeTargetPathResolver sourceCodeTargetPathResolver)
 	{
-		this.modelParser = modelParser;
+		this.generationContextResolver = generationContextResolver;
 		this.templateProcessor = templateProcessor;
 		this.sourceCodeFileWriter = sourceCodeFileWriter;
 		this.relationshipConfigurationValidator = relationshipConfigurationValidator;
 		this.generatedRelationshipFactory = generatedRelationshipFactory;
+		this.relationshipConcreteTypeResolver = relationshipConcreteTypeResolver;
 		this.generationExclusionPolicy = generationExclusionPolicy;
 		this.sourceCodeTargetPathResolver = sourceCodeTargetPathResolver;
 	}

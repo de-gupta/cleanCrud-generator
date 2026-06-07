@@ -4,20 +4,23 @@ import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Prop
 
 public record GeneratedRelationship(
 		Property property,
+		String genericPlaceholder,
 		String masterAggregate,
 		String satelliteAggregate,
+		String satelliteBaseModelType,
 		String relationshipKind,
 		String cardinality,
 		String reconciliationStrategy,
 		String satelliteApiIdType,
+		String satelliteDomainIdType,
+		String satellitePersistenceIdType,
 		boolean cascadeCreate,
 		boolean cascadeUpdate,
 		boolean cascadeDelete,
 		boolean orphanDelete,
 		boolean hydrateOnFetch,
 		boolean generateNestedCreate,
-		boolean generateNestedUpdate
-)
+		boolean generateNestedUpdate)
 {
 	public String propertyName()
 	{
@@ -74,6 +77,15 @@ public record GeneratedRelationship(
 		return satelliteBeanNamePrefix();
 	}
 
+	public String satelliteBasePackage()
+	{
+		String canonical = satelliteBaseModelType;
+		return canonical.endsWith(".domain.model." + satelliteAggregate + "Model")
+				?
+				canonical.substring(0, canonical.length() - (".domain.model." + satelliteAggregate + "Model").length())
+				: canonical.substring(0, canonical.lastIndexOf('.'));
+	}
+
 	public String responseType()
 	{
 		return satelliteAggregate + "APIModelResponse";
@@ -81,15 +93,12 @@ public record GeneratedRelationship(
 
 	public String responseImport()
 	{
-		return property.collectionValued() ? property.collectionElementQualifiedTypeName() :
-				property.baseTypeQualifiedName();
+		return satelliteBasePackage() + ".useCases.crud.common.dto." + responseType();
 	}
 
-	public String responseFieldType()
+	public String apiResponseFieldType()
 	{
-		return many()
-				? "Collection<" + responseType() + ">"
-				: optional() ? "Optional<" + responseType() + ">" : responseType();
+		return wrapByCardinality(responseType());
 	}
 
 	public String createType()
@@ -99,9 +108,7 @@ public record GeneratedRelationship(
 
 	public String createImport()
 	{
-		return property.collectionValued()
-				? property.collectionElementQualifiedTypeName().replace("APIModelResponse", "APIModelCreate")
-				: property.baseTypeQualifiedName().replace("APIModelResponse", "APIModelCreate");
+		return satelliteBasePackage() + ".useCases.crud.common.dto." + createType();
 	}
 
 	public String updatePatchType()
@@ -111,9 +118,7 @@ public record GeneratedRelationship(
 
 	public String updatePatchImport()
 	{
-		return property.collectionValued()
-				? property.collectionElementQualifiedTypeName().replace("APIModelResponse", "APIModelUpdatePatch")
-				: property.baseTypeQualifiedName().replace("APIModelResponse", "APIModelUpdatePatch");
+		return satelliteBasePackage() + ".useCases.crud.common.dto." + updatePatchType();
 	}
 
 	public String domainCreateType()
@@ -123,9 +128,7 @@ public record GeneratedRelationship(
 
 	public String domainCreateImport(final String basePackage)
 	{
-		return createImport()
-				.replace(".useCases.crud.common.dto.", ".domain.model.dto.")
-				.replace("APIModelCreate", "DomainModelCreate");
+		return satelliteBasePackage() + ".domain.model.dto." + domainCreateType();
 	}
 
 	public String domainUpdatePatchType()
@@ -135,9 +138,7 @@ public record GeneratedRelationship(
 
 	public String domainUpdatePatchImport(final String basePackage)
 	{
-		return updatePatchImport()
-				.replace(".useCases.crud.common.dto.", ".domain.model.dto.")
-				.replace("APIModelUpdatePatch", "DomainModelUpdatePatch");
+		return satelliteBasePackage() + ".domain.model.dto." + domainUpdatePatchType();
 	}
 
 	public String domainResponseType()
@@ -147,52 +148,121 @@ public record GeneratedRelationship(
 
 	public String domainResponseImport(final String basePackage)
 	{
-		return responseImport()
-				.replace(".useCases.crud.common.dto.", ".domain.model.dto.")
-				.replace("APIModelResponse", "DomainModelResponse");
+		return satelliteBasePackage() + ".domain.model.dto." + domainResponseType();
+	}
+
+	public String domainModelType()
+	{
+		return satelliteAggregate + "DomainModel";
+	}
+
+	public String domainModelImport()
+	{
+		return satelliteBasePackage() + ".domain.model." + domainModelType();
+	}
+
+	public String responseFieldType()
+	{
+		return domainFieldType();
+	}
+
+	public String domainFieldType()
+	{
+		return wrapByCardinality(identifiedDomainModelType());
+	}
+
+	public String identifiedDomainModelType()
+	{
+		return normalized(
+				"de.gupta.clean.crud.template.domain.model.identified.IdentifiedModel<" + satelliteDomainIdType + ", " + domainModelType() + ">");
 	}
 
 	public String persistenceIdPropertyName()
 	{
-		return many() ? singularPropertyName() + "Ids" : propertyName() + "Id";
+		return propertyName();
 	}
 
 	public String persistenceIdPropertyType()
 	{
-		return many()
-				? "Collection<" + satelliteApiIdType + ">"
-				: optional() ? "Optional<" + satelliteApiIdType + ">" : satelliteApiIdType;
+		return wrapByCardinality(satellitePersistenceIdType);
+	}
+
+	public String satelliteApiIdSimpleType()
+	{
+		return normalized(satelliteApiIdType);
+	}
+
+	public String satelliteDomainIdSimpleType()
+	{
+		return normalized(satelliteDomainIdType);
+	}
+
+	public String satellitePersistenceIdSimpleType()
+	{
+		return normalized(satellitePersistenceIdType);
 	}
 
 	public String createFieldType()
 	{
+		return apiCreateFieldType();
+	}
+
+	public String apiCreateFieldType()
+	{
 		if (referenced())
 		{
-			return many()
-					? "Collection<" + satelliteApiIdType + ">"
-					: optional() ? "Optional<" + satelliteApiIdType + ">" : satelliteApiIdType;
+			return wrapByCardinality(satelliteApiIdType);
 		}
-		return many()
-				? "Collection<" + createType() + ">"
-				: optional() ? "Optional<" + createType() + ">" : createType();
+		return wrapByCardinality(createType());
+	}
+
+	public String domainCreateFieldType()
+	{
+		if (referenced())
+		{
+			return wrapByCardinality(satelliteDomainIdType);
+		}
+		return wrapByCardinality(domainCreateType());
 	}
 
 	public String apiUpdateFieldType()
 	{
 		if (referenced())
 		{
-			return many() ? "Optional<Collection<" + satelliteApiIdType + ">>" : "Optional<" + satelliteApiIdType + ">";
+			return many() ? normalized("Optional<Collection<" + satelliteApiIdType + ">>") :
+					normalized("Optional<" + satelliteApiIdType + ">");
 		}
-		return "Optional<Collection<SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>";
+		if (many())
+		{
+			return normalized(
+					"Optional<Collection<de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.standard.SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>");
+		}
+		return normalized("Optional<" + updatePatchType() + ">");
 	}
 
 	public String domainUpdateFieldType()
 	{
 		if (referenced())
 		{
-			return many() ? "Optional<Collection<" + satelliteApiIdType + ">>" : "Optional<" + satelliteApiIdType + ">";
+			return many() ? normalized("Optional<Collection<" + satelliteDomainIdType + ">>") :
+					normalized("Optional<" + satelliteDomainIdType + ">");
 		}
-		return "Optional<Collection<SatelliteUpdatePatchItem<" + satelliteApiIdType + ", " + updatePatchType() + ">>>";
+		if (many())
+		{
+			return normalized(
+					"Optional<Collection<de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.standard.SatelliteUpdatePatchItem<" + satelliteDomainIdType + ", " + domainUpdatePatchType() + ">>>");
+		}
+		return normalized("Optional<" + domainUpdatePatchType() + ">");
+	}
+
+	public String apiRemoveFieldType()
+	{
+		return normalized("Collection<" + satelliteApiIdType + ">");
+	}
+
+	public String domainRemoveFieldType()
+	{
+		return normalized("Collection<" + satelliteDomainIdType + ">");
 	}
 
 	public String removeFieldName()
@@ -200,30 +270,41 @@ public record GeneratedRelationship(
 		return "remove" + singularPropertyCapitalizedName() + "Ids";
 	}
 
-	public String removeFieldType()
-	{
-		return "Collection<" + satelliteApiIdType + ">";
-	}
-
 	public String builderMethodName()
 	{
-		if (referenced())
-		{
-			return many() ? "oneToManyReferencedSatellite" : "oneToOneReferencedSatellite";
-		}
-		return many() ? "oneToManySatellite" : "oneToOneSatellite";
+		return owned()
+				? one() ? "oneToOneSatellite" : "oneToManySatellite"
+				: one() ? "oneToOneReferencedSatellite" : "oneToManyReferencedSatellite";
 	}
 
-	private String singularPropertyName()
+	public String lowLevelIdentityResolverFieldType()
+	{
+		return normalized(
+				"de.gupta.clean.crud.template.useCases.crud.aggregate.relationship.SatelliteIdentityResolver<" + masterAggregate + "DomainModel, " + domainModelType() + ", " + satelliteDomainIdType + ">");
+	}
+
+	public String singularPropertyName()
 	{
 		return propertyName().endsWith("s") && propertyName().length() > 1
 				? propertyName().substring(0, propertyName().length() - 1)
 				: propertyName();
 	}
 
-	private String singularPropertyCapitalizedName()
+	public String singularPropertyCapitalizedName()
 	{
 		String singularPropertyName = singularPropertyName();
 		return Character.toUpperCase(singularPropertyName.charAt(0)) + singularPropertyName.substring(1);
+	}
+
+	private String wrapByCardinality(final String elementType)
+	{
+		return many()
+				? normalized("Collection<" + elementType + ">")
+				: optional() ? normalized("Optional<" + elementType + ">") : normalized(elementType);
+	}
+
+	private String normalized(final String declaredType)
+	{
+		return TypeNameSupport.normalizeGeneratedType(declaredType);
 	}
 }

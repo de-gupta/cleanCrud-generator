@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-<#if api().imports()?has_content>
-<#list api().imports() as import>
+<#if api().createImports()?has_content>
+<#list api().createImports() as import>
 <#if import != "java.util.Optional" && import != "java.util.Collection" && import != "java.util.List">
 import ${import};
 </#if>

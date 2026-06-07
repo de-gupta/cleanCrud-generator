@@ -3,11 +3,10 @@ package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-final class ProjectionSupport
+final class TypeNameSupport
 {
 	private static final Map<String, String> SIMPLE_TYPE_IMPORTS = Map.ofEntries(
 			Map.entry("UUID", "java.util.UUID"),
@@ -23,12 +22,26 @@ final class ProjectionSupport
 
 	static String concreteType(final Map<String, String> concreteTypes, final String genericType)
 	{
-		return concreteTypes.getOrDefault(genericType, genericType);
+		return normalizeGeneratedType(concreteTypes.getOrDefault(genericType, genericType));
 	}
 
 	static String resolvedType(final Map<String, String> concreteTypes, final String declaredType)
 	{
-		return concreteType(concreteTypes, declaredType);
+		StringBuilder resolved = new StringBuilder();
+		StringBuilder token = new StringBuilder();
+		for (int index = 0; index < declaredType.length(); index++)
+		{
+			char character = declaredType.charAt(index);
+			if (Character.isJavaIdentifierPart(character) || character == '.')
+			{
+				token.append(character);
+				continue;
+			}
+			appendResolvedToken(resolved, token, concreteTypes);
+			resolved.append(character);
+		}
+		appendResolvedToken(resolved, token, concreteTypes);
+		return normalizeGeneratedType(resolved.toString());
 	}
 
 	static String boxedResolvedType(final Map<String, String> concreteTypes, final String declaredType)
@@ -47,8 +60,7 @@ final class ProjectionSupport
 	{
 		var imports = new LinkedHashSet<String>();
 		concreteTypes.values().stream()
-		             .map(ProjectionSupport::importForType)
-		             .filter(importName -> !importName.isBlank())
+		             .flatMap(type -> importsForResolvedType(type).stream())
 		             .forEach(imports::add);
 		return imports;
 	}
@@ -59,21 +71,8 @@ final class ProjectionSupport
 		properties.forEach(property -> imports.addAll(property.imports()));
 		properties.stream()
 		          .map(Property::baseType)
-		          .map(ProjectionSupport::importForType)
-		          .filter(importName -> !importName.isBlank())
+		          .flatMap(type -> importsForResolvedType(type).stream())
 		          .forEach(imports::add);
-		return imports;
-	}
-
-	static Set<String> relationshipImports(final List<GeneratedRelationship> relationships)
-	{
-		var imports = new LinkedHashSet<String>();
-		relationships.forEach(relationship ->
-		{
-			imports.add(relationship.responseImport());
-			imports.add(relationship.createImport());
-			imports.add(relationship.updatePatchImport());
-		});
 		return imports;
 	}
 
@@ -136,6 +135,25 @@ final class ProjectionSupport
 		return packageSeparator >= 0 ? rawType.substring(packageSeparator + 1) : rawType;
 	}
 
+	static Set<String> importsForResolvedType(final String typeName)
+	{
+		var imports = new LinkedHashSet<String>();
+		StringBuilder token = new StringBuilder();
+		for (int index = 0; index < typeName.length(); index++)
+		{
+			char character = typeName.charAt(index);
+			if (Character.isJavaIdentifierPart(character) || character == '.')
+			{
+				token.append(character);
+				continue;
+			}
+			appendImportToken(imports, token);
+		}
+		appendImportToken(imports, token);
+		imports.remove("");
+		return imports;
+	}
+
 	private static void appendNormalizedToken(
 			final StringBuilder normalized,
 			final StringBuilder token,
@@ -146,7 +164,36 @@ final class ProjectionSupport
 			return;
 		}
 		String value = token.toString();
-		normalized.append(boxPrimitive ? boxedType(value) : value);
+		String boxed = boxPrimitive ? boxedType(value) : value;
+		normalized.append(rawTypeName(boxed));
+		token.setLength(0);
+	}
+
+	private static void appendResolvedToken(
+			final StringBuilder resolved,
+			final StringBuilder token,
+			final Map<String, String> concreteTypes)
+	{
+		if (token.isEmpty())
+		{
+			return;
+		}
+		String value = token.toString();
+		resolved.append(concreteTypes.getOrDefault(value, value));
+		token.setLength(0);
+	}
+
+	private static void appendImportToken(final Set<String> imports, final StringBuilder token)
+	{
+		if (token.isEmpty())
+		{
+			return;
+		}
+		String importName = importForType(token.toString());
+		if (!importName.isBlank())
+		{
+			imports.add(importName);
+		}
 		token.setLength(0);
 	}
 
@@ -155,7 +202,7 @@ final class ProjectionSupport
 		var rawType = stripGenericArguments(typeName);
 		if (rawType.contains("."))
 		{
-			return rawType;
+			return rawType.startsWith("java.lang.") ? "" : rawType;
 		}
 		return SIMPLE_TYPE_IMPORTS.getOrDefault(rawType, "");
 	}
@@ -166,7 +213,7 @@ final class ProjectionSupport
 		return genericStart >= 0 ? typeName.substring(0, genericStart) : typeName;
 	}
 
-	private ProjectionSupport()
+	private TypeNameSupport()
 	{
 	}
 }

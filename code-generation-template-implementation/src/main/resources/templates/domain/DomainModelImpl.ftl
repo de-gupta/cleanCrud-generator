@@ -6,8 +6,8 @@ import de.gupta.clean.crud.template.domain.model.builder.AbstractModelBuilder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-<#if domain().imports()?has_content>
-<#list domain().imports() as import>
+<#if domain().modelImports()?has_content>
+<#list domain().modelImports() as import>
 <#if import != "java.util.Optional" && import != "java.util.List">
 import ${import};
 </#if>
@@ -128,4 +128,3 @@ final class ${aggregate().baseName()}DomainModelImpl implements ${aggregate().ba
 		}
 	}
 }
-

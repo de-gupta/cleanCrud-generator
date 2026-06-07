@@ -21,7 +21,7 @@ final class GeneratedAppFixtureHarness
 	private static final String FIXTURE_RESOURCE_ROOT = "generated-app-fixutre";
 	private static final String EXAMPLES_PACKAGE_PATH = "de/gupta/clean/crud/implementation/examples";
 	private static final String CLEANCRUD_VERSION_TOKEN = "__CLEANCRUD_VERSION__";
-	private static final String DEFAULT_CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.1");
+	private static final String DEFAULT_CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.3-SNAPSHOT");
 	private static final List<String> STATIC_MODULES = List.of("note", "version");
 	private static final String GENERATED_MODULE = "person";
 
@@ -33,6 +33,7 @@ final class GeneratedAppFixtureHarness
 		Path projectRoot = tempDir.resolve("generated-app-fixture");
 		Path fixtureRoot = fixtureResourceRoot();
 		Path sourceRoot = projectRoot.resolve("src/main/java").resolve(EXAMPLES_PACKAGE_PATH);
+		Path testSourceRoot = projectRoot.resolve("src/test/java").resolve(EXAMPLES_PACKAGE_PATH);
 
 		copyFixtureScaffold(fixtureRoot, projectRoot);
 		Files.createDirectories(sourceRoot);
@@ -42,6 +43,8 @@ final class GeneratedAppFixtureHarness
 			copyDirectory(fixtureRoot.resolve(module), sourceRoot.resolve(module));
 		}
 		copyDirectory(fixtureRoot.resolve(GENERATED_MODULE), sourceRoot.resolve(GENERATED_MODULE));
+		removePreviouslyGeneratedModuleFiles(sourceRoot.resolve(GENERATED_MODULE));
+		removePreviouslyGeneratedModuleFiles(testSourceRoot.resolve(GENERATED_MODULE));
 
 		replaceToken(projectRoot.resolve("pom.xml"), CLEANCRUD_VERSION_TOKEN, DEFAULT_CLEANCRUD_VERSION);
 
@@ -169,6 +172,28 @@ final class GeneratedAppFixtureHarness
 	{
 		String content = Files.readString(file);
 		Files.writeString(file, content.replace(token, value));
+	}
+
+	private void removePreviouslyGeneratedModuleFiles(final Path generatedModuleRoot)
+			throws IOException
+	{
+		if (!Files.exists(generatedModuleRoot))
+		{
+			return;
+		}
+		try (Stream<Path> stream = Files.walk(generatedModuleRoot))
+		{
+			for (Path path : stream.filter(Files::isRegularFile).toList())
+			{
+				String normalized = generatedModuleRoot.relativize(path).toString().replace('\\', '/');
+				if (normalized.endsWith("domain/model/PersonModel.java") ||
+						normalized.endsWith("domain/model/PersonRelationships.java"))
+				{
+					continue;
+				}
+				Files.deleteIfExists(path);
+			}
+		}
 	}
 
 	GeneratedAppFixtureHarness(final ApplicationContext applicationContext)

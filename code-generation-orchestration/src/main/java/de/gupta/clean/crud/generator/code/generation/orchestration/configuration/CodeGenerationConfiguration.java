@@ -5,6 +5,7 @@ public record CodeGenerationConfiguration(
 		LayerConcreteTypes genericTypes,
 		GenerationSelection generation,
 		java.util.List<RelationshipGenerationConfiguration> relationships,
+		RootAggregateIdConfiguration rootAggregateIds,
 		OwnershipConfiguration ownership,
 		OverwriteConfiguration overwrite,
 		boolean historized
@@ -13,10 +14,11 @@ public record CodeGenerationConfiguration(
 	public static CodeGenerationConfiguration of(final String baseModelSourceCodeFilePath, final boolean historized)
 	{
 		return new CodeGenerationConfiguration(
-				new GenerationInputs(baseModelSourceCodeFilePath, null, null, null),
+				new GenerationInputs(baseModelSourceCodeFilePath, null, null, null, null),
 				LayerConcreteTypes.defaults(),
 				GenerationSelection.defaults(),
 				java.util.List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
 				historized
@@ -35,6 +37,8 @@ public record CodeGenerationConfiguration(
 		generation = generation == null ? GenerationSelection.defaults() : generation.normalized();
 		relationships = relationships == null ? java.util.List.of() :
 				relationships.stream().map(RelationshipGenerationConfiguration::normalized).toList();
+		rootAggregateIds =
+				rootAggregateIds == null ? RootAggregateIdConfiguration.defaults() : rootAggregateIds.normalized();
 		ownership =
 				ownership == null ? OwnershipConfiguration.defaults().normalized(inputs) : ownership.normalized(inputs);
 		overwrite = overwrite == null ? OverwriteConfiguration.defaults() : overwrite.normalized();

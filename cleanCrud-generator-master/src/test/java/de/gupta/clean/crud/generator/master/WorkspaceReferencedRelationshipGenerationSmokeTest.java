@@ -29,17 +29,43 @@ class WorkspaceReferencedRelationshipGenerationSmokeTest
 	private static final String WORKSPACE_MODEL_SOURCE = """
 			package de.gupta.clean.crud.implementation.examples.workspace.domain.model;
 			
-			import de.gupta.clean.crud.implementation.examples.organisation.useCases.crud.common.dto.OrganisationAPIModelResponse;
-			
 			import java.util.Optional;
 			
-			public interface WorkspaceModel
+			public interface WorkspaceModel<O>
 			{
 				String name();
-				Optional<OrganisationAPIModelResponse> organisation();
+				Optional<O> organisation();
 			}
 			""";
-	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.1-SNAPSHOT");
+	private static final String WORKSPACE_RELATIONSHIPS_SOURCE = """
+			package de.gupta.clean.crud.implementation.examples.workspace.domain.model;
+			
+			import de.gupta.clean.crud.template.domain.relationship.Relationship;
+			import de.gupta.clean.crud.template.domain.relationship.Relationships;
+			import de.gupta.clean.crud.implementation.examples.organisation.domain.model.OrganisationModel;
+			
+			import java.util.List;
+			
+			public final class WorkspaceRelationships implements Relationships
+			{
+				@Override
+				public Class<?> baseModelClass()
+				{
+					return WorkspaceModel.class;
+				}
+			
+				@Override
+				public List<Relationship> relationships()
+				{
+					return List.of(Relationship.referenced("organisation", OrganisationModel.class)
+					                           .satelliteApiIdType(Long.class)
+					                           .satelliteDomainIdType(Long.class)
+					                           .satellitePersistenceIdType(java.util.UUID.class)
+					                           .build());
+				}
+			}
+			""";
+	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.3-SNAPSHOT");
 
 	@Autowired
 	private CodeGenerationOrchestrator orchestrator;
@@ -53,13 +79,16 @@ class WorkspaceReferencedRelationshipGenerationSmokeTest
 				"de/gupta/clean/crud/implementation/examples/organisation/domain/model/OrganisationModel.java");
 		Path workspaceModelPath = contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/workspace/domain/model/WorkspaceModel.java");
+		Path workspaceSpecPath = contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/workspace/domain/model/WorkspaceRelationships.java");
 		Files.createDirectories(organisationModelPath.getParent());
 		Files.createDirectories(workspaceModelPath.getParent());
 		Files.writeString(organisationModelPath, ORGANISATION_MODEL_SOURCE);
 		Files.writeString(workspaceModelPath, WORKSPACE_MODEL_SOURCE);
+		Files.writeString(workspaceSpecPath, WORKSPACE_RELATIONSHIPS_SOURCE);
 
 		assertEquals(0, orchestrator.generateCode(standaloneConfiguration(organisationModelPath)));
-		assertEquals(0, orchestrator.generateCode(workspaceConfiguration(workspaceModelPath)));
+		assertEquals(0, orchestrator.generateCode(specDrivenConfiguration(workspaceModelPath, workspaceSpecPath)));
 
 		Path workspaceRelationshipConfiguration = contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/workspace/useCases/crud/configuration/WorkspaceCrudRelationshipConfiguration.java");
@@ -67,14 +96,24 @@ class WorkspaceReferencedRelationshipGenerationSmokeTest
 				"de/gupta/clean/crud/implementation/examples/workspace/useCases/crud/common/dto/WorkspaceAPIModelCreate.java");
 		Path workspaceApiUpdatePatch = contentRoot.resolve(
 				"de/gupta/clean/crud/implementation/examples/workspace/useCases/crud/common/dto/WorkspaceAPIModelUpdatePatch.java");
+		Path workspaceDomainModel = contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/workspace/domain/model/WorkspaceDomainModel.java");
+		Path workspacePersistenceModel = contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/workspace/infrastructure/persistence/model/WorkspacePersistenceModel.java");
 
+		assertTrue(Files.readString(workspaceRelationshipConfiguration).contains("fromRelationship("));
 		assertTrue(Files.readString(workspaceRelationshipConfiguration)
-		                .contains("oneToOneReferencedSatellite(\"organisation\""));
+		                .contains("new WorkspaceRelationships().relationship(\"organisation\")"));
+		assertTrue(Files.readString(workspaceRelationshipConfiguration).contains(".current("));
+		assertTrue(Files.readString(workspaceRelationshipConfiguration).contains(".replace("));
 		assertTrue(Files.readString(workspaceApiCreate).contains("Optional<Long> organisation"));
 		assertTrue(Files.readString(workspaceApiUpdatePatch).contains("Optional<Long> organisation"));
 		assertTrue(Files.readString(workspaceApiUpdatePatch).contains("Collection<Long> removeOrganisationIds"));
 		assertFalse(Files.readString(workspaceApiUpdatePatch).contains("SatelliteUpdatePatchItem"));
-
+		assertTrue(Files.readString(workspaceDomainModel)
+		                .contains("WorkspaceModel<IdentifiedModel<Long, OrganisationDomainModel>>"));
+		assertTrue(Files.readString(workspacePersistenceModel)
+		                .contains("void setOrganisation(final UUID organisation);"));
 		Files.writeString(tempDir.resolve("pom.xml"), pomXml(CLEANCRUD_VERSION));
 		assertEquals(0, compileGeneratedProject(tempDir));
 	}
@@ -82,36 +121,24 @@ class WorkspaceReferencedRelationshipGenerationSmokeTest
 	private CodeGenerationConfiguration standaloneConfiguration(final Path modelPath)
 	{
 		return new CodeGenerationConfiguration(
-				new GenerationInputs(modelPath.toString(), null, null, null),
+				new GenerationInputs(modelPath.toString(), null, null, null, null),
 				new LayerConcreteTypes(Map.of(), Map.of(), Map.of()),
 				GenerationSelection.defaults(),
 				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
 				true);
 	}
 
-	private CodeGenerationConfiguration workspaceConfiguration(final Path modelPath)
+	private CodeGenerationConfiguration specDrivenConfiguration(final Path modelPath, final Path specPath)
 	{
 		return new CodeGenerationConfiguration(
-				new GenerationInputs(modelPath.toString(), null, null, null),
+				new GenerationInputs(modelPath.toString(), null, null, null, specPath.toString()),
 				new LayerConcreteTypes(Map.of(), Map.of(), Map.of()),
 				GenerationSelection.defaults(),
-				List.of(
-						new RelationshipGenerationConfiguration(
-								"organisation",
-								"Organisation",
-								RelationshipKind.REFERENCED,
-								RelationshipCardinality.ONE,
-								RelationshipReconciliationStrategy.REPLACE,
-								"Long",
-								null,
-								null,
-								null,
-								null,
-								null,
-								false,
-								false)),
+				List.of(),
+				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
 				true);

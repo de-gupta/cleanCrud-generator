@@ -6,5 +6,7 @@ module code.generation.orchestration
 	requires code.generation.model.implementation;
 	requires code.generation.template.implementation;
 	requires code.generation.writing.implementation;
+	requires java.compiler;
 	requires spring.context;
+	requires de.gupta.clean.crud;
 }

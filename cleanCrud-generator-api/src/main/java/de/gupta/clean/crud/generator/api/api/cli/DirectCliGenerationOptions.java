@@ -12,6 +12,7 @@ record DirectCliGenerationOptions(
 		String domainModelPath,
 		String persistenceModelPath,
 		String apiModelPath,
+		String relationshipsPath,
 		List<String> domainTypes,
 		List<String> persistenceTypes,
 		List<String> apiTypes,
@@ -38,7 +39,7 @@ record DirectCliGenerationOptions(
 	boolean hasDirectOptions()
 	{
 		return firstNonBlank(positionalBaseModelPath, baseModelPath, domainModelPath, persistenceModelPath,
-				apiModelPath) != null
+				apiModelPath, relationshipsPath) != null
 				|| historized
 				|| !domainTypes.isEmpty()
 				|| !persistenceTypes.isEmpty()
@@ -76,5 +77,65 @@ record DirectCliGenerationOptions(
 		                       .filter(value -> !value.isBlank())
 		                       .findFirst()
 		                       .orElse(null);
+	}
+
+	DirectCliGenerationOptions(
+			String positionalBaseModelPath,
+			String baseModelPath,
+			String domainModelPath,
+			String persistenceModelPath,
+			String apiModelPath,
+			List<String> domainTypes,
+			List<String> persistenceTypes,
+			List<String> apiTypes,
+			Set<String> includeGroups,
+			Set<String> includeTemplates,
+			Set<String> includeTags,
+			Set<String> excludeGroups,
+			Set<String> excludeTemplates,
+			Set<String> excludeTags,
+			GeneratedArtifactOwnership baseModelOwnership,
+			GeneratedArtifactOwnership domainModelOwnership,
+			GeneratedArtifactOwnership persistenceModelOwnership,
+			GeneratedArtifactOwnership apiModelOwnership,
+			List<String> ownershipGroupRules,
+			List<String> ownershipTemplateRules,
+			List<String> ownershipTagRules,
+			Boolean overwriteDefault,
+			List<String> overwriteGroupRules,
+			List<String> overwriteTemplateRules,
+			List<String> overwriteTagRules,
+			List<String> overwriteFileRules,
+			boolean historized)
+	{
+		this(
+				positionalBaseModelPath,
+				baseModelPath,
+				domainModelPath,
+				persistenceModelPath,
+				apiModelPath,
+				null,
+				domainTypes,
+				persistenceTypes,
+				apiTypes,
+				includeGroups,
+				includeTemplates,
+				includeTags,
+				excludeGroups,
+				excludeTemplates,
+				excludeTags,
+				baseModelOwnership,
+				domainModelOwnership,
+				persistenceModelOwnership,
+				apiModelOwnership,
+				ownershipGroupRules,
+				ownershipTemplateRules,
+				ownershipTagRules,
+				overwriteDefault,
+				overwriteGroupRules,
+				overwriteTemplateRules,
+				overwriteTagRules,
+				overwriteFileRules,
+				historized);
 	}
 }

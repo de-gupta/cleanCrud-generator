@@ -21,7 +21,7 @@ import ${import};
 </#list>
 </#if>
 
-<#list types().parameters() as param>
+<#list types().persistenceDomainDifferingParameters() as param>
 @Component
 @Qualifier("${aggregate().beanNamePrefix()}${param}DomainToPersistenceConverter")
 final class ${aggregate().baseName()}${param}DomainToPersistenceConverter implements Function<${domain().concreteType(param)}, ${persistence().concreteType(param)}>
@@ -57,3 +57,4 @@ final class ${aggregate().baseName()}${param}PersistenceToDomainConverter implem
 }
 
 </#list>
+

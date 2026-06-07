@@ -15,7 +15,7 @@ import ${import};
 
 public interface ${aggregate().modelName()}<#if types().isGeneric()><<#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>></#if> extends Validatable
 {
-<#list composition().standaloneProperties() as property>
+<#list composition().properties() as property>
     ${property.returnType()} ${property.name()}();
 
 </#list>
@@ -26,7 +26,7 @@ public interface ${aggregate().modelName()}<#if types().isGeneric()><<#list type
 
 	interface ${aggregate().modelName()}Builder${"<"}<#if types().isGeneric()><#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M extends ${aggregate().modelName()}<#if types().isGeneric()><<#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>></#if>, B extends ${aggregate().modelName()}Builder${"<"}<#if types().isGeneric()><#list types().parameters() as param>${param}<#if param_has_next>, </#if></#list>, </#if>M, B${">"}${">"} extends ModelBuilder${"<"}M${">"}
 	{
-    <#list composition().standaloneProperties() as property>
+    <#list composition().properties() as property>
 		B with${property.capitalizedName()}(final ${composition().declaredBuilderPropertyType(property)} ${property.name()});
     </#list>
 	}

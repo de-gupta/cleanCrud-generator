@@ -2,7 +2,6 @@ package de.gupta.clean.crud.generator.code.generation.template.api.domain.model.
 
 import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Property;
 
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -53,59 +52,50 @@ record PersistenceProjectionImpl(
 	@Override
 	public Set<String> genericImports()
 	{
-		return ProjectionSupport.combineImports(
-				domainGenericImports,
-				ProjectionSupport.inferredConcreteTypeImports(concreteTypes));
+		return PersistenceProjectionSupport.genericImports(domainGenericImports, concreteTypes);
 	}
 
 	@Override
 	public Set<String> imports()
 	{
-		var imports = new LinkedHashSet<>(ProjectionSupport.combineImports(
-				genericImports(),
-				ProjectionSupport.propertyImports(composition.properties())));
-		composition.relationships().forEach(relationship ->
-		{
-			if (relationship.many())
-			{
-				imports.add("java.util.Collection");
-			}
-			if (relationship.optional())
-			{
-				imports.add("java.util.Optional");
-			}
-		});
-		return imports;
+		return PersistenceProjectionSupport.imports(aggregate, composition, domainGenericImports, concreteTypes);
+	}
+
+	@Override
+	public Set<String> interfaceImports()
+	{
+		return PersistenceProjectionSupport.interfaceImports(aggregate, composition, domainGenericImports,
+				concreteTypes);
 	}
 
 	@Override
 	public String concreteType(final String genericType)
 	{
-		return ProjectionSupport.concreteType(concreteTypes, genericType);
+		return TypeNameSupport.concreteType(concreteTypes, genericType);
 	}
 
 	@Override
 	public String resolvedType(final String declaredType)
 	{
-		return ProjectionSupport.resolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.resolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String boxedResolvedType(final String declaredType)
 	{
-		return ProjectionSupport.boxedResolvedType(concreteTypes, declaredType);
+		return TypeNameSupport.boxedResolvedType(concreteTypes, declaredType);
 	}
 
 	@Override
 	public String propertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 
 	@Override
 	public String builderPropertyType(final Property property)
 	{
-		return ProjectionSupport.valueType(concreteTypes, property);
+		return TypeNameSupport.valueType(concreteTypes, property);
 	}
 
 	@Override
@@ -158,7 +148,7 @@ record PersistenceProjectionImpl(
 		{
 			return false;
 		}
-		return !SIMPLE_PERSISTENCE_TYPES.contains(ProjectionSupport.rawTypeName(resolvedType(property.baseType())));
+		return !SIMPLE_PERSISTENCE_TYPES.contains(TypeNameSupport.rawTypeName(resolvedType(property.baseType())));
 	}
 
 	@Override
