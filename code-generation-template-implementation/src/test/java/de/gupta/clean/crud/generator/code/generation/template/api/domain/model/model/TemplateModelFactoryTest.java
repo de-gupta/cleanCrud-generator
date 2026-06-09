@@ -36,5 +36,7 @@ class TemplateModelFactoryTest
 		assertNotNull(templateModel.persistence());
 		assertNotNull(templateModel.api());
 		assertNotNull(templateModel.types());
+		assertNotNull(templateModel.postCommitHooks());
+		assertNotNull(templateModel.subprocesses());
 	}
 }

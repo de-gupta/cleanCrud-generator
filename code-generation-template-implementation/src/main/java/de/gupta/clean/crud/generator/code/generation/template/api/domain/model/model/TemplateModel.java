@@ -13,4 +13,8 @@ public interface TemplateModel
 	ApiProjection api();
 
 	TemplateTypeBindings types();
+
+	PostCommitHooksProjection postCommitHooks();
+
+	SubprocessesProjection subprocesses();
 }

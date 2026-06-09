@@ -30,6 +30,8 @@ class DefaultOwnershipPolicyTest
 						java.util.Map.of()
 				),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				false
 		);
 

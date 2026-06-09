@@ -1,8 +1,14 @@
 package de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orchestration.infrastructure.specification.source;
 
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.PostCommitHookGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.RootAggregateIdConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.SubprocessGenerationConfiguration;
+import de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orchestration.api.application.GenerationSpecificationDescriptor;
 import de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orchestration.api.application.GenerationSpecificationLoader;
 import de.gupta.clean.crud.template.domain.relationship.Relationship;
 import de.gupta.clean.crud.template.domain.relationship.Relationships;
+import de.gupta.clean.crud.template.generation.specification.AggregateGenerationSpec;
+import de.gupta.clean.crud.template.generation.specification.CodeGenerationSpecification;
 import org.springframework.stereotype.Component;
 
 import javax.tools.JavaCompiler;
@@ -15,7 +21,10 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +43,9 @@ public final class JavaGenerationSpecificationLoader implements GenerationSpecif
 	}
 
 	@Override
-	public Relationships load(final Path baseModelSourceFilePath, final Path generationSpecSourceFilePath)
+	public GenerationSpecificationDescriptor load(
+			final Path baseModelSourceFilePath,
+			final Path generationSpecSourceFilePath)
 	{
 		JavaCompiler compiler = compilerSupplier.get();
 		if (compiler == null)
@@ -201,7 +212,7 @@ public final class JavaGenerationSpecificationLoader implements GenerationSpecif
 		}
 	}
 
-	private Relationships loadSpecification(
+	private GenerationSpecificationDescriptor loadSpecification(
 			final String className,
 			final Path outputDirectory,
 			final Path generationSpecSourceFilePath) throws ReflectiveOperationException, IOException
@@ -213,14 +224,22 @@ public final class JavaGenerationSpecificationLoader implements GenerationSpecif
 			var constructor = specificationClass.getDeclaredConstructor();
 			constructor.setAccessible(true);
 			Object instance = constructor.newInstance();
-			if (!(instance instanceof Relationships relationships))
+			if (instance instanceof CodeGenerationSpecification specification)
 			{
-				throw new IllegalArgumentException(
-						"Relationships declaration `" + className + "` must implement `" + Relationships.class.getName() + "`");
+				return toDescriptor(specification.specification());
 			}
-			return new LoadedRelationships(
-					relationships.baseModelClass(),
-					List.copyOf(relationships.relationships()));
+			if (instance instanceof Relationships relationships)
+			{
+				return new GenerationSpecificationDescriptor(
+						relationships.baseModelClass(),
+						List.copyOf(relationships.relationships()),
+						RootAggregateIdConfiguration.defaults(),
+						PostCommitHookGenerationConfiguration.defaults(),
+						SubprocessGenerationConfiguration.defaults());
+			}
+			throw new IllegalArgumentException(
+					"Generation spec `" + className + "` must implement `" + Relationships.class.getName() +
+							"` or `" + CodeGenerationSpecification.class.getName() + "`");
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -228,6 +247,30 @@ public final class JavaGenerationSpecificationLoader implements GenerationSpecif
 					"Failed to load relationships declaration from `" + generationSpecSourceFilePath + "`: " + e.getMessage(),
 					e);
 		}
+	}
+
+	private GenerationSpecificationDescriptor toDescriptor(final AggregateGenerationSpec specification)
+	{
+		return new GenerationSpecificationDescriptor(
+				specification.baseModelClass(),
+				specification.relationships(),
+				new RootAggregateIdConfiguration(
+						typeName(specification.rootApiIdType()),
+						typeName(specification.rootDomainIdType()),
+						typeName(specification.rootPersistenceIdType())),
+				new PostCommitHookGenerationConfiguration(
+						specification.postCommitHooks().save(),
+						specification.postCommitHooks().update(),
+						specification.postCommitHooks().delete()),
+				new SubprocessGenerationConfiguration(
+						specification.subprocesses().save(),
+						specification.subprocesses().update(),
+						specification.subprocesses().delete()));
+	}
+
+	private String typeName(final Class<?> type)
+	{
+		return type == null ? null : type.getCanonicalName();
 	}
 
 	private Path resolveSourceRoot(final Path baseModelSourceFilePath) throws IOException
@@ -287,11 +330,5 @@ public final class JavaGenerationSpecificationLoader implements GenerationSpecif
 	JavaGenerationSpecificationLoader(final Supplier<JavaCompiler> compilerSupplier)
 	{
 		this.compilerSupplier = compilerSupplier;
-	}
-
-	private record LoadedRelationships(
-			Class<?> baseModelClass,
-			Collection<Relationship> relationships) implements Relationships
-	{
 	}
 }

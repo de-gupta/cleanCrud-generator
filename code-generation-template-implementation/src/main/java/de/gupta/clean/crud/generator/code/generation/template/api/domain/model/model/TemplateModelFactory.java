@@ -12,7 +12,8 @@ public final class TemplateModelFactory
 	public static TemplateModel create(final String packageName, final String modelName)
 	{
 		return create(packageName, modelName, List.of(), Set.of(), Map.of(), Map.of(), Map.of(), Set.of(), false,
-				List.of(), "java.lang.Long", "java.lang.Long", "java.util.UUID");
+				List.of(), "java.lang.Long", "java.lang.Long", "java.util.UUID",
+				false, false, false, false, false, false);
 	}
 
 	public static TemplateModel create(
@@ -28,7 +29,13 @@ public final class TemplateModelFactory
 			final java.util.List<GeneratedRelationship> relationships,
 			final String rootApiIdType,
 			final String rootDomainIdType,
-			final String rootPersistenceIdType)
+			final String rootPersistenceIdType,
+			final boolean postCommitSave,
+			final boolean postCommitUpdate,
+			final boolean postCommitDelete,
+			final boolean subprocessSave,
+			final boolean subprocessUpdate,
+			final boolean subprocessDelete)
 	{
 		AggregateDescriptor aggregate = new AggregateDescriptorImpl(
 				packageName,
@@ -51,7 +58,25 @@ public final class TemplateModelFactory
 				persistenceGenericTypes,
 				domainGenericImports);
 		ApiProjection api = new ApiProjectionImpl(composition, apiGenericTypes, domainGenericImports);
-		return new TemplateModelImpl(aggregate, composition, domain, persistence, api, types);
+		PostCommitHooksProjection postCommitHooksProjection = new PostCommitHooksProjectionImpl(
+				aggregate,
+				postCommitSave,
+				postCommitUpdate,
+				postCommitDelete);
+		SubprocessesProjection subprocessesProjection = new SubprocessesProjectionImpl(
+				aggregate,
+				subprocessSave,
+				subprocessUpdate,
+				subprocessDelete);
+		return new TemplateModelImpl(
+				aggregate,
+				composition,
+				domain,
+				persistence,
+				api,
+				types,
+				postCommitHooksProjection,
+				subprocessesProjection);
 	}
 
 	private TemplateModelFactory()

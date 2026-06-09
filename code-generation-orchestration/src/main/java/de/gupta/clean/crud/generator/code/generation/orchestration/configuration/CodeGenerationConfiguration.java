@@ -8,6 +8,8 @@ public record CodeGenerationConfiguration(
 		RootAggregateIdConfiguration rootAggregateIds,
 		OwnershipConfiguration ownership,
 		OverwriteConfiguration overwrite,
+		PostCommitHookGenerationConfiguration postCommitHooks,
+		SubprocessGenerationConfiguration subprocesses,
 		boolean historized
 )
 {
@@ -21,6 +23,8 @@ public record CodeGenerationConfiguration(
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				historized
 		);
 	}
@@ -42,5 +46,9 @@ public record CodeGenerationConfiguration(
 		ownership =
 				ownership == null ? OwnershipConfiguration.defaults().normalized(inputs) : ownership.normalized(inputs);
 		overwrite = overwrite == null ? OverwriteConfiguration.defaults() : overwrite.normalized();
+		postCommitHooks = postCommitHooks == null ? PostCommitHookGenerationConfiguration.defaults() :
+				postCommitHooks.normalized();
+		subprocesses = subprocesses == null ? SubprocessGenerationConfiguration.defaults() :
+				subprocesses.normalized();
 	}
 }

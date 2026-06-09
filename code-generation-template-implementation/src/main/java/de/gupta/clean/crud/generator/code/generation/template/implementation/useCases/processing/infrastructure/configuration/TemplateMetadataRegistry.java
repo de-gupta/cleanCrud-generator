@@ -338,6 +338,58 @@ public final class TemplateMetadataRegistry
 		register(templates, "UpdateServiceFacade", "Facade for update services",
 				Set.of("Facade", "Update"), Set.of("usecase", "facade", "update"),
 				TemplateGroup.USE_CASE_UPDATE);
+		register(templates, "SavePostCommitMutation", "Post-commit mutation stub for save operations",
+				Set.of("PostCommitMutation", "Save"), Set.of("usecase", "postcommit", "save"),
+				TemplateGroup.USE_CASE_POST_COMMIT);
+		register(templates, "UpdatePostCommitMutation", "Post-commit mutation stub for update operations",
+				Set.of("PostCommitMutation", "Update"), Set.of("usecase", "postcommit", "update"),
+				TemplateGroup.USE_CASE_POST_COMMIT);
+		register(templates, "DeletePostCommitMutation", "Post-commit mutation stub for delete operations",
+				Set.of("PostCommitMutation", "Delete"), Set.of("usecase", "postcommit", "delete"),
+				TemplateGroup.USE_CASE_POST_COMMIT);
+		register(templates, "SaveSubprocessTrigger", "Durable subprocess trigger for save operations",
+				Set.of("DurableProcessTrigger", "Save"), Set.of("usecase", "subprocess", "save", "trigger"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "SaveSubprocessPayload", "Durable subprocess payload for save operations",
+				Set.of("DurableProcessPayload", "Save"), Set.of("usecase", "subprocess", "save", "payload"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "SaveSubprocessExecutor", "Durable subprocess executor for save operations",
+				Set.of("DurableProcessExecutor", "Save"), Set.of("usecase", "subprocess", "save", "executor"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "SaveSubprocessConfiguration", "Durable subprocess configuration for save operations",
+				Set.of("DurableProcessDefinition", "Save", "Configuration"),
+				Set.of("usecase", "subprocess", "save", "configuration"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "UpdateSubprocessTrigger", "Durable subprocess trigger for update operations",
+				Set.of("DurableProcessTrigger", "Update"), Set.of("usecase", "subprocess", "update", "trigger"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "UpdateSubprocessPayload", "Durable subprocess payload for update operations",
+				Set.of("DurableProcessPayload", "Update"), Set.of("usecase", "subprocess", "update", "payload"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "UpdateSubprocessExecutor", "Durable subprocess executor for update operations",
+				Set.of("DurableProcessExecutor", "Update"),
+				Set.of("usecase", "subprocess", "update", "executor"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "UpdateSubprocessConfiguration",
+				"Durable subprocess configuration for update operations",
+				Set.of("DurableProcessDefinition", "Update", "Configuration"),
+				Set.of("usecase", "subprocess", "update", "configuration"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "DeleteSubprocessTrigger", "Durable subprocess trigger for delete operations",
+				Set.of("DurableProcessTrigger", "Delete"), Set.of("usecase", "subprocess", "delete", "trigger"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "DeleteSubprocessPayload", "Durable subprocess payload for delete operations",
+				Set.of("DurableProcessPayload", "Delete"), Set.of("usecase", "subprocess", "delete", "payload"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "DeleteSubprocessExecutor", "Durable subprocess executor for delete operations",
+				Set.of("DurableProcessExecutor", "Delete"),
+				Set.of("usecase", "subprocess", "delete", "executor"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
+		register(templates, "DeleteSubprocessConfiguration",
+				"Durable subprocess configuration for delete operations",
+				Set.of("DurableProcessDefinition", "Delete", "Configuration"),
+				Set.of("usecase", "subprocess", "delete", "configuration"),
+				TemplateGroup.USE_CASE_SUBPROCESS);
 	}
 
 	private static void register(

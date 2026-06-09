@@ -57,6 +57,8 @@ final class DirectCliConfigurationAssembler
 						parseBooleanAssignments(options.overwriteTemplateRules(), spec),
 						parseBooleanAssignments(options.overwriteTagRules(), spec),
 						parseBooleanAssignments(options.overwriteFileRules(), spec)),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				options.historized());
 	}
 

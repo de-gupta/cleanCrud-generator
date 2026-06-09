@@ -27,7 +27,13 @@ public final class TemplateModelTestFixture
 				relationships(),
 				"java.lang.Long",
 				"java.lang.Long",
-				"java.util.UUID");
+				"java.util.UUID",
+				true,
+				false,
+				true,
+				false,
+				true,
+				false);
 	}
 
 	private static Set<Property> properties()

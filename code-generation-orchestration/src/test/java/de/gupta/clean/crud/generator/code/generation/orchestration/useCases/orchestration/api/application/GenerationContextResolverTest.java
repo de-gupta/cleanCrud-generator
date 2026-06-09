@@ -5,7 +5,6 @@ import de.gupta.clean.crud.generator.code.generation.model.api.domain.model.Prop
 import de.gupta.clean.crud.generator.code.generation.model.api.useCases.parsing.api.application.DomainModelParser;
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.*;
 import de.gupta.clean.crud.template.domain.relationship.Relationship;
-import de.gupta.clean.crud.template.domain.relationship.Relationships;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -35,6 +34,8 @@ class GenerationContextResolverTest
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				false);
 
 		ResolvedGenerationRequest resolved = resolver.resolve(configuration);
@@ -48,24 +49,17 @@ class GenerationContextResolverTest
 	{
 		Model model = model("TaskModel", "V");
 		DomainModelParser parser = ignored -> model;
-		GenerationSpecificationLoader loader = (ignoredBaseModel, ignoredSpecPath) -> new Relationships()
-		{
-			@Override
-			public Class<?> baseModelClass()
-			{
-				return TaskModel.class;
-			}
-
-			@Override
-			public java.util.Collection<Relationship> relationships()
-			{
-				return List.of(Relationship.owned("version", VersionModel.class)
-				                           .satelliteApiIdType(Long.class)
-				                           .satelliteDomainIdType(Long.class)
-				                           .satellitePersistenceIdType(java.util.UUID.class)
-				                           .build());
-			}
-		};
+		GenerationSpecificationLoader loader =
+				(ignoredBaseModel, ignoredSpecPath) -> new GenerationSpecificationDescriptor(
+						TaskModel.class,
+						List.of(Relationship.owned("version", VersionModel.class)
+						                    .satelliteApiIdType(Long.class)
+						                    .satelliteDomainIdType(Long.class)
+						                    .satellitePersistenceIdType(java.util.UUID.class)
+						                    .build()),
+						new RootAggregateIdConfiguration("java.lang.String", null, null),
+						new PostCommitHookGenerationConfiguration(true, false, false),
+						new SubprocessGenerationConfiguration(false, true, false));
 		var resolver =
 				new GenerationContextResolver(parser, loader, new GenerationSpecificationConfigurationAssembler());
 		var configuration = new CodeGenerationConfiguration(
@@ -76,6 +70,8 @@ class GenerationContextResolverTest
 				new RootAggregateIdConfiguration("java.lang.String", "java.lang.Long", "java.util.UUID"),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				false);
 
 		ResolvedGenerationRequest resolved = resolver.resolve(configuration);
@@ -86,6 +82,8 @@ class GenerationContextResolverTest
 		assertEquals(1, resolved.configuration().relationships().size());
 		assertEquals("version", relationship.masterProperty());
 		assertEquals("Version", relationship.satelliteAggregate());
+		assertTrue(resolved.configuration().postCommitHooks().save());
+		assertTrue(resolved.configuration().subprocesses().update());
 	}
 
 	@Test
@@ -93,24 +91,17 @@ class GenerationContextResolverTest
 	{
 		Model model = model("TaskModel", "V");
 		DomainModelParser parser = ignored -> model;
-		GenerationSpecificationLoader loader = (ignoredBaseModel, ignoredSpecPath) -> new Relationships()
-		{
-			@Override
-			public Class<?> baseModelClass()
-			{
-				return WorkspaceModel.class;
-			}
-
-			@Override
-			public java.util.Collection<Relationship> relationships()
-			{
-				return List.of(Relationship.referenced("organisation", OrganisationModel.class)
-				                           .satelliteApiIdType(Long.class)
-				                           .satelliteDomainIdType(Long.class)
-				                           .satellitePersistenceIdType(java.util.UUID.class)
-				                           .build());
-			}
-		};
+		GenerationSpecificationLoader loader =
+				(ignoredBaseModel, ignoredSpecPath) -> new GenerationSpecificationDescriptor(
+						WorkspaceModel.class,
+						List.of(Relationship.referenced("organisation", OrganisationModel.class)
+						                    .satelliteApiIdType(Long.class)
+						                    .satelliteDomainIdType(Long.class)
+						                    .satellitePersistenceIdType(java.util.UUID.class)
+						                    .build()),
+						RootAggregateIdConfiguration.defaults(),
+						PostCommitHookGenerationConfiguration.defaults(),
+						SubprocessGenerationConfiguration.defaults());
 		var resolver =
 				new GenerationContextResolver(parser, loader, new GenerationSpecificationConfigurationAssembler());
 		var configuration = new CodeGenerationConfiguration(
@@ -121,6 +112,8 @@ class GenerationContextResolverTest
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				false);
 
 		var error = assertThrows(IllegalArgumentException.class, () -> resolver.resolve(configuration));

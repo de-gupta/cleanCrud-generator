@@ -35,7 +35,9 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 			TemplateGroup.USE_CASE_FETCH.name(),
 			TemplateGroup.USE_CASE_SAVE.name(),
 			TemplateGroup.USE_CASE_UPDATE.name(),
-			TemplateGroup.USE_CASE_DELETE.name());
+			TemplateGroup.USE_CASE_DELETE.name(),
+			TemplateGroup.USE_CASE_POST_COMMIT.name(),
+			TemplateGroup.USE_CASE_SUBPROCESS.name());
 	private final GenerationContextResolver generationContextResolver;
 	private final SourceCodeTemplateProcessor templateProcessor;
 	private final SourceCodeFileWriter sourceCodeFileWriter;
@@ -60,7 +62,13 @@ final class CodeGenerationOrchestratorImpl implements CodeGenerationOrchestrator
 				effectiveConfiguration.historized(), relationships,
 				effectiveConfiguration.rootAggregateIds().apiIdType(),
 				effectiveConfiguration.rootAggregateIds().domainIdType(),
-				effectiveConfiguration.rootAggregateIds().persistenceIdType());
+				effectiveConfiguration.rootAggregateIds().persistenceIdType(),
+				effectiveConfiguration.postCommitHooks().save(),
+				effectiveConfiguration.postCommitHooks().update(),
+				effectiveConfiguration.postCommitHooks().delete(),
+				effectiveConfiguration.subprocesses().save(),
+				effectiveConfiguration.subprocesses().update(),
+				effectiveConfiguration.subprocesses().delete());
 		var overwriteResolver = OverwriteResolver.with(effectiveConfiguration.overwrite());
 
 		var files = templateProcessor.generateSourceCode(templateModel,

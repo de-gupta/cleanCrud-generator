@@ -69,6 +69,61 @@ class JavaGenerationSpecificationLoaderTest
 	}
 
 	@Test
+	void loadsRichGenerationSpecificationSource(@TempDir final Path tempDir) throws IOException
+	{
+		Path sourceRoot = tempDir.resolve("src/main/java");
+		Path baseModel = sourceRoot.resolve("example/task/domain/model/TaskModel.java");
+		Path spec = sourceRoot.resolve("example/task/domain/model/TaskGenerationSpec.java");
+		Files.createDirectories(baseModel.getParent());
+		Files.writeString(baseModel, """
+				package example.task.domain.model;
+				
+				public interface TaskModel<V>
+				{
+				}
+				""");
+		Files.writeString(spec, """
+				package example.task.domain.model;
+				
+				import de.gupta.clean.crud.template.domain.relationship.Relationship;
+				import de.gupta.clean.crud.template.generation.specification.AggregateGenerationSpec;
+				import de.gupta.clean.crud.template.generation.specification.AggregateGenerationSpecs;
+				import de.gupta.clean.crud.template.generation.specification.CodeGenerationSpecification;
+				
+				public final class TaskGenerationSpec implements CodeGenerationSpecification
+				{
+				    @Override
+				    public AggregateGenerationSpec specification()
+				    {
+				        return AggregateGenerationSpecs.aggregate(TaskModel.class)
+				                .rootApiIdType(String.class)
+				                .postCommitOnSave()
+				                .subprocessOnUpdate()
+				                .relationship(Relationship.owned("version", VersionModel.class)
+				                        .satelliteApiIdType(Long.class)
+				                        .satelliteDomainIdType(Long.class)
+				                        .satellitePersistenceIdType(java.util.UUID.class)
+				                        .build())
+				                .build();
+				    }
+				}
+				
+				interface VersionModel
+				{
+				}
+				""");
+
+		var specification = new JavaGenerationSpecificationLoader().load(baseModel, spec);
+
+		assertEquals("TaskModel", specification.baseModelClass().getSimpleName());
+		assertEquals("java.lang.String", specification.rootAggregateIds().apiIdType());
+		assertEquals(1, specification.relationships().size());
+		assertEquals("version", specification.relationships().iterator().next().propertyName());
+		assertEquals(true, specification.postCommitHooks().save());
+		assertEquals(true, specification.subprocesses().update());
+	}
+
+	@Test
 	void failsClearlyWhenNoSystemCompilerIsAvailable(@TempDir final Path tempDir) throws IOException
 	{
 		Path sourceRoot = tempDir.resolve("src/main/java");

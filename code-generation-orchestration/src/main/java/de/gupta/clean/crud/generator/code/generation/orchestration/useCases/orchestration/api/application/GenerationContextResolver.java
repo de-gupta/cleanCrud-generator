@@ -39,9 +39,11 @@ final class GenerationContextResolver
 				configuration.genericTypes(),
 				configuration.generation(),
 				loaded.relationships(),
-				configuration.rootAggregateIds(),
+				loaded.rootAggregateIds(),
 				configuration.ownership(),
 				configuration.overwrite(),
+				configuration.postCommitHooks().or(loaded.postCommitHooks()),
+				configuration.subprocesses().or(loaded.subprocesses()),
 				configuration.historized());
 	}
 

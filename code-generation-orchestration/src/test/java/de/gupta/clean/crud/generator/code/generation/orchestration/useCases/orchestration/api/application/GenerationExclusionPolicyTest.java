@@ -27,6 +27,8 @@ class GenerationExclusionPolicyTest
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				false
 		);
 
@@ -59,11 +61,39 @@ class GenerationExclusionPolicyTest
 						Map.of()
 				),
 				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				false
 		);
 
 		var excludedTemplates = policy.excludedTemplates(configuration);
 		assertTrue(excludedTemplates.contains("BaseModel"));
 		assertTrue(excludedTemplates.contains("CrudRelationshipConfiguration"));
+	}
+
+	@Test
+	void excludesPostCommitAndSubprocessTemplatesWhenFlagsAreDisabled()
+	{
+		var policy = new GenerationExclusionPolicy(() -> Set.of(), new DefaultOwnershipPolicy());
+		var configuration = new CodeGenerationConfiguration(
+				GenerationInputs.empty(),
+				LayerConcreteTypes.defaults(),
+				GenerationSelection.defaults(),
+				List.of(),
+				RootAggregateIdConfiguration.defaults(),
+				OwnershipConfiguration.defaults(),
+				OverwriteConfiguration.defaults(),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
+				false
+		);
+
+		var excludedTemplates = policy.excludedTemplates(configuration);
+		assertTrue(excludedTemplates.contains("SavePostCommitMutation"));
+		assertTrue(excludedTemplates.contains("UpdatePostCommitMutation"));
+		assertTrue(excludedTemplates.contains("DeletePostCommitMutation"));
+		assertTrue(excludedTemplates.contains("SaveSubprocessConfiguration"));
+		assertTrue(excludedTemplates.contains("UpdateSubprocessExecutor"));
+		assertTrue(excludedTemplates.contains("DeleteSubprocessPayload"));
 	}
 }

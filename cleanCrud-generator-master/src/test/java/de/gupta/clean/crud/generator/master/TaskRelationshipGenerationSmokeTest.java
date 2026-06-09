@@ -85,7 +85,7 @@ class TaskRelationshipGenerationSmokeTest
 				}
 			}
 			""";
-	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.3-SNAPSHOT");
+	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.9.1-SNAPSHOT");
 
 	@Autowired
 	private CodeGenerationOrchestrator orchestrator;
@@ -174,6 +174,8 @@ class TaskRelationshipGenerationSmokeTest
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				true);
 	}
 
@@ -187,6 +189,8 @@ class TaskRelationshipGenerationSmokeTest
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				true);
 	}
 

@@ -6,7 +6,9 @@ record TemplateModelImpl(
 		DomainProjection domain,
 		PersistenceProjection persistence,
 		ApiProjection api,
-		TemplateTypeBindings types)
+		TemplateTypeBindings types,
+		PostCommitHooksProjection postCommitHooks,
+		SubprocessesProjection subprocesses)
 		implements TemplateModel
 {
 }

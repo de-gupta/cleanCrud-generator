@@ -4,8 +4,8 @@
 
     <parent>
         <groupId>io.github.de-gupta</groupId>
-        <artifactId>cleanCrudParent</artifactId>
-        <version>0.1.5</version>
+        <artifactId>de-gupta-parent</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>cleanCrud-generator</artifactId>
@@ -25,7 +25,7 @@
     <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
     <properties>
-        <clean.crud.version>0.8.4</clean.crud.version>
+        <clean.crud.version>0.9.1-SNAPSHOT</clean.crud.version>
     </properties>
 
     <dependencies>

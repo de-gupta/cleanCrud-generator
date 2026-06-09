@@ -21,7 +21,7 @@ final class GeneratedAppFixtureHarness
 	private static final String FIXTURE_RESOURCE_ROOT = "generated-app-fixutre";
 	private static final String EXAMPLES_PACKAGE_PATH = "de/gupta/clean/crud/implementation/examples";
 	private static final String CLEANCRUD_VERSION_TOKEN = "__CLEANCRUD_VERSION__";
-	private static final String DEFAULT_CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.8.3-SNAPSHOT");
+	private static final String DEFAULT_CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.9.1-SNAPSHOT");
 	private static final List<String> STATIC_MODULES = List.of("note", "version");
 	private static final String GENERATED_MODULE = "person";
 

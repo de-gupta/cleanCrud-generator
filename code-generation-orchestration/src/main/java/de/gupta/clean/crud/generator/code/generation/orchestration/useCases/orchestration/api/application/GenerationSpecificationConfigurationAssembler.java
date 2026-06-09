@@ -9,9 +9,9 @@ import de.gupta.clean.crud.generator.code.generation.orchestration.configuration
 import de.gupta.clean.crud.template.domain.relationship.ReconciliationStrategy;
 import de.gupta.clean.crud.template.domain.relationship.Relationship;
 import de.gupta.clean.crud.template.domain.relationship.RelationshipKind;
-import de.gupta.clean.crud.template.domain.relationship.Relationships;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,31 +23,36 @@ final class GenerationSpecificationConfigurationAssembler
 {
 	LoadedGenerationSpecification assemble(
 			final Model model,
-			final Relationships relationshipsDeclaration,
+			final GenerationSpecificationDescriptor specification,
 			final RootAggregateIdConfiguration rootAggregateIds)
 	{
-		validateBaseModel(model, relationshipsDeclaration);
-		validateRootIds(rootAggregateIds);
+		validateBaseModel(model, specification.baseModelClass());
+		var effectiveRootIds = mergeRootIds(rootAggregateIds, specification.rootAggregateIds());
+		validateRootIds(effectiveRootIds);
 		Map<String, Property> propertiesByName = model.properties().stream().collect(Collectors.toMap(
 				Property::name,
 				Function.identity(),
 				(left, _) -> left,
 				LinkedHashMap::new));
-		validateRelationshipCoverage(model, relationshipsDeclaration, propertiesByName);
-		validatePlaceholderConsistency(model, relationshipsDeclaration, propertiesByName);
+		validateRelationshipCoverage(model, specification.relationships(), propertiesByName);
+		validatePlaceholderConsistency(model, specification.relationships(), propertiesByName);
 
-		List<RelationshipGenerationConfiguration> relationships = relationshipsDeclaration.relationships().stream()
-		                                                                                  .map(relationship -> toConfiguration(
-																								  propertiesByName.get(
-																										  relationship.propertyName()),
-																								  relationship))
-		                                                                                  .toList();
-		return new LoadedGenerationSpecification(relationships);
+		List<RelationshipGenerationConfiguration> relationships = specification.relationships().stream()
+		                                                                       .map(relationship -> toConfiguration(
+																					   propertiesByName.get(
+																							   relationship.propertyName()),
+																					   relationship))
+		                                                                       .toList();
+		return new LoadedGenerationSpecification(
+				relationships,
+				effectiveRootIds,
+				specification.postCommitHooks(),
+				specification.subprocesses());
 	}
 
-	private void validateBaseModel(final Model model, final Relationships relationshipsDeclaration)
+	private void validateBaseModel(final Model model, final Class<?> baseModelClass)
 	{
-		String specificationBaseModel = relationshipsDeclaration.baseModelClass().getSimpleName();
+		String specificationBaseModel = baseModelClass.getSimpleName();
 		if (!model.modelName().equals(specificationBaseModel))
 		{
 			throw new IllegalArgumentException(
@@ -66,14 +71,27 @@ final class GenerationSpecificationConfigurationAssembler
 		}
 	}
 
+	private RootAggregateIdConfiguration mergeRootIds(
+			final RootAggregateIdConfiguration configuredRootIds,
+			final RootAggregateIdConfiguration specificationRootIds)
+	{
+		return new RootAggregateIdConfiguration(
+				specificationRootIds.apiIdType() == null ? configuredRootIds.apiIdType() :
+						specificationRootIds.apiIdType(),
+				specificationRootIds.domainIdType() == null ? configuredRootIds.domainIdType() :
+						specificationRootIds.domainIdType(),
+				specificationRootIds.persistenceIdType() == null ? configuredRootIds.persistenceIdType() :
+						specificationRootIds.persistenceIdType());
+	}
+
 	private void validateRelationshipCoverage(
 			final Model model,
-			final Relationships relationshipsDeclaration,
+			final Collection<Relationship> relationships,
 			final Map<String, Property> propertiesByName)
 	{
 		var configuredProperties =
-				relationshipsDeclaration.relationships().stream().map(Relationship::propertyName)
-				                        .collect(Collectors.toSet());
+				relationships.stream().map(Relationship::propertyName)
+				             .collect(Collectors.toSet());
 		model.properties().stream()
 		     .filter(property -> property.relationshipEligible(model.genericTypeParameters()))
 		     .filter(property -> !configuredProperties.contains(property.name()))
@@ -86,7 +104,7 @@ final class GenerationSpecificationConfigurationAssembler
 								 model.genericTypeParameters()) +
 								 "` and therefore requires an explicit relationship declaration");
 			 });
-		for (Relationship relationship : relationshipsDeclaration.relationships())
+		for (Relationship relationship : relationships)
 		{
 			Property property = propertiesByName.get(relationship.propertyName());
 			if (property == null)
@@ -110,11 +128,11 @@ final class GenerationSpecificationConfigurationAssembler
 
 	private void validatePlaceholderConsistency(
 			final Model model,
-			final Relationships relationshipsDeclaration,
+			final Collection<Relationship> relationships,
 			final Map<String, Property> propertiesByName)
 	{
 		Map<String, Relationship> byPlaceholder = new LinkedHashMap<>();
-		for (Relationship relationship : relationshipsDeclaration.relationships())
+		for (Relationship relationship : relationships)
 		{
 			Property property = propertiesByName.get(relationship.propertyName());
 			String placeholder = property.relationshipGenericPlaceholder(model.genericTypeParameters());

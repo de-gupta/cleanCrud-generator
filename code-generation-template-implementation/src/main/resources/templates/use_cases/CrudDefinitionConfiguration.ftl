@@ -14,6 +14,11 @@ import de.gupta.clean.crud.template.domain.service.equality.DuplicateDefinition;
 import de.gupta.clean.crud.template.domain.service.security.DomainSecurityPolicy;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.builder.AggregateCrudDefinitions;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.AggregateCrudDefinition;
+<#if postCommitHooks().anyEnabled()>
+import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.PostCommitMutation;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.PostCommitMutationContext;
+import de.gupta.clean.crud.template.useCases.crud.aggregate.definition.PostCommitMutationKind;
+</#if>
 import de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateFetchPort;
 import de.gupta.clean.crud.template.useCases.crud.aggregate.port.AggregateMutationPort;
 <#if composition().hasRelationships()>
@@ -39,7 +44,10 @@ class ${aggregate().baseName()}CrudDefinitionConfiguration
 			@Qualifier("${aggregate().beanNamePrefix()}PatchPolicy") final PatchPolicy<${aggregate().baseName()}DomainModel> patchPolicy,
 			@Qualifier("${aggregate().beanNamePrefix()}DeletionPolicy") final DeletionPolicy<${aggregate().baseName()}DomainModel> deletionPolicy,
 			@Qualifier("${aggregate().beanNamePrefix()}DomainSecurityPolicy") final DomainSecurityPolicy<${aggregate().baseName()}DomainModel> securityPolicy,
-			@Qualifier("${aggregate().beanNamePrefix()}DuplicateDefinition") final DuplicateDefinition<${aggregate().baseName()}DomainModel> duplicateDefinition<#if composition().hasRelationships()>,
+			@Qualifier("${aggregate().beanNamePrefix()}DuplicateDefinition") final DuplicateDefinition<${aggregate().baseName()}DomainModel> duplicateDefinition<#if postCommitHooks().saveEnabled()>,
+			@Qualifier("${postCommitHooks().saveQualifier()}") final PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> savePostCommitMutation</#if><#if postCommitHooks().updateEnabled()>,
+			@Qualifier("${postCommitHooks().updateQualifier()}") final PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> updatePostCommitMutation</#if><#if postCommitHooks().deleteEnabled()>,
+			@Qualifier("${postCommitHooks().deleteQualifier()}") final PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> deletePostCommitMutation</#if><#if composition().hasRelationships()>,
 <#list composition().relationships() as relationship>
 			@Qualifier("${relationship.relationshipBeanNamePrefix()}RelationshipDefinition") final AggregateRelationshipDefinitionContract<Long, ${aggregate().baseName()}DomainModel, ${aggregate().baseName()}DomainModelCreate, ${aggregate().baseName()}DomainModelUpdatePatch> ${relationship.relationshipBeanNamePrefix()}RelationshipDefinition<#if relationship_has_next>,</#if>
 </#list>
@@ -57,9 +65,52 @@ class ${aggregate().baseName()}CrudDefinitionConfiguration
 				.deletionPolicy(deletionPolicy)
 				.securityPolicy(securityPolicy)
 				.duplicateDefinition(duplicateDefinition)
+<#if postCommitHooks().anyEnabled()>
+				.postCommitMutation(postCommitMutation(<#if postCommitHooks().saveEnabled()>savePostCommitMutation</#if><#if postCommitHooks().saveEnabled() && (postCommitHooks().updateEnabled() || postCommitHooks().deleteEnabled())>, </#if><#if postCommitHooks().updateEnabled()>updatePostCommitMutation</#if><#if postCommitHooks().updateEnabled() && postCommitHooks().deleteEnabled()>, </#if><#if postCommitHooks().deleteEnabled()>deletePostCommitMutation</#if>))
+</#if>
 <#list composition().relationships() as relationship>
 				.relationshipDefinition(${relationship.relationshipBeanNamePrefix()}RelationshipDefinition)
 </#list>
 				.build();
 	}
+
+<#if postCommitHooks().anyEnabled()>
+	private PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> postCommitMutation(
+<#if postCommitHooks().saveEnabled()>
+			final PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> savePostCommitMutation<#if postCommitHooks().updateEnabled() || postCommitHooks().deleteEnabled()>,</#if>
+</#if>
+<#if postCommitHooks().updateEnabled()>
+			final PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> updatePostCommitMutation<#if postCommitHooks().deleteEnabled()>,</#if>
+</#if>
+<#if postCommitHooks().deleteEnabled()>
+			final PostCommitMutation<Long, ${aggregate().baseName()}DomainModel> deletePostCommitMutation
+</#if>
+	)
+	{
+		return context ->
+		{
+			switch (context.kind())
+			{
+				case CREATE ->
+				{
+<#if postCommitHooks().saveEnabled()>
+					savePostCommitMutation.accept(context);
+</#if>
+				}
+				case PUT, PATCH ->
+				{
+<#if postCommitHooks().updateEnabled()>
+					updatePostCommitMutation.accept(context);
+</#if>
+				}
+				case DELETE ->
+				{
+<#if postCommitHooks().deleteEnabled()>
+					deletePostCommitMutation.accept(context);
+</#if>
+				}
+			}
+		};
+	}
+</#if>
 }

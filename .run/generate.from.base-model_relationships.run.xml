@@ -7,7 +7,7 @@
         </option>
         <option name="MAIN_CLASS_NAME" value="de.gupta.clean.crud.generator.master.SpringBootMasterApplication"/>
         <module name="cleanCrud-generator-master"/>
-        <option name="PROGRAM_PARAMETERS" value="generate --config E:\Projects\Professional\OpenSource\java\de-gupta\crud\cleanCrud-generator\cleanCrud-generator\.run\generate.person.from.sample.relationships.complete.json"/>
+        <option name="PROGRAM_PARAMETERS" value="generate --config E:\Projects\Professional\OpenSource\java\de-gupta\crud\cleanCrud-generator\cleanCrud-generator\.run\generate.person.from.sample.relationships.with-crud-extensions.json"/>
         <extension name="net.ashald.envfile">
             <option name="IS_ENABLED" value="false"/>
             <option name="IS_SUBST" value="false"/>

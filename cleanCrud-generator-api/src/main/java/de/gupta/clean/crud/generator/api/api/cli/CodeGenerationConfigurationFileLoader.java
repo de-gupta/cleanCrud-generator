@@ -101,6 +101,16 @@ final class CodeGenerationConfigurationFileLoader
 						extractBooleanMap(properties, "overwrite.tags."),
 						extractBooleanMap(properties, "overwrite.files.")
 				),
+				new PostCommitHookGenerationConfiguration(
+						Boolean.parseBoolean(properties.getProperty("postCommitHooks.save", "false")),
+						Boolean.parseBoolean(properties.getProperty("postCommitHooks.update", "false")),
+						Boolean.parseBoolean(properties.getProperty("postCommitHooks.delete", "false"))
+				),
+				new SubprocessGenerationConfiguration(
+						Boolean.parseBoolean(properties.getProperty("subprocesses.save", "false")),
+						Boolean.parseBoolean(properties.getProperty("subprocesses.update", "false")),
+						Boolean.parseBoolean(properties.getProperty("subprocesses.delete", "false"))
+				),
 				Boolean.parseBoolean(properties.getProperty("historized", "false"))
 		);
 	}
@@ -118,6 +128,8 @@ final class CodeGenerationConfigurationFileLoader
 				configuration.rootAggregateIds(),
 				configuration.ownership(),
 				normalizeOverwrite(configuration.overwrite(), configDirectory),
+				configuration.postCommitHooks(),
+				configuration.subprocesses(),
 				configuration.historized());
 	}
 
