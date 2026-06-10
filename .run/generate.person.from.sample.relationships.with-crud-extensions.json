@@ -21,6 +21,7 @@
       "USE_CASE_SAVE",
       "USE_CASE_UPDATE",
       "USE_CASE_DELETE",
+      "USE_CASE_MUTATION",
       "USE_CASE_POST_COMMIT",
       "USE_CASE_SUBPROCESS"
     ]

@@ -338,6 +338,10 @@ public final class TemplateMetadataRegistry
 		register(templates, "UpdateServiceFacade", "Facade for update services",
 				Set.of("Facade", "Update"), Set.of("usecase", "facade", "update"),
 				TemplateGroup.USE_CASE_UPDATE);
+		register(templates, "MutationConfiguration", "Application mutation lane configuration",
+				Set.of("MutationService", "MutationApplicationController", "MutationHandlerRegistry"),
+				Set.of("usecase", "mutation", "configuration"),
+				TemplateGroup.USE_CASE_MUTATION);
 		register(templates, "SavePostCommitMutation", "Post-commit mutation stub for save operations",
 				Set.of("PostCommitMutation", "Save"), Set.of("usecase", "postcommit", "save"),
 				TemplateGroup.USE_CASE_POST_COMMIT);

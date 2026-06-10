@@ -25,7 +25,7 @@
     <url>https://github.com/de-gupta/cleanCrud-generator.git</url>
 
     <properties>
-        <clean.crud.version>0.10.0</clean.crud.version>
+        <clean.crud.version>0.10.1-SNAPSHOT</clean.crud.version>
     </properties>
 
     <dependencies>

@@ -2,6 +2,7 @@ package de.gupta.clean.crud.generator.master;
 
 import de.gupta.clean.crud.generator.code.generation.orchestration.configuration.*;
 import de.gupta.clean.crud.generator.code.generation.orchestration.useCases.orchestration.api.application.CodeGenerationOrchestrator;
+import de.gupta.clean.crud.generator.code.generation.template.api.domain.model.selection.TemplateGroup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = SpringBootMasterApplication.class)
-class CrudExtensionGenerationSmokeTest
+class MutationGenerationSmokeTest
 {
 	private static final String PERSON_MODEL_SOURCE = """
 			package de.gupta.clean.crud.implementation.examples.person.domain.model;
@@ -29,13 +31,13 @@ class CrudExtensionGenerationSmokeTest
 				Optional<String> lastName();
 			}
 			""";
-	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.10.1-SNAPSHOT");
+	private static final String CLEANCRUD_VERSION = System.getProperty("clean.crud.version", "0.9.1-SNAPSHOT");
 
 	@Autowired
 	private CodeGenerationOrchestrator orchestrator;
 
 	@Test
-	void generatesPostCommitAndDurableSubprocessScaffoldingThatCompiles(@TempDir final Path tempDir)
+	void generatesMutationConfigurationThatCompilesWithoutHandlers(@TempDir final Path tempDir)
 			throws IOException, InterruptedException
 	{
 		Path contentRoot = tempDir.resolve("src/main/java");
@@ -47,41 +49,44 @@ class CrudExtensionGenerationSmokeTest
 		var configuration = new CodeGenerationConfiguration(
 				new GenerationInputs(modelPath.toString(), null, null, null, null),
 				new LayerConcreteTypes(Map.of(), Map.of(), Map.of()),
-				GenerationSelection.defaults(),
+				new GenerationSelection(
+						Set.of(
+								TemplateGroup.COMMON.name(),
+								TemplateGroup.CONFIGURATION.name(),
+								TemplateGroup.DOMAIN_MODELS.name(),
+								TemplateGroup.DOMAIN_SUPPORT.name(),
+								TemplateGroup.API_DTOS.name(),
+								TemplateGroup.API_ADAPTERS.name(),
+								TemplateGroup.API_CONTROLLERS.name(),
+								TemplateGroup.PERSISTENCE_MODELS.name(),
+								TemplateGroup.PERSISTENCE_ADAPTERS.name(),
+								TemplateGroup.PERSISTENCE_REPOSITORIES.name(),
+								TemplateGroup.PERSISTENCE_HISTORY.name(),
+								TemplateGroup.SECURITY.name(),
+								TemplateGroup.USE_CASE_FETCH.name(),
+								TemplateGroup.USE_CASE_SAVE.name(),
+								TemplateGroup.USE_CASE_UPDATE.name(),
+								TemplateGroup.USE_CASE_DELETE.name(),
+								TemplateGroup.USE_CASE_MUTATION.name()),
+						Set.of(),
+						Set.of(),
+						Set.of(),
+						Set.of(),
+						Set.of()),
 				java.util.List.of(),
 				RootAggregateIdConfiguration.defaults(),
 				OwnershipConfiguration.defaults(),
 				new OverwriteConfiguration(true, Map.of(), Map.of(), Map.of(), Map.of()),
-				new PostCommitHookGenerationConfiguration(true, true, false),
-				new SubprocessGenerationConfiguration(true, false, true),
+				PostCommitHookGenerationConfiguration.defaults(),
+				SubprocessGenerationConfiguration.defaults(),
 				true);
 
 		assertEquals(0, orchestrator.generateCode(configuration));
 
-		assertTrue(Files.exists(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/postcommit/save/PersonSavePostCommitMutation.java")));
-		assertTrue(Files.exists(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/postcommit/update/PersonUpdatePostCommitMutation.java")));
-		assertTrue(Files.exists(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/person/useCases/process/crud/save/PersonSaveSubprocessConfiguration.java")));
-		assertTrue(Files.exists(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/person/useCases/process/crud/delete/PersonDeleteSubprocessExecutor.java")));
-
-		String definitionConfiguration = Files.readString(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/configuration/PersonCrudDefinitionConfiguration.java"));
-		String servicesConfiguration = Files.readString(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/person/useCases/crud/configuration/PersonCrudServicesConfiguration.java"));
-		String commonPersistenceConfiguration = Files.readString(contentRoot.resolve(
-				"de/gupta/clean/crud/implementation/examples/common/persistence/CommonPersistenceConfiguration.java"));
-
-		assertTrue(definitionConfiguration.contains(".postCommitMutation(postCommitMutation("));
-		assertTrue(definitionConfiguration.contains("case CREATE"));
-		assertTrue(definitionConfiguration.contains("case PUT, PATCH"));
-		assertTrue(servicesConfiguration.contains("saveSubprocessStartRequests"));
-		assertTrue(servicesConfiguration.contains("deleteSubprocessStartRequests"));
-		assertTrue(commonPersistenceConfiguration.contains("MutationQuarantineRecorder"));
-		assertTrue(commonPersistenceConfiguration.contains(
-				"withTransactionRunnerAndDurableProcessStarterExecutionNudgeAndMutationQuarantineRecorder"));
+		Path mutationConfiguration = contentRoot.resolve(
+				"de/gupta/clean/crud/implementation/examples/person/useCases/mutation/configuration/PersonMutationConfiguration.java");
+		assertTrue(Files.exists(mutationConfiguration));
+		assertTrue(Files.readString(mutationConfiguration).contains("MutationHandlerRegistry.of(handlers)"));
 
 		Files.writeString(tempDir.resolve("pom.xml"), pomXml(CLEANCRUD_VERSION));
 		assertEquals(0, compileGeneratedProject(tempDir));
@@ -115,7 +120,7 @@ class CrudExtensionGenerationSmokeTest
 				    </parent>
 				
 				    <groupId>de.gupta.clean.crud.generator.smoke</groupId>
-				    <artifactId>person-extension-generated-smoke</artifactId>
+				    <artifactId>person-mutation-generated-smoke</artifactId>
 				    <version>1.0.0-SNAPSHOT</version>
 				
 				    <properties>
